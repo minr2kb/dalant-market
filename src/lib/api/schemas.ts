@@ -1,0 +1,92 @@
+import { z } from 'zod'
+
+export const UserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  realName: z.string(),
+  birthDate: z.string(),
+  gender: z.enum(['male', 'female']),
+  createdAt: z.string(),
+})
+
+export const MarketSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  pointLabel: z.string(),
+  startsAt: z.string(),
+  endsAt: z.string(),
+  createdAt: z.string(),
+})
+
+export const MissionSlotSchema = z.object({
+  slot: z.number(),
+  verifiedByName: z.string().nullable(),
+  verifiedAt: z.string().nullable(),
+  photoUrl: z.string().nullable(),
+})
+
+export const MissionSchema = z.object({
+  id: z.string(),
+  marketId: z.string(),
+  title: z.string(),
+  type: z.enum(['upload', 'qr', 'admin_grant']),
+  isGroup: z.boolean(),
+  reward: z.number(),
+  limitCount: z.number(),
+  activeFrom: z.string().nullable(),
+  activeUntil: z.string().nullable(),
+  isActive: z.boolean(),
+  slots: z.array(MissionSlotSchema).optional(),
+})
+
+export const MarketParticipantSchema = z.object({
+  id: z.string(),
+  marketId: z.string(),
+  user: UserSchema,
+  role: z.enum(['admin', 'user']),
+  balance: z.number(),
+})
+
+export const OrderItemSchema = z.object({
+  name: z.string(),
+  price: z.number(),
+  qty: z.number(),
+})
+
+export const OrderSchema = z.object({
+  id: z.string(),
+  marketId: z.string(),
+  userId: z.string(),
+  verifiedByName: z.string(),
+  items: z.array(OrderItemSchema),
+  total: z.number(),
+  purchasedAt: z.string(),
+})
+
+export const PointLogSchema = z.object({
+  id: z.string(),
+  marketId: z.string(),
+  userId: z.string(),
+  amount: z.number(),
+  reasonType: z.enum(['mission', 'purchase', 'manual']),
+  missionTitle: z.string().optional(),
+  verifiedByName: z.string().optional(),
+  itemName: z.string().optional(),
+  orderId: z.string().optional(),
+  memo: z.string().optional(),
+  createdAt: z.string(),
+})
+
+export const MarketItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  price: z.number(),
+})
+
+// Response wrappers
+export const listOf = <T extends z.ZodTypeAny>(schema: T) =>
+  z.object({ data: z.array(schema) })
+
+export const oneOf = <T extends z.ZodTypeAny>(schema: T) =>
+  z.object({ data: schema })
