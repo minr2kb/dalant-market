@@ -81,7 +81,7 @@ export default function AdminItemsPage() {
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`rounded-full px-5 py-1.5 text-sm font-medium transition-colors ${
+            className={`h-9 rounded-full px-5 text-sm font-medium transition-colors ${
               tab === t ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-500'
             }`}
           >
@@ -219,8 +219,7 @@ export default function AdminItemsPage() {
             />
             <Button
               onClick={addItem}
-              size="sm"
-              className="shrink-0 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600"
+              className="h-10 w-10 shrink-0 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600"
             >
               <Plus className="h-4 w-4" />
             </Button>

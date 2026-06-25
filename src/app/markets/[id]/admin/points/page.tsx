@@ -53,21 +53,19 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
         {/* 지급 설정 */}
         <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
           <p className="text-sm font-semibold text-gray-700">지급 설정</p>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              placeholder="달란트 수량"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="rounded-xl w-36 text-center tabular-nums text-base font-bold"
-            />
-            <Input
-              placeholder="메모 (예: 팀전 우승)"
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              className="rounded-xl flex-1"
-            />
-          </div>
+          <Input
+            type="number"
+            placeholder="달란트 수량"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-12 rounded-xl text-center tabular-nums text-lg font-bold"
+          />
+          <Input
+            placeholder="메모 (예: 팀전 우승)"
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            className="rounded-xl"
+          />
           <div className="flex gap-2">
             <Button
               onClick={() => apply(1)}

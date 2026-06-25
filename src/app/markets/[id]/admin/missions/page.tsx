@@ -97,8 +97,7 @@ export default function AdminMissionsPage() {
 						setForm(EMPTY_FORM);
 						setShowForm(!showForm);
 					}}
-					size="sm"
-					className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+					className="h-10 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 text-sm"
 				>
 					<Plus className="mr-1 h-4 w-4" />
 					미션 추가
@@ -150,7 +149,7 @@ export default function AdminMissionsPage() {
 									onClick={() =>
 										setForm(f => ({ ...f, type: t }))
 									}
-									className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+									className={`rounded-full px-3 py-2 text-xs font-medium transition-colors ${
 										form.type === t
 											? "bg-emerald-500 text-white"
 											: "bg-white text-gray-500 border border-gray-200"
@@ -163,21 +162,19 @@ export default function AdminMissionsPage() {
 					</div>
 					<div className="flex gap-2">
 						<Button
-							size="sm"
 							onClick={submitForm}
-							className="flex-1 rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+							className="h-10 flex-1 rounded-full bg-emerald-500 text-sm text-white hover:bg-emerald-600"
 						>
 							{editingId ? "저장" : "추가"}
 						</Button>
 						<Button
-							size="sm"
 							variant="outline"
 							onClick={() => {
 								setShowForm(false);
 								setEditingId(null);
 								setForm(EMPTY_FORM);
 							}}
-							className="rounded-full"
+							className="h-10 rounded-full text-sm"
 						>
 							취소
 						</Button>
@@ -265,7 +262,7 @@ export default function AdminMissionsPage() {
 									<button
 										type="button"
 										onClick={() => startEdit(mission)}
-										className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
+										className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50"
 									>
 										<Pencil className="h-3 w-3" /> 수정
 									</button>
@@ -274,7 +271,7 @@ export default function AdminMissionsPage() {
 										onClick={() =>
 											deleteMission(mission.id)
 										}
-										className="flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-500 hover:bg-rose-100"
+										className="flex items-center gap-1.5 rounded-full border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-500 hover:bg-rose-100"
 									>
 										<Trash2 className="h-3 w-3" /> 삭제
 									</button>

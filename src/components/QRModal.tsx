@@ -20,7 +20,7 @@ export function QRModal({ missionTitle, disabled = false }: QRModalProps) {
       <Button
         onClick={() => setOpen(true)}
         disabled={disabled}
-        className="w-full rounded-full bg-emerald-500 py-3 text-base font-medium text-white hover:bg-emerald-600 disabled:opacity-40"
+        className="h-12 w-full rounded-full bg-emerald-500 text-base font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
       >
         <QrCode className="mr-2 h-5 w-5" />
         QR 생성하기
