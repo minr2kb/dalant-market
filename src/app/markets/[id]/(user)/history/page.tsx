@@ -1,10 +1,11 @@
 import { PointLogItem } from '@/components/PointLogItem'
-import { MOCK_POINT_LOGS, MOCK_CURRENT_USER, MOCK_MARKET } from '@/lib/mock-data'
+import { MOCK_POINT_LOGS, MOCK_CURRENT_USER, MOCK_MARKET, MOCK_ORDERS } from '@/lib/mock-data'
 
 export default async function HistoryPage(props: PageProps<'/markets/[id]/history'>) {
   await props.params
   const balance = MOCK_CURRENT_USER.balance
   const market = MOCK_MARKET
+  const orderMap = Object.fromEntries(MOCK_ORDERS.map((o) => [o.id, o]))
 
   return (
     <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
@@ -20,7 +21,11 @@ export default async function HistoryPage(props: PageProps<'/markets/[id]/histor
 
       <div className="divide-y divide-gray-50">
         {MOCK_POINT_LOGS.map((log) => (
-          <PointLogItem key={log.id} log={log} />
+          <PointLogItem
+            key={log.id}
+            log={log}
+            order={log.orderId ? orderMap[log.orderId] : undefined}
+          />
         ))}
       </div>
     </div>

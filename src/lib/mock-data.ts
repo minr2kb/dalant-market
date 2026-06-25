@@ -192,7 +192,8 @@ export const MOCK_POINT_LOGS: PointLog[] = [
     userId: 'u1',
     amount: -8,
     reasonType: 'purchase',
-    itemName: '아이스크림 세트',
+    itemName: '아이스크림 세트 외 1건',
+    orderId: 'o1',
     createdAt: '2025-08-01T15:00:00Z',
   },
   {
@@ -231,6 +232,7 @@ export const MOCK_POINT_LOGS: PointLog[] = [
     amount: -5,
     reasonType: 'purchase',
     itemName: '음료수',
+    orderId: 'o2',
     createdAt: '2025-08-02T13:00:00Z',
   },
 ]

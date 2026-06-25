@@ -69,6 +69,7 @@ export interface PointLog {
   missionTitle?: string
   verifiedByName?: string
   itemName?: string
+  orderId?: string
   memo?: string
   createdAt: string
 }

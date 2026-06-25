@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
 import { MOCK_CURRENT_USER, MOCK_MARKET, MOCK_POINT_LOGS } from '@/lib/mock-data'
+import { PayQRButton } from '@/components/PayQRButton'
 
 export default async function UserHomePage(props: PageProps<'/markets/[id]/home'>) {
   const { id } = await props.params
@@ -17,10 +18,13 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
         </div>
       </div>
 
-      <div className="rounded-3xl bg-emerald-500 p-6 text-white space-y-1">
-        <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
-        <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
-        <p className="text-sm opacity-70">{market.pointLabel}</p>
+      <div className="space-y-3">
+        <div className="rounded-3xl bg-emerald-500 p-6 text-white space-y-1">
+          <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
+          <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
+          <p className="text-sm opacity-70">{market.pointLabel}</p>
+        </div>
+        <PayQRButton userName={user.user.realName} />
       </div>
 
       <div className="space-y-3">

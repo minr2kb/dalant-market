@@ -2,22 +2,23 @@ import { MissionCard } from '@/components/MissionCard'
 import { MOCK_MISSIONS } from '@/lib/mock-data'
 import { getMissionStatus, type MissionStatus } from '@/types'
 
-const STATUS_LABEL: Record<MissionStatus, string> = {
+type VisibleStatus = Extract<MissionStatus, 'active' | 'past'>
+
+const STATUS_LABEL: Record<VisibleStatus, string> = {
   active: '진행중',
-  upcoming: '예정',
   past: '지남',
 }
 
 export default async function MissionsPage(props: PageProps<'/markets/[id]/missions'>) {
   const { id } = await props.params
   const searchParams = await props.searchParams
-  const status = (searchParams?.status as MissionStatus) ?? 'active'
+  const raw = searchParams?.status as MissionStatus | undefined
+  const status: VisibleStatus = raw === 'past' ? 'past' : 'active'
 
   const filtered = MOCK_MISSIONS.filter((m) => getMissionStatus(m) === status)
 
-  const counts = {
+  const counts: Record<VisibleStatus, number> = {
     active: MOCK_MISSIONS.filter((m) => getMissionStatus(m) === 'active').length,
-    upcoming: MOCK_MISSIONS.filter((m) => getMissionStatus(m) === 'upcoming').length,
     past: MOCK_MISSIONS.filter((m) => getMissionStatus(m) === 'past').length,
   }
 
@@ -26,7 +27,7 @@ export default async function MissionsPage(props: PageProps<'/markets/[id]/missi
       <h1 className="text-xl font-bold text-gray-900">미션</h1>
 
       <div className="flex gap-2">
-        {(['active', 'upcoming', 'past'] as MissionStatus[]).map((s) => (
+        {(['active', 'past'] as VisibleStatus[]).map((s) => (
           <a
             key={s}
             href={`/markets/${id}/missions?status=${s}`}
@@ -51,9 +52,7 @@ export default async function MissionsPage(props: PageProps<'/markets/[id]/missi
       <div className="space-y-3">
         {filtered.length === 0 ? (
           <div className="py-12 text-center text-sm text-gray-400">
-            {status === 'active' && '진행중인 미션이 없어요'}
-            {status === 'upcoming' && '예정된 미션이 없어요'}
-            {status === 'past' && '지난 미션이 없어요'}
+            {status === 'active' ? '진행중인 미션이 없어요' : '지난 미션이 없어요'}
           </div>
         ) : (
           filtered.map((mission) => (
