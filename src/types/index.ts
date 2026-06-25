@@ -37,6 +37,8 @@ export interface MissionSlotData {
   photoUrl: string | null
 }
 
+export type MissionStatus = 'active' | 'upcoming' | 'past'
+
 export interface Mission {
   id: string
   marketId: string
@@ -48,8 +50,14 @@ export interface Mission {
   activeFrom: string | null
   activeUntil: string | null
   isActive: boolean
-  period: '2weeks' | '1week' | 'retreat'
   slots?: MissionSlotData[]
+}
+
+export function getMissionStatus(mission: Mission): MissionStatus {
+  const now = new Date()
+  if (mission.activeUntil && new Date(mission.activeUntil) < now) return 'past'
+  if (mission.activeFrom && new Date(mission.activeFrom) > now) return 'upcoming'
+  return 'active'
 }
 
 export interface PointLog {
