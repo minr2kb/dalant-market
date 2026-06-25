@@ -2,14 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Home, ListTodo, History, User, QrCode, Wallet, Users, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { LucideIcon } from 'lucide-react'
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Home, ListTodo, History, User, QrCode, Wallet, Users,
+}
 
 export interface TabItem {
   label: string
   segment: string
   href: string
-  icon: LucideIcon
+  icon: string
 }
 
 interface FloatingTabBarProps {
@@ -24,7 +28,7 @@ export function FloatingTabBar({ tabs }: FloatingTabBarProps) {
       <div className="flex items-center justify-around rounded-full border border-gray-100 bg-white px-2 py-2 shadow-2xl">
         {tabs.map((tab) => {
           const isActive = pathname.includes(tab.segment)
-          const Icon = tab.icon
+          const Icon = ICON_MAP[tab.icon] ?? Home
           return (
             <Link
               key={tab.href}
