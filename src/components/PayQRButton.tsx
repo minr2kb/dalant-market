@@ -14,7 +14,7 @@ export function PayQRButton({ userName }: { userName: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white py-3.5 text-sm font-semibold text-emerald-600 transition-colors hover:bg-emerald-50 active:scale-95"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white text-sm font-semibold text-emerald-600 transition-colors hover:bg-emerald-50 active:scale-95"
       >
         <Wallet className="h-4 w-4" />
         달란트 사용하기
