@@ -1,39 +1,18 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Plus, Minus } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { ChevronLeft } from 'lucide-react'
 import { PointLogItem } from '@/components/PointLogItem'
 import { MOCK_PARTICIPANTS, MOCK_POINT_LOGS, MOCK_MISSIONS } from '@/lib/mock-data'
-import { use } from 'react'
 
-export default function AdminUserDetailPage(
+export default async function AdminUserDetailPage(
   props: PageProps<'/markets/[id]/admin/users/[userId]'>,
 ) {
-  const { id, userId } = use(props.params)
+  const { id, userId } = await props.params
   const participant =
     MOCK_PARTICIPANTS.find((p) => p.user.id === userId) ?? MOCK_PARTICIPANTS[0]
   const userLogs = MOCK_POINT_LOGS.filter((l) => l.userId === participant.user.id)
   const completedMissions = MOCK_MISSIONS.filter((m) =>
     m.slots?.some((s) => s.verifiedAt !== null),
   )
-
-  const [amount, setAmount] = useState('')
-  const [memo, setMemo] = useState('')
-  const [balance, setBalance] = useState(participant.balance)
-  const [applied, setApplied] = useState(false)
-
-  function applyPoints(sign: 1 | -1) {
-    const n = Number(amount)
-    if (!n) return
-    setBalance((b) => b + sign * n)
-    setAmount('')
-    setMemo('')
-    setApplied(true)
-    setTimeout(() => setApplied(false), 1500)
-  }
 
   return (
     <div className="min-h-svh bg-white">
@@ -50,11 +29,12 @@ export default function AdminUserDetailPage(
       </div>
 
       <div className="px-4 max-w-lg mx-auto space-y-6">
-        {/* 잔액 카드 */}
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-emerald-50 p-4 space-y-1">
             <p className="text-xs font-medium text-emerald-600">달란트 잔액</p>
-            <p className="text-2xl font-bold tabular-nums text-emerald-700">{balance}</p>
+            <p className="text-2xl font-bold tabular-nums text-emerald-700">
+              {participant.balance}
+            </p>
           </div>
           <div className="rounded-2xl bg-gray-50 p-4 space-y-1">
             <p className="text-xs font-medium text-gray-500">미션 완료</p>
@@ -64,47 +44,6 @@ export default function AdminUserDetailPage(
           </div>
         </div>
 
-        {/* 달란트 수동 조정 */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
-          <p className="text-sm font-semibold text-gray-700">달란트 수동 조정</p>
-          <div className="flex gap-2">
-            <Input
-              type="number"
-              placeholder="수량"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="rounded-xl w-28 text-center tabular-nums"
-            />
-            <Input
-              placeholder="메모 (선택)"
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
-              className="rounded-xl flex-1"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => applyPoints(1)}
-              disabled={!amount}
-              className="flex-1 h-11 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 gap-1.5 disabled:opacity-40"
-            >
-              <Plus className="h-4 w-4" /> 지급
-            </Button>
-            <Button
-              onClick={() => applyPoints(-1)}
-              disabled={!amount}
-              variant="outline"
-              className="flex-1 h-11 rounded-xl border-rose-200 text-rose-500 hover:bg-rose-50 gap-1.5 disabled:opacity-40"
-            >
-              <Minus className="h-4 w-4" /> 차감
-            </Button>
-          </div>
-          {applied && (
-            <p className="text-xs text-center font-medium text-emerald-500">적용됐어요</p>
-          )}
-        </div>
-
-        {/* 달란트 내역 */}
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-gray-700">달란트 내역</h2>
           <div className="divide-y divide-gray-50 rounded-2xl border border-gray-100 bg-white px-4">
@@ -116,7 +55,6 @@ export default function AdminUserDetailPage(
           </div>
         </div>
 
-        {/* 미션 현황 */}
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-gray-700">미션 현황</h2>
           <div className="space-y-2">

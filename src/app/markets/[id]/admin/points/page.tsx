@@ -1,130 +1,158 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
+import { ChevronLeft, CheckSquare, Square, Plus, Minus, CheckCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2 } from 'lucide-react'
 import { MOCK_PARTICIPANTS } from '@/lib/mock-data'
+import { use } from 'react'
 
-type Mode = 'grant' | 'deduct'
+export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/points'>) {
+  const { id } = use(props.params)
+  const participants = MOCK_PARTICIPANTS
 
-export default function PointsManagePage() {
-  const [selectedUserId, setSelectedUserId] = useState<string>('')
-  const [mode, setMode] = useState<Mode>('grant')
+  const [selected, setSelected] = useState<Set<string>>(new Set())
   const [amount, setAmount] = useState('')
   const [memo, setMemo] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+  const [done, setDone] = useState(false)
 
-  const selectedUser = MOCK_PARTICIPANTS.find((p) => p.user.id === selectedUserId)
-  const canSubmit = selectedUserId && Number(amount) > 0
+  const allSelected = selected.size === participants.length
+  const n = Number(amount)
 
-  function handleSubmit() {
-    if (!canSubmit) return
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setAmount('')
-      setMemo('')
-      setSelectedUserId('')
-    }, 2000)
+  function toggleAll() {
+    setSelected(
+      allSelected ? new Set() : new Set(participants.map((p) => p.user.id))
+    )
+  }
+
+  function toggle(uid: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      next.has(uid) ? next.delete(uid) : next.add(uid)
+      return next
+    })
+  }
+
+  function apply(sign: 1 | -1) {
+    if (!n || selected.size === 0) return
+    setDone(true)
+    setTimeout(() => setDone(false), 2000)
   }
 
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-6">
-      <h1 className="text-xl font-bold text-gray-900">달란트 수동 관리</h1>
+    <div className="min-h-svh bg-white">
+      <div className="flex items-center gap-3 px-4 pt-14 pb-4">
+        <Link href={`/markets/${id}/admin/home`} className="text-gray-400">
+          <ChevronLeft className="h-6 w-6" />
+        </Link>
+        <h1 className="text-lg font-bold text-gray-900">달란트 일괄 지급</h1>
+      </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">참여자 선택</label>
-        <div className="grid grid-cols-2 gap-2">
-          {MOCK_PARTICIPANTS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => setSelectedUserId(p.user.id)}
-              className={`rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
-                selectedUserId === p.user.id
-                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                  : 'border-gray-100 bg-white text-gray-700'
-              }`}
+      <div className="px-4 max-w-lg mx-auto space-y-5">
+        {/* 지급 설정 */}
+        <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
+          <p className="text-sm font-semibold text-gray-700">지급 설정</p>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              placeholder="달란트 수량"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="rounded-xl w-36 text-center tabular-nums text-base font-bold"
+            />
+            <Input
+              placeholder="메모 (예: 팀전 우승)"
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              className="rounded-xl flex-1"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => apply(1)}
+              disabled={!n || selected.size === 0}
+              className="flex-1 h-11 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 gap-1.5 font-semibold disabled:opacity-40"
             >
-              <p className="font-medium">{p.user.realName}</p>
-              <p className="text-xs text-gray-400">잔액 {p.balance}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">처리 유형</label>
-        <div className="flex gap-2">
-          {(['grant', 'deduct'] as Mode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={`flex-1 rounded-full py-2.5 text-sm font-medium transition-colors ${
-                mode === m
-                  ? m === 'grant'
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-rose-500 text-white'
-                  : 'bg-gray-100 text-gray-500'
-              }`}
+              <Plus className="h-4 w-4" />
+              {selected.size > 0 && n ? `${selected.size}명에게 +${n} 지급` : '지급'}
+            </Button>
+            <Button
+              onClick={() => apply(-1)}
+              disabled={!n || selected.size === 0}
+              variant="outline"
+              className="flex-1 h-11 rounded-xl border-rose-200 text-rose-500 hover:bg-rose-50 gap-1.5 font-semibold disabled:opacity-40"
             >
-              {m === 'grant' ? '지급' : '차감'}
-            </button>
-          ))}
+              <Minus className="h-4 w-4" />
+              {selected.size > 0 && n ? `${selected.size}명에게 -${n} 차감` : '차감'}
+            </Button>
+          </div>
+          {done && (
+            <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm font-medium text-emerald-600">
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              {selected.size}명에게 적용됐어요
+            </div>
+          )}
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">달란트 수량</label>
-        <Input
-          type="number"
-          placeholder="0"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          min="1"
-          className="rounded-xl text-base"
-        />
-        {selectedUser && amount && (
-          <p className="text-xs text-gray-400">
-            처리 후 잔액:{' '}
-            {mode === 'grant'
-              ? selectedUser.balance + Number(amount)
-              : selectedUser.balance - Number(amount)}{' '}
-            달란트
-          </p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-700">사유 (선택)</label>
-        <Input
-          placeholder="예: 출석 보너스, 미션 취소 등"
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          className="rounded-xl"
-        />
-      </div>
-
-      {submitted ? (
-        <div className="flex items-center justify-center gap-2 rounded-full bg-emerald-50 py-3 text-sm font-medium text-emerald-600">
-          <CheckCircle2 className="h-4 w-4" />
-          처리 완료
-        </div>
-      ) : (
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          className={`w-full rounded-full py-3 text-base font-medium text-white disabled:opacity-40 ${
-            mode === 'grant'
-              ? 'bg-emerald-500 hover:bg-emerald-600'
-              : 'bg-rose-500 hover:bg-rose-600'
-          }`}
+        {/* 전체 선택 */}
+        <button
+          type="button"
+          onClick={toggleAll}
+          className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-left hover:bg-gray-50"
         >
-          {mode === 'grant' ? '달란트 지급' : '달란트 차감'}
-        </Button>
-      )}
+          {allSelected
+            ? <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
+            : <Square className="h-5 w-5 text-gray-300 shrink-0" />
+          }
+          <span className="text-sm font-semibold text-gray-700">
+            전체 선택 ({selected.size}/{participants.length})
+          </span>
+        </button>
+
+        {/* 유저 목록 */}
+        <div className="space-y-2">
+          {participants.map((p) => {
+            const isSelected = selected.has(p.user.id)
+            return (
+              <button
+                key={p.user.id}
+                type="button"
+                onClick={() => toggle(p.user.id)}
+                className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${
+                  isSelected
+                    ? 'border-emerald-200 bg-emerald-50'
+                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                }`}
+              >
+                {isSelected
+                  ? <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
+                  : <Square className="h-5 w-5 text-gray-300 shrink-0" />
+                }
+                <div className="flex min-w-0 flex-1 items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
+                      {p.user.realName[0]}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
+                      {p.role === 'admin' && (
+                        <span className="text-[10px] text-purple-500">관리자</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold tabular-nums text-emerald-500">{p.balance}</p>
+                    {n > 0 && isSelected && (
+                      <p className="text-xs tabular-nums text-gray-400">→ {p.balance + n}</p>
+                    )}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }

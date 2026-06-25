@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { QrCode, User } from 'lucide-react'
+import { QrCode, Coins, User } from 'lucide-react'
 import { MOCK_MARKET, MOCK_PARTICIPANTS } from '@/lib/mock-data'
 
 export default async function AdminHomePage(props: PageProps<'/markets/[id]/admin/home'>) {
@@ -22,14 +22,25 @@ export default async function AdminHomePage(props: PageProps<'/markets/[id]/admi
         </Link>
       </div>
 
-      <Link
-        href={`/markets/${id}/admin/scan`}
-        className="flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-transform active:scale-95"
-      >
-        <QrCode className="h-7 w-7" />
-        QR 스캔
-      </Link>
+      {/* 주요 액션 */}
+      <div className="grid grid-cols-2 gap-3">
+        <Link
+          href={`/markets/${id}/admin/scan`}
+          className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-6 text-white shadow-lg shadow-emerald-200 transition-transform active:scale-95"
+        >
+          <QrCode className="h-8 w-8" />
+          <span className="text-sm font-bold">QR 스캔</span>
+        </Link>
+        <Link
+          href={`/markets/${id}/admin/points`}
+          className="flex flex-col items-center justify-center gap-2 rounded-2xl bg-purple-500 py-6 text-white shadow-lg shadow-purple-200 transition-transform active:scale-95"
+        >
+          <Coins className="h-8 w-8" />
+          <span className="text-sm font-bold">달란트 지급</span>
+        </Link>
+      </div>
 
+      {/* 참여자 현황 */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">참여자 달란트 현황</h2>
         <div className="overflow-hidden rounded-2xl border border-gray-100">
