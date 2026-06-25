@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { QrCode } from 'lucide-react'
+import { QrCode, User } from 'lucide-react'
 import { MOCK_MARKET, MOCK_PARTICIPANTS } from '@/lib/mock-data'
 
 export default async function AdminHomePage(props: PageProps<'/markets/[id]/admin/home'>) {
@@ -8,9 +8,18 @@ export default async function AdminHomePage(props: PageProps<'/markets/[id]/admi
 
   return (
     <div className="px-4 pt-14 max-w-lg mx-auto space-y-6">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-500">관리자</p>
-        <h1 className="text-xl font-bold text-gray-900">{MOCK_MARKET.title}</h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-500">관리자</p>
+          <h1 className="text-xl font-bold text-gray-900">{MOCK_MARKET.title}</h1>
+        </div>
+        <Link
+          href={`/markets/${id}/home`}
+          className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50"
+        >
+          <User className="h-3.5 w-3.5" />
+          유저 화면
+        </Link>
       </div>
 
       <Link

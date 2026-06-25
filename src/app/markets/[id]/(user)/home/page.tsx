@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
 import { MOCK_CURRENT_USER, MOCK_MARKET, MOCK_POINT_LOGS } from '@/lib/mock-data'
 import { PayQRButton } from '@/components/PayQRButton'
+import { AdminAccessButton } from '@/components/AdminAccessButton'
 
 export default async function UserHomePage(props: PageProps<'/markets/[id]/home'>) {
   const { id } = await props.params
@@ -25,6 +26,7 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
           <p className="text-sm opacity-70">{market.pointLabel}</p>
         </div>
         <PayQRButton userName={user.user.realName} />
+        <AdminAccessButton marketId={id} />
       </div>
 
       <div className="space-y-3">
