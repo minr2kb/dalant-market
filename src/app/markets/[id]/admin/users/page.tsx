@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { MOCK_PARTICIPANTS, MOCK_MISSIONS } from '@/lib/mock-data'
 
 export default async function AdminUsersPage(props: PageProps<'/markets/[id]/admin/users'>) {
@@ -12,10 +13,10 @@ export default async function AdminUsersPage(props: PageProps<'/markets/[id]/adm
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <input
+        <Input
           type="search"
           placeholder="이름으로 검색"
-          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm outline-none focus:border-emerald-400"
+          className="rounded-xl pl-9"
         />
       </div>
 
