@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { QrCode, X, Wallet } from 'lucide-react'
+import { useModalHistory } from '@/hooks/use-modal-history'
 
 export function PayQRButton({ userName }: { userName: string }) {
   const [open, setOpen] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
+  useModalHistory(open, close)
 
   return (
     <>
@@ -18,8 +21,8 @@ export function PayQRButton({ userName }: { userName: string }) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
-          <div className="w-full max-w-sm rounded-t-3xl bg-white p-6 space-y-5 sm:rounded-3xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 space-y-5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-gray-400">결제용 QR</p>
@@ -27,7 +30,7 @@ export function PayQRButton({ userName }: { userName: string }) {
               </div>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => window.history.back()}
                 className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100"
               >
                 <X className="h-5 w-5" />

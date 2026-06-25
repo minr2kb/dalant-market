@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { QrCode, X } from 'lucide-react'
+import { useModalHistory } from '@/hooks/use-modal-history'
 
 interface QRModalProps {
   missionTitle: string
@@ -11,6 +12,8 @@ interface QRModalProps {
 
 export function QRModal({ missionTitle, disabled = false }: QRModalProps) {
   const [open, setOpen] = useState(false)
+  const close = useCallback(() => setOpen(false), [])
+  useModalHistory(open, close)
 
   return (
     <>
@@ -30,7 +33,7 @@ export function QRModal({ missionTitle, disabled = false }: QRModalProps) {
               <h3 className="font-bold text-gray-900">{missionTitle}</h3>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => window.history.back()}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />

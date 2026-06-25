@@ -45,6 +45,22 @@
 - `'upcoming'`: `activeFrom > now` (UI에 탭 노출 안 함)
 - `'past'`: `activeUntil < now`
 
+## 모달 규칙
+
+**모든 모달은 뒤로가기로 닫혀야 한다.**
+
+`useModalHistory(open, close)` 훅(`src/hooks/use-modal-history.ts`)을 반드시 사용한다.
+
+```tsx
+const [open, setOpen] = useState(false)
+const close = useCallback(() => setOpen(false), [])
+useModalHistory(open, close)      // 열릴 때 pushState, popstate로 close 연결
+```
+
+- X 버튼 / 배경 클릭 닫기: `setOpen(false)` ❌ → `window.history.back()` ✅
+- 모달 내부에서 직접 `setOpen(false)`를 호출하면 history 스택이 남아 다음 뒤로가기가 어긋남
+- 새 모달을 만들 때도 동일하게 적용할 것
+
 ## 스타일링
 
 - Tailwind CSS v4 — `tailwind.config.js` 없음, `@import "tailwindcss"` in CSS
