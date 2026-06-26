@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
-import { MOCK_MARKET } from '@/lib/mock-data'
+import { supabase } from '@/lib/supabase'
+import { mapMarket } from '@/lib/db'
 
 export async function GET(
   _req: Request,
-  props: { params: Promise<{ marketId: string }> }
+  props: { params: Promise<{ marketId: string }> },
 ) {
   const { marketId } = await props.params
-  if (marketId !== MOCK_MARKET.id) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  return NextResponse.json({ data: MOCK_MARKET })
+  const { data, error } = await supabase
+    .from('markets')
+    .select('*')
+    .eq('id', marketId)
+    .single()
+  if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  return NextResponse.json({ data: mapMarket(data) })
 }

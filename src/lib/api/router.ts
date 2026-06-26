@@ -15,6 +15,7 @@ import {
 const marketId = z.object({ marketId: z.string() })
 const marketAndUser = z.object({ marketId: z.string(), userId: z.string() })
 const marketAndMission = z.object({ marketId: z.string(), missionId: z.string() })
+const marketAndItem = z.object({ marketId: z.string(), itemId: z.string() })
 
 export const marketsRouter = defineRouter('/api/markets', {
   list: endpoint({
@@ -82,6 +83,49 @@ export const missionsRouter = defineRouter('/api/markets', {
     path: '/:marketId/missions/:missionId',
     request: { path: marketAndMission },
     response: oneOf(MissionSchema),
+  }),
+  create: endpoint({
+    method: 'POST',
+    path: '/:marketId/missions',
+    request: {
+      path: marketId,
+      body: z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        type: z.enum(['user_qr', 'upload', 'admin_qr', 'manual']),
+        isGroup: z.boolean(),
+        reward: z.number(),
+        limitCount: z.number().nullable(),
+        activeFrom: z.string().nullable(),
+        activeUntil: z.string().nullable(),
+      }),
+    },
+    response: oneOf(MissionSchema),
+  }),
+  update: endpoint({
+    method: 'PATCH',
+    path: '/:marketId/missions/:missionId',
+    request: {
+      path: marketAndMission,
+      body: z.object({
+        title: z.string().optional(),
+        description: z.string().optional(),
+        type: z.enum(['user_qr', 'upload', 'admin_qr', 'manual']).optional(),
+        isGroup: z.boolean().optional(),
+        reward: z.number().optional(),
+        limitCount: z.number().nullable().optional(),
+        activeFrom: z.string().nullable().optional(),
+        activeUntil: z.string().nullable().optional(),
+        isActive: z.boolean().optional(),
+      }),
+    },
+    response: oneOf(MissionSchema),
+  }),
+  delete: endpoint({
+    method: 'DELETE',
+    path: '/:marketId/missions/:missionId',
+    request: { path: marketAndMission },
+    response: oneOf(z.object({ id: z.string() })),
   }),
   verify: endpoint({
     method: 'POST',
@@ -161,6 +205,21 @@ export const itemsRouter = defineRouter('/api/markets', {
     path: '/:marketId/items',
     request: { path: marketId },
     response: listOf(MarketItemSchema),
+  }),
+  create: endpoint({
+    method: 'POST',
+    path: '/:marketId/items',
+    request: {
+      path: marketId,
+      body: z.object({ name: z.string(), price: z.number() }),
+    },
+    response: oneOf(MarketItemSchema),
+  }),
+  delete: endpoint({
+    method: 'DELETE',
+    path: '/:marketId/items/:itemId',
+    request: { path: marketAndItem },
+    response: oneOf(z.object({ id: z.string() })),
   }),
 })
 

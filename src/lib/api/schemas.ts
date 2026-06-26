@@ -30,6 +30,7 @@ export const MissionSchema = z.object({
   id: z.string(),
   marketId: z.string(),
   title: z.string(),
+  description: z.string().optional(),
   type: z.enum(['user_qr', 'upload', 'admin_qr', 'manual']),
   isGroup: z.boolean(),
   reward: z.number(),
