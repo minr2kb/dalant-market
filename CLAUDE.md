@@ -92,6 +92,19 @@ useModalHistory(open, close)      // 열릴 때 pushState, popstate로 close 연
 - `Button`에 `py-*`만으로 높이 지정 → 반드시 `h-*` 병행
 - `size="sm"` → 높이가 36px 이하로 떨어지므로 사용 금지 (탭 pill 제외)
 
+## FloatingTabBar · Nav 클리어런스
+
+- TabBar: `fixed bottom-4 left-4 right-4 z-50 rounded-full` — 뷰포트 하단 약 86px 차지
+- 레이아웃 `<main>`: **`min-h-svh pb-28`** — `<main>` 자체가 최소 뷰포트 높이를 보장하고 112px 여백으로 nav 가림 방지
+- 페이지 root div: **`min-h-svh` 사용 금지** — 레이아웃 `<main>`이 이미 처리하므로 페이지에서 중복 설정하면 `pb-28`이 div 밖으로 밀려 하단 콘텐츠가 가려짐
+- 예외: `admin/scan` 같은 full-screen 고정 오버레이 페이지는 별도 처리
+
+```
+✅ 레이아웃:  <main className="min-h-svh pb-28">
+✅ 페이지:    <div className="bg-white">
+❌ 페이지:    <div className="min-h-svh bg-white">  ← nav가 콘텐츠 가림
+```
+
 ## 스타일링
 
 - Tailwind CSS v4 — `tailwind.config.js` 없음, `@import "tailwindcss"` in CSS

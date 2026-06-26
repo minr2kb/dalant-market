@@ -41,7 +41,7 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
   }
 
   return (
-    <div className="min-h-svh bg-white">
+    <div className="bg-white">
       <div className="flex items-center gap-3 px-4 pt-14 pb-4">
         <Link href={`/markets/${id}/admin/home`} className="text-gray-400">
           <ChevronLeft className="h-6 w-6" />

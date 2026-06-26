@@ -53,7 +53,7 @@ export function MissionCard({ mission, marketId }: MissionCardProps) {
           </div>
         </div>
 
-        {mission.limitCount > 1 && mission.slots && (
+        {mission.limitCount != null && mission.limitCount > 1 && mission.slots && (
           <div className="flex gap-1.5">
             {mission.slots.map((slot) => (
               <div
@@ -67,7 +67,7 @@ export function MissionCard({ mission, marketId }: MissionCardProps) {
           </div>
         )}
 
-        {mission.limitCount > 1 && (
+        {mission.limitCount != null && mission.limitCount > 1 && (
           <p className="text-xs text-gray-400">
             {completedCount}/{mission.limitCount}회 완료
           </p>
