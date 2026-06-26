@@ -61,6 +61,24 @@ useModalHistory(open, close)      // 열릴 때 pushState, popstate로 close 연
 - 모달 내부에서 직접 `setOpen(false)`를 호출하면 history 스택이 남아 다음 뒤로가기가 어긋남
 - 새 모달을 만들 때도 동일하게 적용할 것
 
+## 버튼·입력 높이 규칙
+
+**모든 인터랙티브 요소는 shadcn/ui 기반으로 작성한다.**
+
+| 요소 | 최소 높이 | 비고 |
+|------|-----------|------|
+| 주요 액션 `Button` (CTA, 확인, 제출) | `h-12` (48px) | `py-*` 단독 사용 금지 |
+| 보조 `Button` (취소, 보조 액션) | `h-10` (40px) | |
+| `Input` (텍스트, 숫자, 검색) | `h-12` (48px) | `py-*`로 높이 지정 금지 |
+| 탭 pill (토글형 선택) | `h-9` (36px) | 네이티브 `<button>` 허용 |
+| 카드형 선택지 (성별, 옵션 카드 등) | 자유 (`py-6` 등) | 카드 전체가 터치 영역 |
+| 아이콘 전용 버튼 (삭제, 추가 아이콘) | `h-8`~`h-10` | 네이티브 `<button>` 허용 |
+
+**금지 패턴**
+- `<input>` 네이티브 태그 직접 사용 → `<Input>` (shadcn)으로 교체
+- `Button`에 `py-*`만으로 높이 지정 → 반드시 `h-*` 병행
+- `size="sm"` → 높이가 36px 이하로 떨어지므로 사용 금지 (탭 pill 제외)
+
 ## 스타일링
 
 - Tailwind CSS v4 — `tailwind.config.js` 없음, `@import "tailwindcss"` in CSS

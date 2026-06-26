@@ -61,7 +61,7 @@ export default function OnboardingPage() {
             placeholder="홍길동"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="rounded-xl border-gray-200 py-3 text-base"
+            className="h-12 rounded-xl border-gray-200 text-base"
             autoFocus
           />
         </div>
@@ -81,7 +81,7 @@ export default function OnboardingPage() {
               setBirthDate(v)
             }}
             maxLength={10}
-            className="rounded-xl border-gray-200 py-3 text-base"
+            className="h-12 rounded-xl border-gray-200 text-base"
             autoFocus
           />
         </div>
@@ -116,7 +116,7 @@ export default function OnboardingPage() {
         <Button
           onClick={handleNext}
           disabled={!canProceed}
-          className="w-full rounded-full bg-emerald-500 py-3 text-base font-medium text-white hover:bg-emerald-600 disabled:opacity-40"
+          className="h-12 w-full rounded-full bg-emerald-500 text-base font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
         >
           {step === 3 ? '완료하고 시작하기' : '다음'}
         </Button>
