@@ -15,10 +15,10 @@ export default async function AdminHomePage(props: PageProps<'/markets/[id]/admi
         </div>
         <Link
           href={`/markets/${id}/home`}
-          className="flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50"
+          className="flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-600 active:scale-95 transition-transform"
         >
           <User className="h-3.5 w-3.5" />
-          유저 화면
+          일반화면
         </Link>
       </div>
 
