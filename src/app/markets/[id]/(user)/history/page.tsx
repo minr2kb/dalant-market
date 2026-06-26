@@ -19,7 +19,7 @@ export default async function HistoryPage(props: PageProps<'/markets/[id]/histor
         </span>
       </div>
 
-      <div className="divide-y divide-gray-50">
+      <div className="space-y-3">
         {MOCK_POINT_LOGS.map((log) => (
           <PointLogItem
             key={log.id}

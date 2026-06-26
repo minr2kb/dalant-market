@@ -41,16 +41,16 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
     : 'text-rose-500'
 
   return (
-    <div>
+    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
       <button
         type="button"
         onClick={() => isPurchase && order && setExpanded((v) => !v)}
-        className={`flex w-full items-center justify-between py-4 text-left ${
+        className={`flex w-full items-center justify-between px-4 py-4 text-left ${
           isPurchase && order ? 'cursor-pointer' : 'cursor-default'
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className={`flex h-9 w-9 items-center justify-center rounded-full ${iconBg}`}>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
             {isPositive ? (
               log.reasonType === 'manual' ? (
                 <Award className="h-4 w-4 text-purple-500" />
@@ -62,7 +62,7 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
             )}
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-800">{label}</p>
+            <p className="text-sm font-semibold text-gray-800">{label}</p>
             <p className="text-xs text-gray-400">{sub}</p>
             <p className="text-xs text-gray-300">
               {new Date(log.createdAt).toLocaleString('ko-KR', {
@@ -89,7 +89,7 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
       </button>
 
       {expanded && order && (
-        <div className="mb-3 rounded-xl bg-gray-50 px-4 py-3 space-y-2">
+        <div className="border-t border-gray-50 bg-gray-50 px-4 py-3 space-y-2">
           {order.items.map((item, idx) => (
             <div key={idx} className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-gray-600">

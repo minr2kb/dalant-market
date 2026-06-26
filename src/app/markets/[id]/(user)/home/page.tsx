@@ -12,23 +12,28 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
 
   return (
     <div className="px-4 pt-14 space-y-6 max-w-lg mx-auto">
+      {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs text-gray-400">{market.title}</p>
           <h1 className="text-xl font-bold text-gray-900">{user.user.realName}</h1>
         </div>
+        <AdminAccessButton marketId={id} compact />
       </div>
 
-      <div className="space-y-3">
-        <div className="rounded-3xl bg-emerald-500 p-6 text-white space-y-1">
-          <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
-          <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
-          <p className="text-sm opacity-70">{market.pointLabel}</p>
+      {/* 보유 달란트 카드 */}
+      <div className="rounded-3xl bg-emerald-500 p-6 text-white">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
+            <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
+            <p className="text-sm opacity-70">{market.pointLabel}</p>
+          </div>
+          <PayQRButton userName={user.user.realName} compact />
         </div>
-        <PayQRButton userName={user.user.realName} />
-        <AdminAccessButton marketId={id} />
       </div>
 
+      {/* 최근 내역 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-700">최근 내역</h2>
@@ -40,7 +45,7 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
           </Link>
         </div>
 
-        <div className="divide-y divide-gray-50 rounded-2xl border border-gray-100 bg-white overflow-hidden">
+        <div className="space-y-2">
           {recentLogs.map((log) => {
             const label =
               log.reasonType === 'mission'
@@ -52,7 +57,10 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
             const isPositive = log.amount > 0
 
             return (
-              <div key={log.id} className="flex items-center justify-between px-4 py-3">
+              <div
+                key={log.id}
+                className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3"
+              >
                 <div className="flex items-center gap-3">
                   <div
                     className={`flex h-8 w-8 items-center justify-center rounded-full ${

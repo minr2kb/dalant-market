@@ -4,21 +4,38 @@ import { useState, useCallback } from 'react'
 import { QrCode, X, Wallet } from 'lucide-react'
 import { useModalHistory } from '@/hooks/use-modal-history'
 
-export function PayQRButton({ userName }: { userName: string }) {
+export function PayQRButton({
+  userName,
+  compact = false,
+}: {
+  userName: string
+  compact?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white text-sm font-semibold text-emerald-600 transition-colors hover:bg-emerald-50 active:scale-95"
-      >
-        <Wallet className="h-4 w-4" />
-        달란트 사용하기
-      </button>
+      {compact ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/30 active:scale-95 transition-transform shrink-0"
+        >
+          <Wallet className="h-3.5 w-3.5" />
+          사용하기
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-emerald-200 bg-white text-sm font-semibold text-emerald-600 transition-colors hover:bg-emerald-50 active:scale-95"
+        >
+          <Wallet className="h-4 w-4" />
+          달란트 사용하기
+        </button>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">

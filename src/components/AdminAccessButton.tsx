@@ -10,7 +10,13 @@ const STORAGE_KEY = 'dalant_admin_granted'
 const CODE_LENGTH = 4
 const MOCK_CODE = '0000'
 
-export function AdminAccessButton({ marketId }: { marketId: string }) {
+export function AdminAccessButton({
+  marketId,
+  compact = false,
+}: {
+  marketId: string
+  compact?: boolean
+}) {
   const router = useRouter()
   const [isAdmin, setIsAdmin] = useState(false)
   const [open, setOpen] = useState(false)
@@ -45,7 +51,15 @@ export function AdminAccessButton({ marketId }: { marketId: string }) {
   }
 
   if (isAdmin) {
-    return (
+    return compact ? (
+      <a
+        href={`/markets/${marketId}/admin/home`}
+        className="flex items-center gap-1.5 rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-medium text-purple-600 hover:bg-purple-50"
+      >
+        <ShieldCheck className="h-3.5 w-3.5" />
+        관리자
+      </a>
+    ) : (
       <a
         href={`/markets/${marketId}/admin/home`}
         className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-purple-200 bg-white text-sm font-semibold text-purple-600 transition-colors hover:bg-purple-50"
@@ -58,14 +72,25 @@ export function AdminAccessButton({ marketId }: { marketId: string }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white text-sm font-medium text-gray-400 transition-colors hover:bg-gray-50"
-      >
-        <Lock className="h-4 w-4" />
-        관리자 전환
-      </button>
+      {compact ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-400 hover:bg-gray-50"
+        >
+          <Lock className="h-3.5 w-3.5" />
+          관리자
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white text-sm font-medium text-gray-400 transition-colors hover:bg-gray-50"
+        >
+          <Lock className="h-4 w-4" />
+          관리자 전환
+        </button>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">
