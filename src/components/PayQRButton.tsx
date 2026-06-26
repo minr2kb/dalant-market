@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { QrCode, X, Wallet } from 'lucide-react'
+import { QrCode, X } from 'lucide-react'
 import { useModalHistory } from '@/hooks/use-modal-history'
 
 export function PayQRButton({
@@ -21,10 +21,9 @@ export function PayQRButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/30 active:scale-95 transition-transform shrink-0"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 active:scale-95 transition-transform self-center"
         >
-          <Wallet className="h-3.5 w-3.5" />
-          사용하기
+          <QrCode className="h-5 w-5" />
         </button>
       ) : (
         <button
