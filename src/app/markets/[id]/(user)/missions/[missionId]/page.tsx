@@ -9,9 +9,10 @@ import { QRModal } from '@/components/QRModal'
 import { MOCK_MISSIONS } from '@/lib/mock-data'
 
 const TYPE_LABEL: Record<string, string> = {
-  upload: '사진 업로드 후 QR 인증',
-  qr: 'QR 즉시 인증',
-  admin_grant: '관리자 일괄 지급',
+  user_qr: '유저 간 인증',
+  upload: '업로드형',
+  admin_qr: '관리자 인증',
+  manual: '상시',
 }
 
 export default function MissionDetailPage() {
@@ -47,14 +48,14 @@ export default function MissionDetailPage() {
           )}
         </div>
 
-        {mission.type === 'admin_grant' ? (
+        {mission.type === 'manual' ? (
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6 text-center space-y-2">
             <CheckCircle2 className="mx-auto h-10 w-10 text-gray-300" />
             <p className="text-sm font-medium text-gray-600">
-              관리자가 일괄 지급하는 미션이에요
+              관리자가 수동으로 지급하는 상시 미션이에요
             </p>
             <p className="text-xs text-gray-400">
-              별도 인증 없이 자동으로 달란트가 적립됩니다
+              별도 인증 없이 관리자가 직접 달란트를 지급합니다
             </p>
           </div>
         ) : (
@@ -93,6 +94,16 @@ export default function MissionDetailPage() {
             {mission.type === 'upload' && !photoUploaded && (
               <p className="text-center text-xs text-gray-400">
                 사진을 업로드해야 QR을 생성할 수 있어요
+              </p>
+            )}
+            {mission.type === 'admin_qr' && (
+              <p className="text-center text-xs text-gray-400">
+                관리자에게 직접 가서 이 QR을 보여주세요
+              </p>
+            )}
+            {mission.type === 'user_qr' && (
+              <p className="text-center text-xs text-gray-400">
+                다른 참여자에게 이 QR을 보여주면 상대방이 찍어줘요
               </p>
             )}
           </div>

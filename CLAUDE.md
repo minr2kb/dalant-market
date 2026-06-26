@@ -38,7 +38,20 @@
 - 탭바: 고정 pill 형태 `fixed bottom-4 left-4 right-4 rounded-full`
 - 기본 색상: emerald `oklch(0.696 0.17 162.48)` (`--color-primary` 재정의)
 
-## 미션 상태
+## 미션 타입 (`MissionType`)
+
+| 값 | 한국어 | 인증 방식 |
+|----|--------|-----------|
+| `'user_qr'` | 유저 간 인증 | 미션 수행자가 QR 생성 → 다른 참여자가 스캔 |
+| `'upload'` | 업로드형 | 사진 업로드 → 관리자가 승인 후 QR 스캔 |
+| `'admin_qr'` | 관리자 인증 | 미션 수행자가 QR 생성 → 관리자가 직접 스캔 |
+| `'manual'` | 상시 | 인증 없음 — 관리자가 수동 지급 (게임 포인트 등) |
+
+- `limitCount: number | null` — `null` = 무제한
+- `isGroup: boolean` — 단체 미션이면 관리자 QR 스캔 시 같이 줄 인원 선택 창 표시
+- `activeFrom` / `activeUntil` — `null`이면 제한 없음
+
+## 미션 상태 (`MissionStatus`)
 
 `getMissionStatus(mission)` — `src/types/index.ts` 에 정의
 - `'active'`: `activeFrom ≤ now ≤ activeUntil`

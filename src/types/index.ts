@@ -1,5 +1,5 @@
 export type Role = 'admin' | 'user'
-export type MissionType = 'upload' | 'qr' | 'admin_grant'
+export type MissionType = 'user_qr' | 'upload' | 'admin_qr' | 'manual'
 export type PointReasonType = 'mission' | 'purchase' | 'manual'
 export type Gender = 'male' | 'female'
 
@@ -46,7 +46,7 @@ export interface Mission {
   type: MissionType
   isGroup: boolean
   reward: number
-  limitCount: number
+  limitCount: number | null
   activeFrom: string | null
   activeUntil: string | null
   isActive: boolean
