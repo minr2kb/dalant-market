@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { QrCode, X } from 'lucide-react'
+import { QrCode, X, Wallet } from 'lucide-react'
 import { useModalHistory } from '@/hooks/use-modal-history'
 
 export function PayQRButton({
