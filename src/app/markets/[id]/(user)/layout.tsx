@@ -10,7 +10,7 @@ export default async function UserLayout(props: LayoutProps<'/markets/[id]'>) {
   ]
 
   return (
-    <div className="min-h-svh bg-white">
+    <div className="min-h-svh bg-gray-50">
       <main className="pb-28">{props.children}</main>
       <FloatingTabBar tabs={tabs} />
     </div>

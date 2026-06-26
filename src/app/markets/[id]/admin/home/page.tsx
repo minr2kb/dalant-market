@@ -9,9 +9,9 @@ export default async function AdminHomePage(props: PageProps<'/markets/[id]/admi
   return (
     <div className="px-4 pt-14 max-w-lg mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-500">관리자</p>
+        <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold text-gray-900">{MOCK_MARKET.title}</h1>
+          <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-500">관리자</span>
         </div>
         <Link
           href={`/markets/${id}/home`}

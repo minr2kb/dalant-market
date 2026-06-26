@@ -8,12 +8,26 @@ import { ChevronLeft } from 'lucide-react'
 
 type Step = 1 | 2 | 3
 
+const YEARS = Array.from({ length: 66 }, (_, i) => String(2015 - i))
+const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))
+const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'))
+
+const selectClass =
+  'h-12 w-full appearance-none rounded-xl border border-gray-200 bg-white px-3 text-base text-gray-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>(1)
   const [name, setName] = useState('')
-  const [birthDate, setBirthDate] = useState('')
+  const [birthYear, setBirthYear] = useState('')
+  const [birthMonth, setBirthMonth] = useState('')
+  const [birthDay, setBirthDay] = useState('')
   const [gender, setGender] = useState<'male' | 'female' | null>(null)
+
+  const birthDate =
+    birthYear && birthMonth && birthDay
+      ? `${birthYear}-${birthMonth}-${birthDay}`
+      : ''
 
   function handleNext() {
     if (step < 3) setStep((s) => (s + 1) as Step)
@@ -61,7 +75,7 @@ export default function OnboardingPage() {
             placeholder="홍길동"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="h-12 rounded-xl border-gray-200 text-base"
+            className="rounded-xl border-gray-200"
             autoFocus
           />
         </div>
@@ -70,20 +84,23 @@ export default function OnboardingPage() {
       {step === 2 && (
         <div className="space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900">생일을 입력해주세요</h2>
+            <h2 className="text-xl font-bold text-gray-900">생일을 선택해주세요</h2>
             <p className="text-sm text-gray-500">생일월 미션 인증에 활용돼요</p>
           </div>
-          <Input
-            placeholder="YYYY-MM-DD"
-            value={birthDate}
-            onChange={(e) => {
-              const v = e.target.value.replace(/[^0-9-]/g, '')
-              setBirthDate(v)
-            }}
-            maxLength={10}
-            className="h-12 rounded-xl border-gray-200 text-base"
-            autoFocus
-          />
+          <div className="grid grid-cols-3 gap-2">
+            <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)} className={selectClass}>
+              <option value="">년도</option>
+              {YEARS.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+            <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)} className={selectClass}>
+              <option value="">월</option>
+              {MONTHS.map((m) => <option key={m} value={m}>{Number(m)}월</option>)}
+            </select>
+            <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)} className={selectClass}>
+              <option value="">일</option>
+              {DAYS.map((d) => <option key={d} value={d}>{Number(d)}일</option>)}
+            </select>
+          </div>
         </div>
       )}
 
@@ -116,7 +133,7 @@ export default function OnboardingPage() {
         <Button
           onClick={handleNext}
           disabled={!canProceed}
-          className="h-12 w-full rounded-full bg-emerald-500 text-base font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
+          className="w-full rounded-full bg-emerald-500 text-base font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
         >
           {step === 3 ? '완료하고 시작하기' : '다음'}
         </Button>

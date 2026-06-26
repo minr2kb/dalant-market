@@ -14,8 +14,8 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
     <div className="px-4 pt-14 space-y-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-500">{market.title}</p>
-          <h1 className="text-lg font-bold text-gray-900">{user.user.realName}</h1>
+          <p className="text-xs text-gray-400">{market.title}</p>
+          <h1 className="text-xl font-bold text-gray-900">{user.user.realName}</h1>
         </div>
       </div>
 
