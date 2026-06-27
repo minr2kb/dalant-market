@@ -79,20 +79,20 @@
 /markets/[id]/(user)/home
 /markets/[id]/(user)/missions
 /markets/[id]/(user)/missions/[missionId]
-/markets/[id]/(user)/history
-/markets/[id]/(user)/purchases
+/markets/[id]/(user)/history                ← 적립/차감/구매 통합 타임라인
 
-/markets/[id]/(admin)/home
-/markets/[id]/(admin)/scan
-/markets/[id]/(admin)/points
-/markets/[id]/(admin)/missions
-/markets/[id]/(admin)/pos
-/markets/[id]/(admin)/users
-/markets/[id]/(admin)/users/[userId]
+/markets/[id]/admin/home
+/markets/[id]/admin/scan
+/markets/[id]/admin/points
+/markets/[id]/admin/missions
+/markets/[id]/admin/pos
+/markets/[id]/admin/users
+/markets/[id]/admin/users/[userId]
 ```
 
-`(user)` / `(admin)` 은 Next.js route group — URL에 노출되지 않음.  
-각 route group은 자체 `layout.tsx`를 가지며 floating tab bar를 포함한다.
+`(user)` 는 Next.js route group — URL에 노출되지 않음.  
+`admin` 은 실제 URL 세그먼트로 노출됨 (`/markets/[id]/admin/...`).  
+각 그룹은 자체 `layout.tsx`를 가지며 floating tab bar를 포함한다.
 
 ---
 
@@ -107,7 +107,7 @@
 마켓 참여 방법 ②: /markets 에서 활성 마켓 목록 확인 후 직접 참여
 
 관리자 승격: (user)/home 또는 설정에서 "관리자 코드 입력"
-  → 마켓 생성자가 발급한 코드 입력 → 즉시 admin 권한 부여
+  → markets.admin_code 와 일치하면 → market_participants.role = 'admin' 으로 즉시 승격
 ```
 
 ---
@@ -195,21 +195,15 @@
 
 ### 7.8 `(user)/history` — 달란트 내역
 
-- 적립/차감/구매 타임라인
+- 적립/차감/구매 통합 타임라인 (별도 구매 내역 화면 없음)
 - 적립: emerald `+N달란트`, 미션명, 인증자
 - 차감/구매: rose `-N달란트`, 물품명 또는 사유
 - 날짜 구분선
+- 구매 항목 탭하면 주문 상세 인라인 확장
 
 ---
 
-### 7.9 `(user)/purchases` — 구매 내역
-
-- 구매 이력 카드 리스트
-- 카드: 구매 일시, 물품 목록, 합계 달란트
-
----
-
-### 7.10 `(admin)/home` — 관리자 홈
+### 7.9 `(admin)/home` — 관리자 홈
 
 - 상단: 마켓 이름 + "관리자" 뱃지
 - 전체 인원 달란트 현황 테이블 (이름, 잔액, 미션 완료 수)
