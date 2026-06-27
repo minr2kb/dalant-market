@@ -1,13 +1,17 @@
 import { Suspense } from 'react'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/server'
 import { getQueryClient } from '@/lib/query/get-query-client'
 import { participantsQuery } from '@/lib/query/queries'
+import { listParticipants } from '@/lib/data/participants'
 import { AdminUsersClient } from './AdminUsersClient'
 
 export default async function AdminUsersPage(props: PageProps<'/markets/[id]/admin/users'>) {
   const { id: marketId } = await props.params
+  const supabase = await createClient()
   const qc = getQueryClient()
-  await qc.prefetchQuery(participantsQuery.list({ marketId }))
+  const participants = await listParticipants(supabase, marketId)
+  qc.setQueryData(participantsQuery.list({ marketId }).queryKey, { data: participants })
   return (
     <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
       <h1 className="text-xl font-bold text-gray-900">유저 관리</h1>

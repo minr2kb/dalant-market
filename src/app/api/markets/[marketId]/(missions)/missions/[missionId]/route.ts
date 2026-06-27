@@ -1,28 +1,14 @@
+import { getMission } from '@/lib/data/missions'
 import { mapMission } from '@/lib/db'
 import { route, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ missionId: string }>(async (req, { supabase, params }) => {
-  const userId = req.nextUrl.searchParams.get('userId')
-
-  const { data: mission, error } = await supabase
-    .from('missions')
-    .select('*')
-    .eq('id', params.missionId)
-    .single()
-
-  if (error || !mission) return err('Not found', 404)
-
-  let logs: Record<string, unknown>[] = []
-  if (userId) {
-    const { data } = await supabase
-      .from('mission_logs')
-      .select('*')
-      .eq('mission_id', params.missionId)
-      .eq('user_id', userId)
-    logs = (data ?? []) as Record<string, unknown>[]
+  const userId = req.nextUrl.searchParams.get('userId') ?? undefined
+  try {
+    return ok(await getMission(supabase, params.missionId, { userId }))
+  } catch {
+    return err('Not found', 404)
   }
-
-  return ok(mapMission(mission as Record<string, unknown>, logs))
 })
 
 export const PATCH = route<{ missionId: string }>(async (req, { supabase, params }) => {

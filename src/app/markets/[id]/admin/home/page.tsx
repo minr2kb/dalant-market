@@ -1,4 +1,12 @@
 import { Suspense } from 'react'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/server'
+import { getQueryClient } from '@/lib/query/get-query-client'
+import { marketsQuery, participantsQuery, missionsQuery, pointLogsQuery } from '@/lib/query/queries'
+import { getMarket } from '@/lib/data/markets'
+import { listParticipants } from '@/lib/data/participants'
+import { listMissions } from '@/lib/data/missions'
+import { listPointLogs } from '@/lib/data/point-logs'
 import { AdminHomeClient } from './AdminHomeClient'
 
 function Skeleton() {
@@ -20,9 +28,23 @@ function Skeleton() {
 
 export default async function AdminHomePage(props: PageProps<'/markets/[id]/admin/home'>) {
   const { id: marketId } = await props.params
+  const supabase = await createClient()
+  const qc = getQueryClient()
+  const [market, participants, missions, pointLogs] = await Promise.all([
+    getMarket(supabase, marketId),
+    listParticipants(supabase, marketId),
+    listMissions(supabase, marketId),
+    listPointLogs(supabase, marketId),
+  ])
+  qc.setQueryData(marketsQuery.get({ marketId }).queryKey, { data: market })
+  qc.setQueryData(participantsQuery.list({ marketId }).queryKey, { data: participants })
+  qc.setQueryData(missionsQuery.list({ marketId }).queryKey, { data: missions })
+  qc.setQueryData(pointLogsQuery.list({ marketId }).queryKey, { data: pointLogs })
   return (
-    <Suspense fallback={<Skeleton />}>
-      <AdminHomeClient marketId={marketId} />
-    </Suspense>
+    <HydrationBoundary state={dehydrate(qc)}>
+      <Suspense fallback={<Skeleton />}>
+        <AdminHomeClient marketId={marketId} />
+      </Suspense>
+    </HydrationBoundary>
   )
 }

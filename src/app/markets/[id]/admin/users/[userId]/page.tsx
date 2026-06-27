@@ -2,19 +2,25 @@ import { Suspense } from 'react'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 import { getQueryClient } from '@/lib/query/get-query-client'
 import { participantsQuery, missionsQuery } from '@/lib/query/queries'
+import { getParticipant } from '@/lib/data/participants'
+import { listMissions } from '@/lib/data/missions'
 import { AdminUserDetailClient } from './AdminUserDetailClient'
 
 export default async function AdminUserDetailPage(
   props: PageProps<'/markets/[id]/admin/users/[userId]'>,
 ) {
   const { id: marketId, userId } = await props.params
+  const supabase = await createClient()
   const qc = getQueryClient()
-  await Promise.all([
-    qc.prefetchQuery(participantsQuery.get({ marketId, userId })),
-    qc.prefetchQuery(missionsQuery.list({ marketId })),
+  const [participantData, missions] = await Promise.all([
+    getParticipant(supabase, marketId, userId),
+    listMissions(supabase, marketId),
   ])
+  qc.setQueryData(participantsQuery.get({ marketId, userId }).queryKey, { data: participantData })
+  qc.setQueryData(missionsQuery.list({ marketId }).queryKey, { data: missions })
   return (
     <div>
       <div className="flex items-center gap-3 px-4 pt-14 pb-4 max-w-lg mx-auto">

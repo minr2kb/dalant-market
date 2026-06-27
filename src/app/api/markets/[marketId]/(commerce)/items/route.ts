@@ -1,14 +1,13 @@
+import { listItems } from '@/lib/data/items'
 import { mapItem } from '@/lib/db'
 import { route, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ marketId: string }>(async (_req, { supabase, params }) => {
-  const { data, error } = await supabase
-    .from('market_items')
-    .select('*')
-    .eq('market_id', params.marketId)
-    .order('name')
-  if (error) return err(error.message)
-  return ok((data ?? []).map(mapItem))
+  try {
+    return ok(await listItems(supabase, params.marketId))
+  } catch (e) {
+    return err(e instanceof Error ? e.message : 'Error')
+  }
 })
 
 export const POST = route<{ marketId: string }>(async (req, { supabase, params }) => {

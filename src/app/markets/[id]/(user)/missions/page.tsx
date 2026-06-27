@@ -1,14 +1,19 @@
 import { Suspense } from 'react'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/server'
 import { getQueryClient } from '@/lib/query/get-query-client'
-import { getCurrentUserId } from '@/lib/auth'
 import { missionsQuery } from '@/lib/query/queries'
+import { listMissions } from '@/lib/data/missions'
 import { MissionListClient } from './MissionListClient'
 
 export default async function MissionsPage(props: PageProps<'/markets/[id]/missions'>) {
   const { id: marketId } = await props.params
-  const [userId, qc] = await Promise.all([getCurrentUserId(), Promise.resolve(getQueryClient())])
-  await qc.prefetchQuery(missionsQuery.list({ marketId, userId: userId ?? undefined }))
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const userId = user?.id
+  const qc = getQueryClient()
+  const missions = await listMissions(supabase, marketId, { userId })
+  qc.setQueryData(missionsQuery.list({ marketId, userId }).queryKey, { data: missions })
 
   return (
     <div className="px-4 pt-14 pb-4 max-w-lg mx-auto space-y-5">

@@ -1,5 +1,10 @@
 import { Suspense } from 'react'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/server'
+import { getQueryClient } from '@/lib/query/get-query-client'
+import { marketsQuery, participantsQuery } from '@/lib/query/queries'
+import { getMarket } from '@/lib/data/markets'
+import { getParticipant } from '@/lib/data/participants'
 import { UserHomeClient } from './UserHomeClient'
 
 function Skeleton() {
@@ -33,9 +38,19 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
       { onConflict: 'market_id,user_id', ignoreDuplicates: true },
     )
 
+  const qc = getQueryClient()
+  const [market, participantData] = await Promise.all([
+    getMarket(supabase, marketId),
+    getParticipant(supabase, marketId, user.id),
+  ])
+  qc.setQueryData(marketsQuery.get({ marketId }).queryKey, { data: market })
+  qc.setQueryData(participantsQuery.get({ marketId, userId: user.id }).queryKey, { data: participantData })
+
   return (
-    <Suspense fallback={<Skeleton />}>
-      <UserHomeClient marketId={marketId} userId={user.id} />
-    </Suspense>
+    <HydrationBoundary state={dehydrate(qc)}>
+      <Suspense fallback={<Skeleton />}>
+        <UserHomeClient marketId={marketId} userId={user.id} />
+      </Suspense>
+    </HydrationBoundary>
   )
 }

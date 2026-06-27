@@ -1,14 +1,12 @@
-import { mapParticipant } from '@/lib/db'
+import { listParticipants } from '@/lib/data/participants'
 import { route, authRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ marketId: string }>(async (_req, { supabase, params }) => {
-  const { data, error } = await supabase
-    .from('market_participants')
-    .select('*, user:users!user_id(*)')
-    .eq('market_id', params.marketId)
-    .order('real_name', { foreignTable: 'users' })
-  if (error) return err(error.message)
-  return ok((data ?? []).map(mapParticipant))
+  try {
+    return ok(await listParticipants(supabase, params.marketId))
+  } catch (e) {
+    return err(e instanceof Error ? e.message : 'Error')
+  }
 })
 
 export const POST = authRoute<{ marketId: string }>(async (_req, { supabase, params, userId }) => {
