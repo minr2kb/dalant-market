@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
+import { createClient } from '@/lib/supabase/server'
 import { UserHomeClient } from './UserHomeClient'
-import { getCurrentUserId } from '@/lib/auth'
 
 function Skeleton() {
   return (
@@ -22,12 +22,20 @@ function Skeleton() {
 
 export default async function UserHomePage(props: PageProps<'/markets/[id]/home'>) {
   const { id: marketId } = await props.params
-  const userId = await getCurrentUserId()
-  if (!userId) return null
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  await supabase
+    .from('market_participants')
+    .upsert(
+      { market_id: marketId, user_id: user.id, role: 'user', balance: 0 },
+      { onConflict: 'market_id,user_id', ignoreDuplicates: true },
+    )
 
   return (
     <Suspense fallback={<Skeleton />}>
-      <UserHomeClient marketId={marketId} userId={userId} />
+      <UserHomeClient marketId={marketId} userId={user.id} />
     </Suspense>
   )
 }
