@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
-    "@routar/core": "^1.8.0",
-    "@routar/react-query": "^1.8.0",
+    "@routar/core": "^1.8.1",
+    "@routar/react-query": "^1.8.2",
+    "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-query": "^5.101.1",
     "class-variance-authority": "^0.7.1",

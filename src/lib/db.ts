@@ -1,0 +1,111 @@
+import type { Market, MarketParticipant, Mission, MissionSlotData, PointLog, Order, MarketItem, User } from '@/types'
+
+export function mapUser(row: Record<string, unknown>): User {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    realName: row.real_name as string,
+    birthDate: row.birth_date as string,
+    gender: row.gender as 'male' | 'female',
+    createdAt: row.created_at as string,
+  }
+}
+
+export function mapMarket(row: Record<string, unknown>): Market {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    description: (row.description as string) ?? '',
+    pointLabel: row.point_label as string,
+    adminCode: row.admin_code as string,
+    startsAt: row.starts_at as string,
+    endsAt: row.ends_at as string,
+    createdAt: row.created_at as string,
+  }
+}
+
+export function mapParticipant(row: Record<string, unknown>): MarketParticipant {
+  return {
+    id: row.id as string,
+    marketId: row.market_id as string,
+    user: mapUser(row.user as Record<string, unknown>),
+    role: row.role as 'admin' | 'user',
+    balance: row.balance as number,
+  }
+}
+
+export function mapMission(row: Record<string, unknown>, logs: Record<string, unknown>[] = []): Mission {
+  const limitCount = row.limit_count as number | null
+  const logsForThis = logs.filter((l) => l.mission_id === row.id)
+
+  let slots: MissionSlotData[] | undefined
+  if (limitCount !== null) {
+    slots = Array.from({ length: limitCount }, (_, i) => {
+      const log = logsForThis.find((l) => (l.slot as number) === i + 1)
+      return {
+        slot: i + 1,
+        verifiedByName: log ? (log.verified_by_name as string | null) : null,
+        verifiedAt: log ? (log.verified_at as string | null) : null,
+        photoUrl: log ? (log.photo_url as string | null) : null,
+      }
+    })
+  } else if (logsForThis.length > 0) {
+    slots = logsForThis.map((log) => ({
+      slot: log.slot as number,
+      verifiedByName: (log.verified_by_name as string | null) ?? null,
+      verifiedAt: (log.verified_at as string | null) ?? null,
+      photoUrl: (log.photo_url as string | null) ?? null,
+    }))
+  }
+
+  return {
+    id: row.id as string,
+    marketId: row.market_id as string,
+    title: row.title as string,
+    ...(row.description ? { description: row.description as string } : {}),
+    type: row.type as Mission['type'],
+    isGroup: row.is_group as boolean,
+    reward: row.reward as number,
+    limitCount,
+    activeFrom: (row.active_from as string | null) ?? null,
+    activeUntil: (row.active_until as string | null) ?? null,
+    isActive: row.is_active as boolean,
+    ...(slots ? { slots } : {}),
+  }
+}
+
+export function mapPointLog(row: Record<string, unknown>): PointLog {
+  return {
+    id: row.id as string,
+    marketId: row.market_id as string,
+    userId: row.user_id as string,
+    amount: row.amount as number,
+    reasonType: row.reason_type as PointLog['reasonType'],
+    ...(row.mission_title ? { missionTitle: row.mission_title as string } : {}),
+    ...(row.verified_by_name ? { verifiedByName: row.verified_by_name as string } : {}),
+    ...(row.item_name ? { itemName: row.item_name as string } : {}),
+    ...(row.order_id ? { orderId: row.order_id as string } : {}),
+    ...(row.memo ? { memo: row.memo as string } : {}),
+    createdAt: row.created_at as string,
+  }
+}
+
+export function mapOrder(row: Record<string, unknown>): Order {
+  return {
+    id: row.id as string,
+    marketId: row.market_id as string,
+    userId: row.user_id as string,
+    verifiedByName: (row.verified_by_name as string) ?? '',
+    items: row.items as Order['items'],
+    total: row.total as number,
+    purchasedAt: row.purchased_at as string,
+  }
+}
+
+export function mapItem(row: Record<string, unknown>): MarketItem {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    price: row.price as number,
+  }
+}

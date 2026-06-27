@@ -12,11 +12,14 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@routar/core':
-        specifier: ^1.8.0
-        version: 1.8.0
+        specifier: ^1.8.1
+        version: 1.8.1
       '@routar/react-query':
-        specifier: ^1.8.0
-        version: 1.8.0(@tanstack/react-query@5.101.1(react@19.2.4))
+        specifier: ^1.8.2
+        version: 1.8.2(@tanstack/react-query@5.101.1(react@19.2.4))
+      '@supabase/ssr':
+        specifier: ^0.12.0
+        version: 0.12.0(@supabase/supabase-js@2.108.2)
       '@supabase/supabase-js':
         specifier: ^2.108.2
         version: 2.108.2
@@ -738,11 +741,14 @@ packages:
       '@types/react':
         optional: true
 
-  '@routar/core@1.8.0':
-    resolution: {integrity: sha512-r8Cfsmn2Iv0ZrEpr3TqNicAE8zh682ofsAqe1CFuuOgPxLiOe2jRDt6j7WKPv6wFlxrCECYfdvJBVZTC+krSyg==}
+  '@routar/core@1.8.1':
+    resolution: {integrity: sha512-GhdsxN27xduGrzipTnzKZ01WowJ+IcEJUsEXN53mt4XS8XtpqhYq/CX0ixCin85zKBYnXgq/XkME+yudgkkApg==}
 
-  '@routar/react-query@1.8.0':
-    resolution: {integrity: sha512-cPJ2jitycTGIUI60uWR7TbNOZJBZleiFyKaPbpNn6U0b+VbPtW6r0nH/84ZZRp3coaqOWfwHIG26cbxADPE2cQ==}
+  '@routar/core@1.8.2':
+    resolution: {integrity: sha512-6Q1vyYXTfOCBWWYiEULAvssfEtmDPQN5fQU1HA6fezyNONdmmVPHS3BYdYcARnGL5MVR1XLZJd09gQegULAWOA==}
+
+  '@routar/react-query@1.8.2':
+    resolution: {integrity: sha512-Swh0uyIhvOXD19OLKN0gy7pYN8367NCOvZ5Empdl4nRGWHuSV9qgyVp6Ya49Kc+TAN3d6kKYT5b5HfQ3puc5nQ==}
     peerDependencies:
       '@tanstack/react-query': '>=5.0.0'
 
@@ -771,6 +777,11 @@ packages:
   '@supabase/realtime-js@2.108.2':
     resolution: {integrity: sha512-aAGxCSUemZvQIibnCdvNvgaKib28I4rfrNjKbQ9cG1uBLwUsI7hVpGXgEbypCCDhLjQlDTAiJlu7rgljYUT73g==}
     engines: {node: '>=20.0.0'}
+
+  '@supabase/ssr@0.12.0':
+    resolution: {integrity: sha512-d9XV5XzJvzzZbeAIM7fWTCUYxQJZ2Ru6ny3dJHmHGp/LIrJ+o9FpD7N9Rf/UhhWEvHXSoDe8SI32Z2ouOdMjBg==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.108.0
 
   '@supabase/storage-js@2.108.2':
     resolution: {integrity: sha512-TVZPQxXGxY2+A6yTtm77zUHsh70lBhYUEaJL8RQC+BghcX/ygiMG/rmXrNVBce30/WAeNPa8FiG8HbqlGeV05g==}
@@ -1061,6 +1072,10 @@ packages:
   cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
+
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
 
   cors@2.8.6:
     resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
@@ -2880,11 +2895,13 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.17
 
-  '@routar/core@1.8.0': {}
+  '@routar/core@1.8.1': {}
 
-  '@routar/react-query@1.8.0(@tanstack/react-query@5.101.1(react@19.2.4))':
+  '@routar/core@1.8.2': {}
+
+  '@routar/react-query@1.8.2(@tanstack/react-query@5.101.1(react@19.2.4))':
     dependencies:
-      '@routar/core': 1.8.0
+      '@routar/core': 1.8.2
       '@tanstack/react-query': 5.101.1(react@19.2.4)
 
   '@sec-ant/readable-stream@0.4.1': {}
@@ -2909,6 +2926,11 @@ snapshots:
     dependencies:
       '@supabase/phoenix': 0.4.4
       tslib: 2.8.1
+
+  '@supabase/ssr@0.12.0(@supabase/supabase-js@2.108.2)':
+    dependencies:
+      '@supabase/supabase-js': 2.108.2
+      cookie: 1.1.1
 
   '@supabase/storage-js@2.108.2':
     dependencies:
@@ -3167,6 +3189,8 @@ snapshots:
   cookie-signature@1.2.2: {}
 
   cookie@0.7.2: {}
+
+  cookie@1.1.1: {}
 
   cors@2.8.6:
     dependencies:
