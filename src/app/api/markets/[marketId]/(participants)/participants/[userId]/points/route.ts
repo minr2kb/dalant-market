@@ -1,14 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { route, ok, err } from '@/lib/api/route-helpers'
 
-export async function PATCH(
-  req: NextRequest,
-  props: { params: Promise<{ marketId: string; userId: string }> },
-) {
-  const { marketId, userId } = await props.params
+export const PATCH = route<{ marketId: string; userId: string }>(async (req, { supabase, params }) => {
   const body = (await req.json()) as { amount: number; memo?: string }
-  if (typeof body.amount !== 'number')
-    return NextResponse.json({ error: 'amount required' }, { status: 400 })
+  if (typeof body.amount !== 'number') return err('amount required', 400)
+
+  const { marketId, userId } = params
 
   const { data: p, error: e1 } = await supabase
     .from('market_participants')
@@ -17,7 +13,7 @@ export async function PATCH(
     .eq('user_id', userId)
     .single()
 
-  if (e1 || !p) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (e1 || !p) return err('Not found', 404)
 
   const newBalance = p.balance + body.amount
 
@@ -36,9 +32,7 @@ export async function PATCH(
     }),
   ])
 
-  if (e2 || e3) return NextResponse.json({ error: (e2 ?? e3)?.message }, { status: 500 })
+  if (e2 || e3) return err((e2 ?? e3)?.message ?? 'Error')
 
-  return NextResponse.json({
-    data: { userId, amount: body.amount, newBalance, memo: body.memo ?? null },
-  })
-}
+  return ok({ userId, amount: body.amount, newBalance, memo: body.memo ?? null })
+})

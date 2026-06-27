@@ -1,4 +1,4 @@
-import { createApi, createFetchExecutor, dispatchExecutor } from '@routar/core'
+import { createApi, createFetchExecutor, dispatchExecutor, logger } from '@routar/core'
 import {
   marketsRouter,
   participantsRouter,
@@ -12,10 +12,10 @@ import {
 const BASE_URL =
   typeof window === 'undefined'
     ? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
-    : ''
+    : window.location.origin
 
-const serverExecutor = createFetchExecutor(BASE_URL)
-const clientExecutor = createFetchExecutor('')
+const serverExecutor = createFetchExecutor(`${BASE_URL}/api`, { plugins: [logger()] })
+const clientExecutor = createFetchExecutor(`${BASE_URL}/api`, { plugins: [logger()] })
 
 const executor = dispatchExecutor(() =>
   typeof window === 'undefined' ? serverExecutor : clientExecutor

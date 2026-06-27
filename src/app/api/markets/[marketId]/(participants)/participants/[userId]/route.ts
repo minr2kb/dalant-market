@@ -1,12 +1,8 @@
-import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import { mapParticipant, mapPointLog, mapOrder } from '@/lib/db'
+import { route, ok, err } from '@/lib/api/route-helpers'
 
-export async function GET(
-  _req: Request,
-  props: { params: Promise<{ marketId: string; userId: string }> },
-) {
-  const { marketId, userId } = await props.params
+export const GET = route<{ marketId: string; userId: string }>(async (_req, { supabase, params }) => {
+  const { marketId, userId } = params
 
   const [{ data: p, error }, { data: logs }, { data: orders }] = await Promise.all([
     supabase
@@ -29,13 +25,11 @@ export async function GET(
       .order('purchased_at', { ascending: false }),
   ])
 
-  if (error || !p) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (error || !p) return err('Not found', 404)
 
-  return NextResponse.json({
-    data: {
-      participant: mapParticipant(p),
-      pointLogs: (logs ?? []).map(mapPointLog),
-      orders: (orders ?? []).map(mapOrder),
-    },
+  return ok({
+    participant: mapParticipant(p),
+    pointLogs: (logs ?? []).map(mapPointLog),
+    orders: (orders ?? []).map(mapOrder),
   })
-}
+})

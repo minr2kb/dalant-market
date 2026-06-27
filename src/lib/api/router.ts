@@ -17,7 +17,7 @@ const marketAndUser = z.object({ marketId: z.string(), userId: z.string() })
 const marketAndMission = z.object({ marketId: z.string(), missionId: z.string() })
 const marketAndItem = z.object({ marketId: z.string(), itemId: z.string() })
 
-export const marketsRouter = defineRouter('/api/markets', {
+export const marketsRouter = defineRouter('/markets', {
   list: endpoint({
     method: 'GET',
     path: '/',
@@ -31,7 +31,7 @@ export const marketsRouter = defineRouter('/api/markets', {
   }),
 })
 
-export const participantsRouter = defineRouter('/api/markets', {
+export const participantsRouter = defineRouter('/markets', {
   list: endpoint({
     method: 'GET',
     path: '/:marketId/participants',
@@ -68,13 +68,13 @@ export const participantsRouter = defineRouter('/api/markets', {
   }),
 })
 
-export const missionsRouter = defineRouter('/api/markets', {
+export const missionsRouter = defineRouter('/markets', {
   list: endpoint({
     method: 'GET',
     path: '/:marketId/missions',
     request: {
       path: marketId,
-      query: z.object({ status: z.enum(['active', 'upcoming', 'past']).optional() }),
+      query: z.object({ status: z.enum(['active', 'upcoming', 'past']).optional() }).optional(),
     },
     response: listOf(MissionSchema),
   }),
@@ -151,25 +151,25 @@ export const missionsRouter = defineRouter('/api/markets', {
   }),
 })
 
-export const pointLogsRouter = defineRouter('/api/markets', {
+export const pointLogsRouter = defineRouter('/markets', {
   list: endpoint({
     method: 'GET',
     path: '/:marketId/point-logs',
     request: {
       path: marketId,
-      query: z.object({ userId: z.string().optional() }),
+      query: z.object({ userId: z.string().optional() }).optional(),
     },
     response: listOf(PointLogSchema),
   }),
 })
 
-export const ordersRouter = defineRouter('/api/markets', {
+export const ordersRouter = defineRouter('/markets', {
   list: endpoint({
     method: 'GET',
     path: '/:marketId/orders',
     request: {
       path: marketId,
-      query: z.object({ userId: z.string().optional() }),
+      query: z.object({ userId: z.string().optional() }).optional(),
     },
     response: listOf(OrderSchema),
   }),
@@ -199,7 +199,7 @@ export const ordersRouter = defineRouter('/api/markets', {
   }),
 })
 
-export const itemsRouter = defineRouter('/api/markets', {
+export const itemsRouter = defineRouter('/markets', {
   list: endpoint({
     method: 'GET',
     path: '/:marketId/items',
@@ -223,7 +223,7 @@ export const itemsRouter = defineRouter('/api/markets', {
   }),
 })
 
-export const adminRouter = defineRouter('/api/markets', {
+export const adminRouter = defineRouter('/markets', {
   auth: endpoint({
     method: 'POST',
     path: '/:marketId/admin/auth',

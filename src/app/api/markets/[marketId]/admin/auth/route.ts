@@ -1,28 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { route, ok, err } from '@/lib/api/route-helpers'
 
-export async function POST(
-  req: NextRequest,
-  props: { params: Promise<{ marketId: string }> },
-) {
-  const { marketId } = await props.params
+export const POST = route<{ marketId: string }>(async (req, { supabase, params }) => {
   const body = (await req.json()) as { code: string; userId: string }
 
   const { data: market } = await supabase
     .from('markets')
     .select('admin_code')
-    .eq('id', marketId)
+    .eq('id', params.marketId)
     .single()
 
-  if (!market || market.admin_code !== body.code)
-    return NextResponse.json({ error: 'Invalid code' }, { status: 403 })
+  if (!market || market.admin_code !== body.code) return err('Invalid code', 403)
 
   const { error } = await supabase
     .from('market_participants')
     .update({ role: 'admin' })
-    .eq('market_id', marketId)
+    .eq('market_id', params.marketId)
     .eq('user_id', body.userId)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data: { granted: true } })
-}
+  if (error) return err(error.message)
+  return ok({ granted: true })
+})

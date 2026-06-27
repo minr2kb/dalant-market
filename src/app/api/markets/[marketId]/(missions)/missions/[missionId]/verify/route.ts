@@ -1,15 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { route, ok, err } from '@/lib/api/route-helpers'
 
-export async function POST(
-  req: NextRequest,
-  props: { params: Promise<{ marketId: string; missionId: string }> },
-) {
-  const { marketId, missionId } = await props.params
+export const POST = route<{ marketId: string; missionId: string }>(async (req, { supabase, params }) => {
   const body = (await req.json()) as { userId: string; verifiedBy: string; slot?: number }
+  const { marketId, missionId } = params
 
-  if (body.userId === body.verifiedBy)
-    return NextResponse.json({ error: 'Cannot verify own QR' }, { status: 403 })
+  if (body.userId === body.verifiedBy) return err('Cannot verify own QR', 403)
 
   const [{ data: mission, error: e1 }, { data: participant, error: e2 }, { data: verifier }] =
     await Promise.all([
@@ -23,8 +18,8 @@ export async function POST(
       supabase.from('users').select('real_name').eq('id', body.verifiedBy).maybeSingle(),
     ])
 
-  if (e1 || !mission) return NextResponse.json({ error: 'Mission not found' }, { status: 404 })
-  if (e2 || !participant) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  if (e1 || !mission) return err('Mission not found', 404)
+  if (e2 || !participant) return err('User not found', 404)
 
   const { data: existingLogs } = await supabase
     .from('mission_logs')
@@ -34,7 +29,7 @@ export async function POST(
 
   const usedSlots = new Set((existingLogs ?? []).map((l) => l.slot as number))
   if (mission.limit_count !== null && usedSlots.size >= mission.limit_count)
-    return NextResponse.json({ error: 'All slots already completed' }, { status: 422 })
+    return err('All slots already completed', 422)
 
   const slotNum =
     body.slot ??
@@ -60,7 +55,7 @@ export async function POST(
     .select()
     .single()
 
-  if (e3 || !missionLog) return NextResponse.json({ error: e3?.message }, { status: 500 })
+  if (e3 || !missionLog) return err(e3?.message ?? 'Error')
 
   await Promise.all([
     supabase
@@ -79,14 +74,12 @@ export async function POST(
     }),
   ])
 
-  return NextResponse.json({
-    data: {
-      missionId,
-      userId: body.userId,
-      verifiedBy: body.verifiedBy,
-      slot: slotNum,
-      reward: mission.reward,
-      verifiedAt,
-    },
+  return ok({
+    missionId,
+    userId: body.userId,
+    verifiedBy: body.verifiedBy,
+    slot: slotNum,
+    reward: mission.reward,
+    verifiedAt,
   })
-}
+})
