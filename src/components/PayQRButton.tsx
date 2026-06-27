@@ -2,18 +2,23 @@
 
 import { useState, useCallback } from 'react'
 import { QrCode, X, Wallet } from 'lucide-react'
+import QRCode from 'react-qr-code'
 import { useModalHistory } from '@/hooks/use-modal-history'
+import { encodePayQR } from '@/lib/qr'
 
-export function PayQRButton({
-  userName,
-  compact = false,
-}: {
+interface PayQRButtonProps {
+  marketId: string
+  userId: string
   userName: string
   compact?: boolean
-}) {
+}
+
+export function PayQRButton({ marketId, userId, userName, compact = false }: PayQRButtonProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
+
+  const qrValue = encodePayQR(marketId, userId)
 
   return (
     <>
@@ -38,7 +43,7 @@ export function PayQRButton({
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6">
-          <div className="w-full max-w-sm rounded-3xl bg-white p-6 space-y-5">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 pb-10 space-y-5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-gray-400">결제용 QR</p>
@@ -53,11 +58,8 @@ export function PayQRButton({
               </button>
             </div>
 
-            <div className="mx-auto flex h-56 w-56 items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
-              <div className="text-center space-y-2">
-                <QrCode className="mx-auto h-20 w-20 text-gray-300" />
-                <p className="text-xs text-gray-400">관리자가 스캔합니다</p>
-              </div>
+            <div className="mx-auto flex h-56 w-56 items-center justify-center rounded-2xl bg-white p-2">
+              <QRCode value={qrValue} size={208} />
             </div>
 
             <p className="text-center text-xs text-gray-400">

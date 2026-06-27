@@ -54,10 +54,10 @@ export function AdminAccessButton({
     return compact ? (
       <a
         href={`/markets/${marketId}/admin/home`}
-        className="p-1.5 text-gray-300 hover:text-purple-400 transition-colors"
-        aria-label="관리자 화면"
+        className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-200 active:scale-95 transition-all"
       >
-        <ShieldCheck className="h-4 w-4" />
+        <ShieldCheck className="h-3.5 w-3.5" />
+        관리자
       </a>
     ) : (
       <a
@@ -76,10 +76,10 @@ export function AdminAccessButton({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="p-1.5 text-gray-300 hover:text-gray-400 transition-colors"
-          aria-label="관리자 전환"
+          className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-200 active:scale-95 transition-all"
         >
-          <Lock className="h-4 w-4" />
+          <Lock className="h-3.5 w-3.5" />
+          관리자
         </button>
       ) : (
         <button

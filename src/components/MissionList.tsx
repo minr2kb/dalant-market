@@ -4,13 +4,22 @@ import { useState } from "react";
 import { MissionCard } from "@/components/MissionCard";
 import { getMissionStatus, type Mission } from "@/types";
 
-type VisibleStatus = "active" | "past";
+type Tab = "active" | "completed" | "past";
 
-const LABEL: Record<VisibleStatus, string> = { active: "진행중", past: "지남" };
-const EMPTY: Record<VisibleStatus, string> = {
+const LABEL: Record<Tab, string> = { active: "진행중", completed: "완료됨", past: "지남" };
+const EMPTY: Record<Tab, string> = {
 	active: "진행중인 미션이 없어요",
+	completed: "완료한 미션이 없어요",
 	past: "지난 미션이 없어요",
 };
+
+function isCompleted(mission: Mission): boolean {
+	if (!mission.slots || mission.slots.length === 0) return false;
+	if (mission.limitCount !== null) {
+		return mission.slots.filter(s => s.verifiedAt !== null).length >= mission.limitCount;
+	}
+	return mission.slots.some(s => s.verifiedAt !== null);
+}
 
 export function MissionList({
 	missions,
@@ -19,50 +28,44 @@ export function MissionList({
 	missions: Mission[];
 	marketId: string;
 }) {
-	const [status, setStatus] = useState<VisibleStatus>("active");
+	const [tab, setTab] = useState<Tab>("active");
 
-	const counts: Record<VisibleStatus, number> = {
-		active: missions.filter(m => getMissionStatus(m) === "active").length,
-		past: missions.filter(m => getMissionStatus(m) === "past").length,
+	const byTab: Record<Tab, Mission[]> = {
+		completed: missions.filter(m => isCompleted(m)),
+		active: missions.filter(m => getMissionStatus(m) === "active" && !isCompleted(m)),
+		past: missions.filter(m => getMissionStatus(m) === "past" && !isCompleted(m)),
 	};
-	const filtered = missions.filter(m => getMissionStatus(m) === status);
 
 	return (
 		<div className="space-y-5">
 			<div className="flex gap-2">
-				{(["active", "past"] as VisibleStatus[]).map(s => (
+				{(["active", "completed", "past"] as Tab[]).map(t => (
 					<button
-						key={s}
+						key={t}
 						type="button"
-						onClick={() => setStatus(s)}
+						onClick={() => setTab(t)}
 						className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-							status === s
+							tab === t
 								? "bg-emerald-500 text-white"
 								: "bg-gray-100 text-gray-500 hover:bg-gray-200"
 						}`}
 					>
-						{LABEL[s]}
-						<span
-							className={`text-[11px] tabular-nums ${status === s ? "opacity-80" : "text-gray-400"}`}
-						>
-							{counts[s]}
+						{LABEL[t]}
+						<span className={`text-[11px] tabular-nums ${tab === t ? "opacity-80" : "text-gray-400"}`}>
+							{byTab[t].length}
 						</span>
 					</button>
 				))}
 			</div>
 
 			<div className="flex flex-col gap-2">
-				{filtered.length === 0 ? (
+				{byTab[tab].length === 0 ? (
 					<div className="py-12 text-center text-sm text-gray-400">
-						{EMPTY[status]}
+						{EMPTY[tab]}
 					</div>
 				) : (
-					filtered.map(mission => (
-						<MissionCard
-							key={mission.id}
-							mission={mission}
-							marketId={marketId}
-						/>
+					byTab[tab].map(mission => (
+						<MissionCard key={mission.id} mission={mission} marketId={marketId} />
 					))
 				)}
 			</div>

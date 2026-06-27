@@ -3,17 +3,24 @@
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { QrCode, X } from 'lucide-react'
+import QRCode from 'react-qr-code'
 import { useModalHistory } from '@/hooks/use-modal-history'
+import { encodeMissionQR } from '@/lib/qr'
 
 interface QRModalProps {
+  marketId: string
+  missionId: string
+  userId: string
   missionTitle: string
   disabled?: boolean
 }
 
-export function QRModal({ missionTitle, disabled = false }: QRModalProps) {
+export function QRModal({ marketId, missionId, userId, missionTitle, disabled = false }: QRModalProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
+
+  const qrValue = encodeMissionQR(marketId, missionId, userId)
 
   return (
     <>
@@ -40,16 +47,13 @@ export function QRModal({ missionTitle, disabled = false }: QRModalProps) {
               </button>
             </div>
 
-            <div className="mx-auto flex h-52 w-52 items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50">
-              <div className="text-center space-y-2">
-                <QrCode className="mx-auto h-16 w-16 text-gray-300" />
-                <p className="text-xs text-gray-400">QR 코드</p>
-              </div>
+            <div className="mx-auto flex h-52 w-52 items-center justify-center rounded-2xl bg-white p-2">
+              <QRCode value={qrValue} size={192} />
             </div>
 
             <div className="rounded-xl bg-amber-50 px-4 py-3 text-center">
-              <p className="text-sm font-medium text-amber-700">5분 후 만료됩니다</p>
-              <p className="text-xs text-amber-600 mt-0.5">상대방 카메라로 스캔해주세요</p>
+              <p className="text-sm font-medium text-amber-700">상대방 카메라로 스캔해주세요</p>
+              <p className="text-xs text-amber-600 mt-0.5">유저 간 인증 미션 — 상대방이 이 QR을 찍어줘야 해요</p>
             </div>
           </div>
         </div>
