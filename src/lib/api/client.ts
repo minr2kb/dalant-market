@@ -16,7 +16,7 @@ const BASE_URL =
 
 const serverExecutor = createFetchExecutor(`${BASE_URL}/api`, {
   plugins: [logger()],
-  defaultHeaders: async () => {
+  defaultHeaders: async (): Promise<Record<string, string>> => {
     const { cookies } = await import('next/headers')
     const cookieStore = await cookies()
     const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join('; ')
