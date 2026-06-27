@@ -17,6 +17,7 @@ export interface Market {
   title: string
   description: string
   pointLabel: string
+  adminCode: string
   startsAt: string
   endsAt: string
   createdAt: string
@@ -43,6 +44,7 @@ export interface Mission {
   id: string
   marketId: string
   title: string
+  description?: string
   type: MissionType
   isGroup: boolean
   reward: number

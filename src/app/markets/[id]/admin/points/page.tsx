@@ -1,29 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState, use } from 'react'
+import { useSuspenseQuery, useMutation } from '@tanstack/react-query'
 import Link from 'next/link'
-import { ChevronLeft, CheckSquare, Square, Plus, Minus, CheckCircle } from 'lucide-react'
+import { ChevronLeft, CheckSquare, Square, CheckCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { MOCK_PARTICIPANTS } from '@/lib/mock-data'
-import { use } from 'react'
+import { participantsQuery } from '@/lib/query/queries'
 
-export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/points'>) {
-  const { id } = use(props.params)
-  const participants = MOCK_PARTICIPANTS
+function AdminPointsContent({ marketId }: { marketId: string }) {
+  const { data } = useSuspenseQuery(participantsQuery.list({ marketId }))
+  const participants = data.data
+
+  const adjustMutation = useMutation(
+    participantsQuery.adjustPoints({ invalidates: [participantsQuery.$key] }),
+  )
 
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [amount, setAmount] = useState('')
   const [memo, setMemo] = useState('')
   const [done, setDone] = useState(false)
+  const [isApplying, setIsApplying] = useState(false)
 
-  const allSelected = selected.size === participants.length
+  const allSelected = participants.length > 0 && selected.size === participants.length
   const n = Number(amount)
 
   function toggleAll() {
-    setSelected(
-      allSelected ? new Set() : new Set(participants.map((p) => p.user.id))
-    )
+    setSelected(allSelected ? new Set() : new Set(participants.map((p) => p.user.id)))
   }
 
   function toggle(uid: string) {
@@ -34,23 +37,34 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
     })
   }
 
-  function apply(sign: 1 | -1) {
-    if (!n || selected.size === 0) return
+  async function apply(sign: 1 | -1) {
+    if (!n || selected.size === 0 || isApplying) return
+    setIsApplying(true)
+    await Promise.all(
+      Array.from(selected).map((uid) =>
+        adjustMutation.mutateAsync({
+          marketId,
+          userId: uid,
+          amount: n * sign,
+          memo: memo || undefined,
+        }),
+      ),
+    )
+    setIsApplying(false)
     setDone(true)
     setTimeout(() => setDone(false), 2000)
   }
 
   return (
-    <div className="bg-white">
-      <div className="flex items-center gap-3 px-4 pt-14 pb-4">
-        <Link href={`/markets/${id}/admin/home`} className="text-gray-400">
+    <div>
+      <div className="flex items-center gap-3 px-4 pt-14 pb-4 max-w-lg mx-auto">
+        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400">
           <ChevronLeft className="h-6 w-6" />
         </Link>
         <h1 className="text-lg font-bold text-gray-900">달란트 일괄 지급</h1>
       </div>
 
       <div className="px-4 max-w-lg mx-auto space-y-5">
-        {/* 지급 설정 */}
         <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
           <p className="text-sm font-semibold text-gray-700">지급 설정</p>
           <Input
@@ -69,19 +83,17 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
           <div className="flex gap-2">
             <Button
               onClick={() => apply(1)}
-              disabled={!n || selected.size === 0}
+              disabled={!n || selected.size === 0 || isApplying}
               className="flex-1 h-11 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 gap-1.5 font-semibold disabled:opacity-40"
             >
-              <Plus className="h-4 w-4" />
               {selected.size > 0 && n ? `${selected.size}명에게 +${n} 지급` : '지급'}
             </Button>
             <Button
               onClick={() => apply(-1)}
-              disabled={!n || selected.size === 0}
+              disabled={!n || selected.size === 0 || isApplying}
               variant="outline"
               className="flex-1 h-11 rounded-xl border-rose-200 text-rose-500 hover:bg-rose-50 gap-1.5 font-semibold disabled:opacity-40"
             >
-              <Minus className="h-4 w-4" />
               {selected.size > 0 && n ? `${selected.size}명에게 -${n} 차감` : '차감'}
             </Button>
           </div>
@@ -93,22 +105,21 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
           )}
         </div>
 
-        {/* 전체 선택 */}
         <button
           type="button"
           onClick={toggleAll}
           className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-left hover:bg-gray-50"
         >
-          {allSelected
-            ? <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
-            : <Square className="h-5 w-5 text-gray-300 shrink-0" />
-          }
+          {allSelected ? (
+            <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
+          ) : (
+            <Square className="h-5 w-5 text-gray-300 shrink-0" />
+          )}
           <span className="text-sm font-semibold text-gray-700">
             전체 선택 ({selected.size}/{participants.length})
           </span>
         </button>
 
-        {/* 유저 목록 */}
         <div className="space-y-2">
           {participants.map((p) => {
             const isSelected = selected.has(p.user.id)
@@ -123,10 +134,11 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
                     : 'border-gray-100 bg-white hover:bg-gray-50'
                 }`}
               >
-                {isSelected
-                  ? <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
-                  : <Square className="h-5 w-5 text-gray-300 shrink-0" />
-                }
+                {isSelected ? (
+                  <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
+                ) : (
+                  <Square className="h-5 w-5 text-gray-300 shrink-0" />
+                )}
                 <div className="flex min-w-0 flex-1 items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
@@ -152,5 +164,14 @@ export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/po
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/points'>) {
+  const { id: marketId } = use(props.params)
+  return (
+    <Suspense fallback={<p className="py-8 text-center text-sm text-gray-400">불러오는 중…</p>}>
+      <AdminPointsContent marketId={marketId} />
+    </Suspense>
   )
 }

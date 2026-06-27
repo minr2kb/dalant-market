@@ -1,6 +1,18 @@
-import Link from 'next/link'
+'use client'
+
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
+  async function handleKakaoLogin() {
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
+    })
+  }
+
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-white px-6">
       <div className="w-full max-w-sm space-y-10">
@@ -13,8 +25,9 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-3">
-          <Link
-            href="/onboarding"
+          <button
+            type="button"
+            onClick={handleKakaoLogin}
             className="flex w-full items-center justify-center gap-3 rounded-full bg-[#FEE500] px-6 py-3.5 font-medium text-[#3C1E1E] transition-opacity hover:opacity-90"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -26,7 +39,7 @@ export default function LoginPage() {
               />
             </svg>
             카카오로 시작하기
-          </Link>
+          </button>
           <p className="text-center text-xs text-gray-400">
             로그인 시 서비스 이용약관에 동의하는 것으로 간주됩니다
           </p>

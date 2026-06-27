@@ -1,153 +1,307 @@
 'use client'
 
-import { useState } from 'react'
-import { Plus, Minus, QrCode, CheckCircle2 } from 'lucide-react'
+import { Suspense, useState, use } from 'react'
+import { useSuspenseQueries, useMutation } from '@tanstack/react-query'
+import { Plus, Minus, ShoppingCart, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { MOCK_MARKET_ITEMS, MOCK_MARKET } from '@/lib/mock-data'
-import type { MarketItem } from '@/types'
+import { QRScanner } from '@/components/QRScanner'
+import { parseQR } from '@/lib/qr'
+import { itemsQuery, participantsQuery, ordersQuery } from '@/lib/query/queries'
+import type { MarketItem, MarketParticipant } from '@/types'
 
-interface CartItem extends MarketItem {
-  qty: number
-}
+type CartEntry = { item: MarketItem; qty: number }
+type ScanState = 'idle' | 'scanning' | 'picking_user' | 'confirm' | 'done'
 
-type PosState = 'shopping' | 'scanning' | 'done'
+function PosContent({ marketId }: { marketId: string }) {
+  const [{ data: itemsData }, { data: participantsData }] = useSuspenseQueries({
+    queries: [
+      itemsQuery.list({ marketId }),
+      participantsQuery.list({ marketId }),
+    ],
+  })
+  const items = itemsData.data
+  const participants = participantsData.data
 
-export default function PosPage() {
-  const [cart, setCart] = useState<CartItem[]>([])
-  const [posState, setPosState] = useState<PosState>('shopping')
+  const orderMutation = useMutation(
+    ordersQuery.create({ invalidates: [participantsQuery.$key] }),
+  )
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
-  const market = MOCK_MARKET
+  const [cart, setCart] = useState<CartEntry[]>([])
+  const [scanState, setScanState] = useState<ScanState>('idle')
+  const [scannedUser, setScannedUser] = useState<MarketParticipant | null>(null)
 
-  function addItem(item: MarketItem) {
+  const total = cart.reduce((s, e) => s + e.item.price * e.qty, 0)
+
+  function addToCart(item: MarketItem) {
     setCart((prev) => {
-      const existing = prev.find((c) => c.id === item.id)
-      if (existing) {
-        return prev.map((c) => (c.id === item.id ? { ...c, qty: c.qty + 1 } : c))
-      }
-      return [...prev, { ...item, qty: 1 }]
+      const e = prev.find((e) => e.item.id === item.id)
+      return e
+        ? prev.map((e) => (e.item.id === item.id ? { ...e, qty: e.qty + 1 } : e))
+        : [...prev, { item, qty: 1 }]
     })
   }
 
-  function changeQty(id: string, delta: number) {
+  function changeQty(itemId: string, delta: number) {
     setCart((prev) =>
       prev
-        .map((c) => (c.id === id ? { ...c, qty: c.qty + delta } : c))
-        .filter((c) => c.qty > 0),
+        .map((e) => (e.item.id === itemId ? { ...e, qty: e.qty + delta } : e))
+        .filter((e) => e.qty > 0),
     )
   }
 
-  function handleScan() {
-    setPosState('scanning')
-    setTimeout(() => setPosState('done'), 2000)
+  function handleScan(val: string) {
+    const qr = parseQR(val)
+    if (qr?.type === 'pay') {
+      const participant = participants.find((p) => p.user.id === qr.userId)
+      if (participant) {
+        setScannedUser(participant)
+        setScanState('confirm')
+        return
+      }
+    }
+    setScanState('picking_user')
+  }
+
+  function handleSimulate() {
+    const p = participants[0]
+    if (p) {
+      setScannedUser(p)
+      setScanState('confirm')
+    } else {
+      setScanState('picking_user')
+    }
+  }
+
+  async function confirmPayment() {
+    if (!scannedUser) return
+    await orderMutation.mutateAsync({
+      marketId,
+      userId: scannedUser.user.id,
+      verifiedBy: 'admin',
+      items: cart.map(({ item, qty }) => ({ name: item.name, price: item.price, qty })),
+    })
+    setScanState('done')
   }
 
   function reset() {
+    setScanState('idle')
+    setScannedUser(null)
     setCart([])
-    setPosState('shopping')
   }
 
+  const updatedUser = scannedUser
+    ? (participants.find((p) => p.user.id === scannedUser.user.id) ?? scannedUser)
+    : null
+
   return (
-    <div className="flex min-h-svh flex-col bg-gray-50">
-      <div className="flex-1 px-4 pt-14 max-w-lg mx-auto w-full space-y-5">
-        <h1 className="text-xl font-bold text-gray-900">마켓 POS</h1>
+    <>
+      <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+        <h1 className="text-xl font-bold text-gray-900">물품 결제</h1>
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {MOCK_MARKET_ITEMS.map((item) => {
-            const cartItem = cart.find((c) => c.id === item.id)
+          {items.map((item) => {
+            const inCart = cart.find((e) => e.item.id === item.id)
             return (
               <button
                 key={item.id}
                 type="button"
-                onClick={() => addItem(item)}
-                className="relative rounded-2xl border border-gray-100 bg-white p-4 text-left transition-transform active:scale-95"
+                onClick={() => addToCart(item)}
+                className={`relative flex flex-col items-start rounded-2xl border p-4 text-left transition-colors active:scale-95 ${
+                  inCart
+                    ? 'border-emerald-300 bg-emerald-50'
+                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                }`}
               >
-                {cartItem && (
+                {inCart && (
                   <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
-                    {cartItem.qty}
+                    {inCart.qty}
                   </span>
                 )}
                 <p className="text-sm font-semibold text-gray-800">{item.name}</p>
-                <p className="text-xs font-bold text-emerald-500">
-                  {item.price} {market.pointLabel}
-                </p>
+                <p className="text-base font-bold tabular-nums text-emerald-500">{item.price}</p>
               </button>
             )
           })}
+          {items.length === 0 && (
+            <p className="col-span-2 py-6 text-center text-sm text-gray-400">
+              등록된 물품이 없어요
+            </p>
+          )}
         </div>
 
         {cart.length > 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
-            <h2 className="text-sm font-semibold text-gray-700">선택 목록</h2>
-            <div className="space-y-2">
-              {cart.map((item) => (
-                <div key={item.id} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">{item.name}</span>
+          <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50">
+              <ShoppingCart className="h-4 w-4 text-gray-400" />
+              <p className="text-sm font-semibold text-gray-700">장바구니</p>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {cart.map(({ item, qty }) => (
+                <div key={item.id} className="flex items-center justify-between px-4 py-3">
+                  <p className="text-sm text-gray-700">{item.name}</p>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => changeQty(item.id, -1)}
-                      className="rounded-full p-1 hover:bg-gray-100"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
                     >
-                      <Minus className="h-3.5 w-3.5 text-gray-500" />
+                      <Minus className="h-3 w-3 text-gray-600" />
                     </button>
-                    <span className="w-5 text-center text-sm font-bold tabular-nums">
-                      {item.qty}
-                    </span>
+                    <span className="w-6 text-center text-sm font-bold tabular-nums">{qty}</span>
                     <button
                       type="button"
                       onClick={() => changeQty(item.id, 1)}
-                      className="rounded-full p-1 hover:bg-gray-100"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
                     >
-                      <Plus className="h-3.5 w-3.5 text-gray-500" />
+                      <Plus className="h-3 w-3 text-gray-600" />
                     </button>
-                    <span className="w-10 text-right text-sm font-medium text-gray-700 tabular-nums">
-                      {item.price * item.qty}
+                    <span className="w-12 text-right text-sm tabular-nums text-rose-500">
+                      -{item.price * qty}
                     </span>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between border-t border-gray-50 pt-3">
+            <div className="flex items-center justify-between bg-gray-50 px-4 py-3">
               <span className="text-sm font-semibold text-gray-700">합계</span>
-              <span className="text-lg font-bold tabular-nums text-emerald-500">
-                {total} {market.pointLabel}
-              </span>
+              <span className="text-base font-bold tabular-nums text-rose-500">-{total}</span>
             </div>
           </div>
+        )}
+
+        {cart.length > 0 ? (
+          <Button
+            onClick={() => setScanState('scanning')}
+            className="h-12 w-full rounded-2xl bg-rose-500 text-sm font-semibold text-white hover:bg-rose-600"
+          >
+            결제하기 ({total} 달란트)
+          </Button>
+        ) : (
+          <p className="py-4 text-center text-sm text-gray-400">
+            물품을 선택하면 장바구니에 담겨요
+          </p>
         )}
       </div>
 
-      <div className="sticky bottom-24 px-4 pb-2 max-w-lg mx-auto w-full">
-        {posState === 'shopping' && (
-          <Button
-            onClick={handleScan}
-            disabled={cart.length === 0}
-            className="w-full rounded-full bg-emerald-500 py-3 text-base font-medium text-white hover:bg-emerald-600 disabled:opacity-40 shadow-lg shadow-emerald-200"
-          >
-            <QrCode className="mr-2 h-5 w-5" />
-            유저 QR 스캔으로 결제
-          </Button>
-        )}
-
-        {posState === 'scanning' && (
-          <div className="flex items-center justify-center rounded-full bg-gray-100 py-3 text-sm text-gray-500">
-            QR 스캔 중...
+      <QRScanner
+        open={scanState !== 'idle'}
+        title="결제 QR 스캔"
+        hint="유저의 결제 QR을 화면 중앙에 맞춰주세요"
+        badge={
+          <span className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold tabular-nums text-white">
+            -{total} 달란트
+          </span>
+        }
+        onScan={handleScan}
+        onSimulate={handleSimulate}
+        onClose={() => setScanState('idle')}
+      >
+        {scanState === 'picking_user' && (
+          <div className="flex flex-1 flex-col justify-end">
+            <div className="max-h-[70svh] overflow-y-auto rounded-t-3xl bg-white px-6 pb-10 pt-5 space-y-4">
+              <div className="mx-auto h-1 w-10 rounded-full bg-gray-200" />
+              <p className="text-sm font-semibold text-gray-700">누구의 QR인가요?</p>
+              <div className="space-y-2">
+                {participants.map((p) => (
+                  <button
+                    key={p.user.id}
+                    type="button"
+                    onClick={() => {
+                      setScannedUser(p)
+                      setScanState('confirm')
+                    }}
+                    className="flex h-14 w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 text-left hover:bg-rose-50 hover:border-rose-200 transition-colors"
+                  >
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
+                      {p.user.realName[0]}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
+                      <p className="text-xs text-gray-400">{p.balance} 달란트 보유</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
-        {posState === 'done' && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-2 rounded-full bg-emerald-50 py-3 text-sm font-medium text-emerald-600">
-              <CheckCircle2 className="h-4 w-4" />
-              결제 완료 — {total} {market.pointLabel} 차감
+        {scanState === 'confirm' && updatedUser && (
+          <div className="flex flex-1 flex-col justify-end">
+            <div className="rounded-t-3xl bg-white px-6 pb-10 pt-5 space-y-5">
+              <div className="mx-auto h-1 w-10 rounded-full bg-gray-200" />
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-base font-bold text-gray-600">
+                  {updatedUser.user.realName[0]}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">{updatedUser.user.realName}</p>
+                  <p className="text-sm text-gray-500">
+                    잔액 {updatedUser.balance} → {updatedUser.balance - total}
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 px-4 py-3 space-y-1">
+                {cart.map(({ item, qty }) => (
+                  <div key={item.id} className="flex justify-between text-sm text-gray-600">
+                    <span>
+                      {item.name} × {qty}
+                    </span>
+                    <span className="tabular-nums">{item.price * qty}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between border-t border-gray-100 pt-2 text-sm font-bold">
+                  <span>합계</span>
+                  <span className="tabular-nums text-rose-500">-{total}</span>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setScanState('picking_user')}
+                  className="h-12 flex-1 rounded-full text-sm font-semibold"
+                >
+                  다시 선택
+                </Button>
+                <Button
+                  onClick={confirmPayment}
+                  disabled={orderMutation.isPending}
+                  className="h-12 flex-1 rounded-full bg-rose-500 text-sm font-semibold text-white hover:bg-rose-600"
+                >
+                  결제 확인
+                </Button>
+              </div>
             </div>
-            <Button onClick={reset} variant="outline" className="w-full rounded-full">
-              새 결제
+          </div>
+        )}
+
+        {scanState === 'done' && updatedUser && (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+            <CheckCircle2 className="h-20 w-20 text-rose-300" />
+            <div>
+              <p className="text-xl font-bold text-white">결제 완료!</p>
+              <p className="mt-1 text-sm text-white/60">
+                {updatedUser.user.realName} · -{total} 달란트
+              </p>
+            </div>
+            <Button
+              onClick={reset}
+              className="mt-4 h-12 w-full max-w-xs rounded-full bg-white text-sm font-semibold text-gray-900 hover:bg-white/90"
+            >
+              다음 결제
             </Button>
           </div>
         )}
-      </div>
-    </div>
+      </QRScanner>
+    </>
+  )
+}
+
+export default function PosPage(props: PageProps<'/markets/[id]/admin/pos'>) {
+  const { id: marketId } = use(props.params)
+  return (
+    <Suspense fallback={<p className="py-8 text-center text-sm text-gray-400">불러오는 중…</p>}>
+      <PosContent marketId={marketId} />
+    </Suspense>
   )
 }

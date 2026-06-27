@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronLeft } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 type Step = 1 | 2 | 3
 
@@ -23,15 +24,45 @@ export default function OnboardingPage() {
   const [birthMonth, setBirthMonth] = useState('')
   const [birthDay, setBirthDay] = useState('')
   const [gender, setGender] = useState<'male' | 'female' | null>(null)
+  const [saving, setSaving] = useState(false)
 
   const birthDate =
     birthYear && birthMonth && birthDay
       ? `${birthYear}-${birthMonth}-${birthDay}`
       : ''
 
-  function handleNext() {
-    if (step < 3) setStep((s) => (s + 1) as Step)
-    else router.push('/markets')
+  async function handleNext() {
+    if (step < 3) {
+      setStep((s) => (s + 1) as Step)
+      return
+    }
+
+    setSaving(true)
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const kakaoName =
+      (user.user_metadata?.name as string | undefined) ??
+      (user.user_metadata?.full_name as string | undefined) ??
+      name
+
+    const { error } = await supabase.from('users').insert({
+      id: user.id,
+      name: kakaoName,
+      real_name: name,
+      birth_date: birthDate,
+      gender,
+    })
+
+    setSaving(false)
+    if (!error) router.push('/markets')
   }
 
   const canProceed =
@@ -132,10 +163,10 @@ export default function OnboardingPage() {
       <div className="mt-auto pb-10 pt-8">
         <Button
           onClick={handleNext}
-          disabled={!canProceed}
+          disabled={!canProceed || saving}
           className="w-full rounded-full bg-emerald-500 text-base font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
         >
-          {step === 3 ? '완료하고 시작하기' : '다음'}
+          {saving ? '저장 중…' : step === 3 ? '완료하고 시작하기' : '다음'}
         </Button>
       </div>
     </div>

@@ -1,33 +1,29 @@
-import { PointLogItem } from '@/components/PointLogItem'
-import { MOCK_POINT_LOGS, MOCK_CURRENT_USER, MOCK_MARKET, MOCK_ORDERS } from '@/lib/mock-data'
+import { Suspense } from 'react'
+import { HistoryClient } from './HistoryClient'
+import { getCurrentUserId } from '@/lib/auth'
 
-export default async function HistoryPage(props: PageProps<'/markets/[id]/history'>) {
-  await props.params
-  const balance = MOCK_CURRENT_USER.balance
-  const market = MOCK_MARKET
-  const orderMap = Object.fromEntries(MOCK_ORDERS.map((o) => [o.id, o]))
-
+function Skeleton() {
   return (
     <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-bold text-gray-900">달란트 내역</h1>
-        <span className="text-sm text-gray-500">
-          잔액{' '}
-          <span className="font-bold text-emerald-500">
-            {balance} {market.pointLabel}
-          </span>
-        </span>
+        <div className="h-7 w-28 animate-pulse rounded-lg bg-gray-100" />
+        <div className="h-5 w-24 animate-pulse rounded bg-gray-100" />
       </div>
-
-      <div className="space-y-3">
-        {MOCK_POINT_LOGS.map((log) => (
-          <PointLogItem
-            key={log.id}
-            log={log}
-            order={log.orderId ? orderMap[log.orderId] : undefined}
-          />
-        ))}
+      <div className="space-y-2">
+        {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-16 animate-pulse rounded-2xl bg-gray-100" />)}
       </div>
     </div>
+  )
+}
+
+export default async function HistoryPage(props: PageProps<'/markets/[id]/history'>) {
+  const { id: marketId } = await props.params
+  const userId = await getCurrentUserId()
+  if (!userId) return null
+
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <HistoryClient marketId={marketId} userId={userId} />
+    </Suspense>
   )
 }

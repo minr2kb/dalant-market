@@ -1,7 +1,14 @@
 import { MarketCard } from '@/components/MarketCard'
-import { MOCK_MARKET, MOCK_PARTICIPANTS } from '@/lib/mock-data'
+import { store } from '@/lib/store'
+
+export const dynamic = 'force-dynamic'
 
 export default function MarketsPage() {
+  const markets = store.markets
+  const participantCounts = Object.fromEntries(
+    markets.map((m) => [m.id, store.participants.filter((p) => p.marketId === m.id).length]),
+  )
+
   return (
     <div className="min-h-svh bg-gray-50 px-4 pt-14 pb-8">
       <div className="max-w-lg mx-auto space-y-6">
@@ -14,11 +21,14 @@ export default function MarketsPage() {
           <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
             참여 중인 마켓
           </h2>
-          <MarketCard
-            market={MOCK_MARKET}
-            participantCount={MOCK_PARTICIPANTS.length}
-            isJoined={true}
-          />
+          {markets.map((market) => (
+            <MarketCard
+              key={market.id}
+              market={market}
+              participantCount={participantCounts[market.id] ?? 0}
+              isJoined={true}
+            />
+          ))}
         </section>
 
         <section className="space-y-3">

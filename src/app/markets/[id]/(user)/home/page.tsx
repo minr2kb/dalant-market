@@ -1,101 +1,33 @@
-import Link from 'next/link'
-import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
-import { MOCK_CURRENT_USER, MOCK_MARKET, MOCK_POINT_LOGS } from '@/lib/mock-data'
-import { PayQRButton } from '@/components/PayQRButton'
-import { AdminAccessButton } from '@/components/AdminAccessButton'
+import { Suspense } from 'react'
+import { UserHomeClient } from './UserHomeClient'
+import { getCurrentUserId } from '@/lib/auth'
 
-export default async function UserHomePage(props: PageProps<'/markets/[id]/home'>) {
-  const { id } = await props.params
-  const user = MOCK_CURRENT_USER
-  const market = MOCK_MARKET
-  const recentLogs = MOCK_POINT_LOGS.slice(0, 3)
-
+function Skeleton() {
   return (
     <div className="px-4 pt-14 space-y-6 max-w-lg mx-auto">
-      {/* 헤더 */}
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-xs text-gray-400">{market.title}</p>
-          <h1 className="text-xl font-bold text-gray-900">{user.user.realName}</h1>
+        <div className="space-y-1.5">
+          <div className="h-3.5 w-24 animate-pulse rounded bg-gray-100" />
+          <div className="h-7 w-32 animate-pulse rounded-lg bg-gray-100" />
         </div>
-        <AdminAccessButton marketId={id} compact />
+        <div className="h-8 w-16 animate-pulse rounded-full bg-gray-100" />
       </div>
-
-      {/* 보유 달란트 카드 */}
-      <div className="rounded-3xl bg-emerald-500 p-6 text-white">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
-            <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
-            <p className="text-sm opacity-70">{market.pointLabel}</p>
-          </div>
-          <PayQRButton userName={user.user.realName} compact />
-        </div>
-      </div>
-
-      {/* 최근 내역 */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700">최근 내역</h2>
-          <Link
-            href={`/markets/${id}/history`}
-            className="flex items-center gap-1 text-xs text-emerald-500"
-          >
-            전체 보기 <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
-
-        <div className="space-y-2">
-          {recentLogs.map((log) => {
-            const label =
-              log.reasonType === 'mission'
-                ? log.missionTitle
-                : log.reasonType === 'purchase'
-                ? log.itemName
-                : log.memo ?? '수동 지급'
-
-            const isPositive = log.amount > 0
-
-            return (
-              <div
-                key={log.id}
-                className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                      isPositive ? 'bg-emerald-50' : 'bg-rose-50'
-                    }`}
-                  >
-                    {isPositive ? (
-                      <TrendingUp className="h-4 w-4 text-emerald-500" />
-                    ) : (
-                      <TrendingDown className="h-4 w-4 text-rose-500" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{label}</p>
-                    <p className="text-xs text-gray-400">
-                      {new Date(log.createdAt).toLocaleDateString('ko-KR', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                </div>
-                <span
-                  className={`text-sm font-bold tabular-nums ${
-                    isPositive ? 'text-emerald-500' : 'text-rose-500'
-                  }`}
-                >
-                  {isPositive ? '+' : ''}
-                  {log.amount}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+      <div className="h-36 animate-pulse rounded-3xl bg-emerald-100" />
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => <div key={i} className="h-14 animate-pulse rounded-2xl bg-gray-100" />)}
       </div>
     </div>
+  )
+}
+
+export default async function UserHomePage(props: PageProps<'/markets/[id]/home'>) {
+  const { id: marketId } = await props.params
+  const userId = await getCurrentUserId()
+  if (!userId) return null
+
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <UserHomeClient marketId={marketId} userId={userId} />
+    </Suspense>
   )
 }
