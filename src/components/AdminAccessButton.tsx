@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useMutation } from '@tanstack/react-query'
 import { ShieldCheck, Lock, X } from 'lucide-react'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { useModalHistory } from '@/hooks/use-modal-history'
+import { adminQuery } from '@/lib/query/queries'
 
 const STORAGE_KEY = 'dalant_admin_granted'
 const CODE_LENGTH = 4
-const MOCK_CODE = '0000'
 
 export function AdminAccessButton({
   marketId,
@@ -34,19 +35,29 @@ export function AdminAccessButton({
   }, [])
   useModalHistory(open, close)
 
+  const authMutation = useMutation(adminQuery.auth())
+
   function handleChange(val: string) {
     setCode(val)
     setError(false)
     if (val.length === CODE_LENGTH) {
-      if (val === MOCK_CODE) {
-        localStorage.setItem(STORAGE_KEY, 'true')
-        setIsAdmin(true)
-        window.history.back()
-        router.push(`/markets/${marketId}/admin/home`)
-      } else {
-        setError(true)
-        setTimeout(() => setCode(''), 600)
-      }
+      authMutation
+        .mutateAsync({ marketId, code: val })
+        .then((result) => {
+          if (result.data.granted) {
+            localStorage.setItem(STORAGE_KEY, 'true')
+            setIsAdmin(true)
+            window.history.back()
+            router.push(`/markets/${marketId}/admin/home`)
+          } else {
+            setError(true)
+            setTimeout(() => setCode(''), 600)
+          }
+        })
+        .catch(() => {
+          setError(true)
+          setTimeout(() => setCode(''), 600)
+        })
     }
   }
 
@@ -114,6 +125,7 @@ export function AdminAccessButton({
                 maxLength={CODE_LENGTH}
                 value={code}
                 onChange={handleChange}
+                disabled={authMutation.isPending}
                 autoFocus
               >
                 <InputOTPGroup className="gap-3">
@@ -133,6 +145,8 @@ export function AdminAccessButton({
 
               {error ? (
                 <p className="text-xs text-rose-500">인증코드가 올바르지 않아요</p>
+              ) : authMutation.isPending ? (
+                <p className="text-xs text-gray-400">확인 중…</p>
               ) : (
                 <p className="text-xs text-gray-400">관리자에게 받은 4자리 코드를 입력하세요</p>
               )}

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { supabase } from '@/lib/supabase' // service role — bypasses RLS for trusted server code
+import { createClient as createSsrClient } from '@/lib/supabase/server' // session auth only
 
-type Supabase = Awaited<ReturnType<typeof createClient>>
+export type Supabase = typeof supabase
 
 export function ok<T>(data: T, status = 200) {
   return NextResponse.json({ data }, { status })
@@ -19,7 +20,7 @@ export function route<P = Record<string, string>>(
   fn: (req: NextRequest, ctx: RouteCtx<P>) => Promise<Response>,
 ) {
   return async (req: NextRequest, props: { params: Promise<P> }) => {
-    const [supabase, params] = await Promise.all([createClient(), props.params])
+    const params = await props.params
     return fn(req, { supabase, params })
   }
 }
@@ -28,8 +29,10 @@ export function authRoute<P = Record<string, string>>(
   fn: (req: NextRequest, ctx: AuthRouteCtx<P>) => Promise<Response>,
 ) {
   return async (req: NextRequest, props: { params: Promise<P> }) => {
-    const [supabase, params] = await Promise.all([createClient(), props.params])
-    const { data: { user } } = await supabase.auth.getUser()
+    const [params, ssrClient] = await Promise.all([props.params, createSsrClient()])
+    const {
+      data: { user },
+    } = await ssrClient.auth.getUser()
     if (!user) return err('Unauthorized', 401)
     return fn(req, { supabase, params, userId: user.id })
   }

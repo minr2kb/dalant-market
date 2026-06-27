@@ -1,7 +1,7 @@
-import { route, ok, err } from '@/lib/api/route-helpers'
+import { authRoute, ok, err } from '@/lib/api/route-helpers'
 
-export const POST = route<{ marketId: string }>(async (req, { supabase, params }) => {
-  const body = (await req.json()) as { code: string; userId: string }
+export const POST = authRoute<{ marketId: string }>(async (req, { supabase, params, userId }) => {
+  const body = (await req.json()) as { code: string }
 
   const { data: market } = await supabase
     .from('markets')
@@ -15,7 +15,7 @@ export const POST = route<{ marketId: string }>(async (req, { supabase, params }
     .from('market_participants')
     .update({ role: 'admin' })
     .eq('market_id', params.marketId)
-    .eq('user_id', body.userId)
+    .eq('user_id', userId)
 
   if (error) return err(error.message)
   return ok({ granted: true })

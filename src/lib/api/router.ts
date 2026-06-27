@@ -81,7 +81,10 @@ export const missionsRouter = defineRouter('/markets', {
   get: endpoint({
     method: 'GET',
     path: '/:marketId/missions/:missionId',
-    request: { path: marketAndMission },
+    request: {
+      path: marketAndMission,
+      query: z.object({ userId: z.string().optional() }),
+    },
     response: oneOf(MissionSchema),
   }),
   create: endpoint({

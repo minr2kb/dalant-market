@@ -36,7 +36,7 @@ export function MissionDetailClient({
 
   const [{ data: missionData }, { data: participantsData }] = useSuspenseQueries({
     queries: [
-      missionsQuery.get({ marketId, missionId }),
+      missionsQuery.get({ marketId, missionId, userId }),
       participantsQuery.list({ marketId }),
     ],
   })
