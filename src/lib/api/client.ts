@@ -15,7 +15,6 @@ const BASE_URL =
     : window.location.origin
 
 const serverExecutor = createFetchExecutor(`${BASE_URL}/api`, {
-  plugins: [logger()],
   defaultHeaders: async (): Promise<Record<string, string>> => {
     const { cookies } = await import('next/headers')
     const cookieStore = await cookies()
@@ -23,7 +22,7 @@ const serverExecutor = createFetchExecutor(`${BASE_URL}/api`, {
     return cookieHeader ? { Cookie: cookieHeader } : {}
   },
 })
-const clientExecutor = createFetchExecutor(`${BASE_URL}/api`, { plugins: [logger()] })
+const clientExecutor = createFetchExecutor(`${BASE_URL}/api`)
 
 const executor = dispatchExecutor(() =>
   typeof window === 'undefined' ? serverExecutor : clientExecutor

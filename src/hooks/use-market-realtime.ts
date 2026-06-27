@@ -20,17 +20,20 @@ export function useMarketRealtime(marketId: string, userId: string) {
           event: 'UPDATE',
           schema: 'public',
           table: 'market_participants',
-          filter: `market_id=eq.${marketId}`,
         },
         (payload) => {
-          if ((payload.new as { user_id: string }).user_id !== userId) return
+          const row = payload.new as { market_id: string; user_id: string }
+          if (row.market_id !== marketId || row.user_id !== userId) return
           queryClient.invalidateQueries({ queryKey: participantsQuery.$key })
           queryClient.invalidateQueries({ queryKey: missionsQuery.$key })
           queryClient.invalidateQueries({ queryKey: pointLogsQuery.$key })
           queryClient.invalidateQueries({ queryKey: ordersQuery.$key })
         },
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) console.error('[Realtime] error:', err)
+        else console.log('[Realtime] status:', status)
+      })
 
     return () => {
       supabase.removeChannel(channel)
