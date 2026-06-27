@@ -1,13 +1,32 @@
 import { MarketCard } from '@/components/MarketCard'
-import { store } from '@/lib/store'
+import { createClient } from '@/lib/supabase/server'
+import { mapMarket } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
-export default function MarketsPage() {
-  const markets = store.markets
-  const participantCounts = Object.fromEntries(
-    markets.map((m) => [m.id, store.participants.filter((p) => p.marketId === m.id).length]),
-  )
+export default async function MarketsPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const [{ data: markets }, { data: myParticipations }] = await Promise.all([
+    supabase.from('markets').select('*, market_participants(count)').order('created_at', { ascending: false }),
+    user
+      ? supabase.from('market_participants').select('market_id').eq('user_id', user.id)
+      : Promise.resolve({ data: [] }),
+  ])
+
+  const joinedIds = new Set((myParticipations ?? []).map((p) => p.market_id))
+
+  type RawMarket = NonNullable<typeof markets>[number]
+
+  function getCount(m: RawMarket) {
+    const c = m.market_participants as unknown as { count: number }[]
+    return c?.[0]?.count ?? 0
+  }
+
+  const allMapped = (markets ?? []).map((m) => ({ market: mapMarket(m as Record<string, unknown>), count: getCount(m) }))
+  const joined = allMapped.filter((m) => joinedIds.has(m.market.id))
+  const available = allMapped.filter((m) => !joinedIds.has(m.market.id))
 
   return (
     <div className="min-h-svh bg-gray-50 px-4 pt-14 pb-8">
@@ -17,28 +36,27 @@ export default function MarketsPage() {
           <p className="text-sm text-gray-500">참여 가능한 행사를 선택하세요</p>
         </div>
 
-        <section className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-            참여 중인 마켓
-          </h2>
-          {markets.map((market) => (
-            <MarketCard
-              key={market.id}
-              market={market}
-              participantCount={participantCounts[market.id] ?? 0}
-              isJoined={true}
-            />
-          ))}
-        </section>
+        {joined.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400">참여 중인 마켓</h2>
+            {joined.map(({ market, count }) => (
+              <MarketCard key={market.id} market={market} participantCount={count} isJoined />
+            ))}
+          </section>
+        )}
 
         <section className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-            참여 가능한 마켓
-          </h2>
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center">
-            <p className="text-sm text-gray-400">다른 활성 마켓이 없어요</p>
-            <p className="mt-1 text-xs text-gray-400">QR 코드를 스캔해서 참여할 수 있어요</p>
-          </div>
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400">참여 가능한 마켓</h2>
+          {available.length > 0 ? (
+            available.map(({ market, count }) => (
+              <MarketCard key={market.id} market={market} participantCount={count} isJoined={false} />
+            ))
+          ) : (
+            <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center">
+              <p className="text-sm text-gray-400">다른 활성 마켓이 없어요</p>
+              <p className="mt-1 text-xs text-gray-400">QR 코드를 스캔해서 참여할 수 있어요</p>
+            </div>
+          )}
         </section>
       </div>
     </div>
