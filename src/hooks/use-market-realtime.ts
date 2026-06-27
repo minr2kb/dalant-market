@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { participantsQuery, missionsQuery, pointLogsQuery, ordersQuery } from '@/lib/query/queries'
 
@@ -12,31 +13,47 @@ export function useMarketRealtime(marketId: string, userId: string) {
     if (!userId) return
 
     const supabase = createClient()
-    const channel = supabase
-      .channel(`balance-${marketId}-${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'market_participants',
-        },
-        (payload) => {
-          const row = payload.new as { market_id: string; user_id: string }
-          if (row.market_id !== marketId || row.user_id !== userId) return
-          queryClient.invalidateQueries({ queryKey: participantsQuery.$key })
-          queryClient.invalidateQueries({ queryKey: missionsQuery.$key })
-          queryClient.invalidateQueries({ queryKey: pointLogsQuery.$key })
-          queryClient.invalidateQueries({ queryKey: ordersQuery.$key })
-        },
-      )
-      .subscribe((status, err) => {
-        if (err) console.error('[Realtime] error:', err)
-        else console.log('[Realtime] status:', status)
-      })
+    let channel: ReturnType<typeof supabase.channel> | null = null
+
+    const setup = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+
+      supabase.realtime.setAuth(session.access_token)
+
+      channel = supabase
+        .channel(`balance-${marketId}-${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'market_participants',
+          },
+          (payload) => {
+            const row = payload.new as { market_id: string; user_id: string; balance: number }
+            const old = payload.old as { balance: number }
+            if (row.market_id !== marketId || row.user_id !== userId) return
+
+            const diff = row.balance - (old.balance ?? 0)
+            if (diff > 0) toast.success(`달란트 +${diff}`, { description: '잔액이 업데이트됐습니다.' })
+            else if (diff < 0) toast.info(`달란트 ${diff}`, { description: '잔액이 업데이트됐습니다.' })
+
+            queryClient.invalidateQueries({ queryKey: participantsQuery.$key })
+            queryClient.invalidateQueries({ queryKey: missionsQuery.$key })
+            queryClient.invalidateQueries({ queryKey: pointLogsQuery.$key })
+            queryClient.invalidateQueries({ queryKey: ordersQuery.$key })
+          },
+        )
+        .subscribe((status, err) => {
+          if (err) console.error('[Realtime] error:', err)
+        })
+    }
+
+    setup()
 
     return () => {
-      supabase.removeChannel(channel)
+      if (channel) supabase.removeChannel(channel)
     }
   }, [marketId, userId, queryClient])
 }

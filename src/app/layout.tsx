@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Noto_Sans_KR } from 'next/font/google'
 import NextTopLoader from 'nextjs-toploader'
+import { Toaster } from 'sonner'
 import './globals.css'
 import { Providers } from '@/components/providers'
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="bg-white text-gray-900 antialiased">
         <NextTopLoader color="oklch(0.696 0.17 162.48)" showSpinner={false} height={3} />
         <Providers>{children}</Providers>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   )
