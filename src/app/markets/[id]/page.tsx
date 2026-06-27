@@ -1,11 +1,25 @@
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { MOCK_MARKET, MOCK_PARTICIPANTS } from '@/lib/mock-data'
 import { Calendar, Users } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { mapMarket } from '@/lib/db'
+import { JoinButton } from './JoinButton'
 
 export default async function MarketJoinPage(props: PageProps<'/markets/[id]'>) {
   const { id } = await props.params
-  const market = MOCK_MARKET
+  const supabase = await createClient()
+
+  const { data: marketRow } = await supabase
+    .from('markets')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  const { count } = await supabase
+    .from('market_participants')
+    .select('*', { count: 'exact', head: true })
+    .eq('market_id', id)
+
+  if (!marketRow) return null
+  const market = mapMarket(marketRow)
 
   const startDate = new Date(market.startsAt).toLocaleDateString('ko-KR', {
     month: 'long',
@@ -36,20 +50,11 @@ export default async function MarketJoinPage(props: PageProps<'/markets/[id]'>) 
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Users className="h-4 w-4 text-emerald-500" />
-            <span>현재 {MOCK_PARTICIPANTS.length}명 참여 중</span>
+            <span>현재 {count ?? 0}명 참여 중</span>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <Link href={`/markets/${id}/home`}>
-            <Button className="w-full rounded-full bg-emerald-500 py-3 text-base font-medium text-white hover:bg-emerald-600">
-              마켓 참여하기
-            </Button>
-          </Link>
-          <Link href="/login" className="flex justify-center text-sm text-gray-400 hover:text-gray-600">
-            다른 계정으로 로그인
-          </Link>
-        </div>
+        <JoinButton marketId={id} />
       </div>
     </div>
   )
