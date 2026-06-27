@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { Home, ListTodo, History, User, QrCode, Wallet, Users, ShoppingBag, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -22,17 +22,28 @@ interface FloatingTabBarProps {
 
 export function FloatingTabBar({ tabs }: FloatingTabBarProps) {
   const pathname = usePathname()
+  const router = useRouter()
+  const [pendingHref, setPendingHref] = useState<string | null>(null)
+
+  useEffect(() => {
+    setPendingHref(null)
+  }, [pathname])
+
+  function handleTab(href: string) {
+    setPendingHref(href)
+    router.push(href)
+  }
 
   return (
     <nav className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg">
       <div className="flex items-center justify-around rounded-full border border-gray-100 bg-white px-2 py-2 shadow-2xl">
         {tabs.map((tab) => {
-          const isActive = pathname.includes(tab.segment)
+          const isActive = pendingHref ? pendingHref === tab.href : pathname.includes(tab.segment)
           const Icon = ICON_MAP[tab.icon] ?? Home
           return (
-            <Link
+            <button
               key={tab.href}
-              href={tab.href}
+              onClick={() => handleTab(tab.href)}
               className={cn(
                 'flex min-w-[52px] flex-col items-center gap-0.5 rounded-full px-3 py-2 transition-colors',
                 isActive ? 'text-emerald-500' : 'text-gray-400 hover:text-gray-600',
@@ -47,7 +58,7 @@ export function FloatingTabBar({ tabs }: FloatingTabBarProps) {
               >
                 {tab.label}
               </span>
-            </Link>
+            </button>
           )
         })}
       </div>
