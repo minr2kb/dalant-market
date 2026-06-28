@@ -12,8 +12,8 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@routar/core':
-        specifier: ^1.8.1
-        version: 1.8.1
+        specifier: ^1.8.2
+        version: 1.8.2
       '@routar/react-query':
         specifier: ^1.8.2
         version: 1.8.2(@tanstack/react-query@5.101.1(react@19.2.4))
@@ -749,9 +749,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  '@routar/core@1.8.1':
-    resolution: {integrity: sha512-GhdsxN27xduGrzipTnzKZ01WowJ+IcEJUsEXN53mt4XS8XtpqhYq/CX0ixCin85zKBYnXgq/XkME+yudgkkApg==}
 
   '@routar/core@1.8.2':
     resolution: {integrity: sha512-6Q1vyYXTfOCBWWYiEULAvssfEtmDPQN5fQU1HA6fezyNONdmmVPHS3BYdYcARnGL5MVR1XLZJd09gQegULAWOA==}
@@ -2925,8 +2922,6 @@ snapshots:
       react: 19.2.4
     optionalDependencies:
       '@types/react': 19.2.17
-
-  '@routar/core@1.8.1': {}
 
   '@routar/core@1.8.2': {}
 
