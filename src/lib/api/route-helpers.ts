@@ -37,3 +37,21 @@ export function authRoute<P = Record<string, string>>(
     return fn(req, { supabase, params, userId: user.id })
   }
 }
+
+export function marketAdminRoute<P extends { marketId: string }>(
+  fn: (req: NextRequest, ctx: AuthRouteCtx<P>) => Promise<Response>,
+) {
+  return async (req: NextRequest, props: { params: Promise<P> }) => {
+    const [params, ssrClient] = await Promise.all([props.params, createSsrClient()])
+    const { data: { user } } = await ssrClient.auth.getUser()
+    if (!user) return err('Unauthorized', 401)
+    const { data: p } = await supabase
+      .from('market_participants')
+      .select('role')
+      .eq('market_id', params.marketId)
+      .eq('user_id', user.id)
+      .single()
+    if (p?.role !== 'admin') return err('Forbidden', 403)
+    return fn(req, { supabase, params, userId: user.id })
+  }
+}

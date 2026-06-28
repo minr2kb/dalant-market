@@ -29,6 +29,7 @@ export function useMarketRealtime(marketId: string, userId: string) {
             event: 'UPDATE',
             schema: 'public',
             table: 'market_participants',
+            filter: `user_id=eq.${userId}`,
           },
           (payload) => {
             const row = payload.new as { market_id: string; user_id: string; balance: number }

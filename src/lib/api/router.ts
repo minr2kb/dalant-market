@@ -140,7 +140,6 @@ export const missionsRouter = defineRouter('/markets', {
       path: marketAndMission,
       body: z.object({
         userId: z.string(),
-        verifiedBy: z.string(),
         slot: z.number().optional(),
       }),
     },
@@ -186,7 +185,6 @@ export const ordersRouter = defineRouter('/markets', {
       path: marketId,
       body: z.object({
         userId: z.string(),
-        verifiedBy: z.string(),
         items: z.array(OrderItemSchema),
       }),
     },

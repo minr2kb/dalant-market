@@ -14,10 +14,8 @@ type ScanState = 'idle' | 'scanning' | 'picking_user' | 'confirm' | 'done'
 
 function PosInner({
   marketId,
-  verifierUserId,
 }: {
   marketId: string
-  verifierUserId: string
 }) {
   const [{ data: itemsData }, { data: participantsData }] = useSuspenseQueries({
     queries: [
@@ -83,7 +81,6 @@ function PosInner({
     await orderMutation.mutateAsync({
       marketId,
       userId: scannedUser.user.id,
-      verifiedBy: verifierUserId,
       items: cart.map(({ item, qty }) => ({ name: item.name, price: item.price, qty })),
     })
     setScanState('done')
@@ -303,16 +300,10 @@ function PosInner({
   )
 }
 
-export function PosContent({
-  marketId,
-  verifierUserId,
-}: {
-  marketId: string
-  verifierUserId: string
-}) {
+export function PosContent({ marketId }: { marketId: string }) {
   return (
     <Suspense fallback={<p className="py-8 text-center text-sm text-gray-400">불러오는 중…</p>}>
-      <PosInner marketId={marketId} verifierUserId={verifierUserId} />
+      <PosInner marketId={marketId} />
     </Suspense>
   )
 }

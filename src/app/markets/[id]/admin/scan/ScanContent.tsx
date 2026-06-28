@@ -4,6 +4,7 @@ import { Suspense, useState } from 'react'
 import { useSuspenseQueries, useMutation } from '@tanstack/react-query'
 import { CheckCircle2, UserPlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { QRScanner } from '@/components/QRScanner'
 import { parseQR } from '@/lib/qr'
@@ -12,7 +13,7 @@ import type { Mission, MarketParticipant } from '@/types'
 
 type ScanState = 'idle' | 'picking_mission' | 'picking_user' | 'confirm' | 'group' | 'done'
 
-function ScanInner({ marketId, verifierUserId }: { marketId: string; verifierUserId: string }) {
+function ScanInner({ marketId }: { marketId: string }) {
   const router = useRouter()
 
   const [{ data: missionsData }, { data: participantsData }] = useSuspenseQueries({
@@ -83,17 +84,24 @@ function ScanInner({ marketId, verifierUserId }: { marketId: string; verifierUse
   async function confirmVerify(extraUserIds: string[] = []) {
     if (!selectedMission || !selectedUser) return
     const allUserIds = [selectedUser.user.id, ...extraUserIds]
-    await Promise.all(
+    const results = await Promise.allSettled(
       allUserIds.map((uid) =>
         verifyMutation.mutateAsync({
           marketId,
           missionId: selectedMission.id,
           userId: uid,
-          verifiedBy: verifierUserId,
         }),
       ),
     )
-    setState('done')
+    const failed = results.filter((r) => r.status === 'rejected')
+    if (failed.length > 0) {
+      toast.error(`${failed.length}명 적립 실패`, {
+        description: '일부 인원의 달란트 적립에 실패했습니다.',
+      })
+    }
+    if (results.some((r) => r.status === 'fulfilled')) {
+      setState('done')
+    }
   }
 
   function reset() {
@@ -262,10 +270,10 @@ function ScanInner({ marketId, verifierUserId }: { marketId: string; verifierUse
   )
 }
 
-export function ScanContent({ marketId, verifierUserId }: { marketId: string; verifierUserId: string }) {
+export function ScanContent({ marketId }: { marketId: string }) {
   return (
     <Suspense fallback={<p className="py-8 text-center text-sm text-gray-400">불러오는 중…</p>}>
-      <ScanInner marketId={marketId} verifierUserId={verifierUserId} />
+      <ScanInner marketId={marketId} />
     </Suspense>
   )
 }

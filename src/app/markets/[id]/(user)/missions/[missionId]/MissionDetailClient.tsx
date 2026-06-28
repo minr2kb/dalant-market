@@ -63,7 +63,6 @@ export function MissionDetailClient({
       marketId,
       missionId,
       userId: scanTarget.user.id,
-      verifiedBy: userId,
     })
     setScanDone(true)
   }
