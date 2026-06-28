@@ -16,7 +16,7 @@ export default async function MissionsPage(props: PageProps<'/markets/[id]/missi
   qc.setQueryData(missionsQuery.list({ marketId, userId }).queryKey, { data: missions })
 
   return (
-    <div className="px-4 pt-14 pb-4 max-w-lg mx-auto space-y-5">
+    <div className="px-4 pb-4 max-w-lg mx-auto space-y-5">
       <h1 className="text-xl font-bold text-gray-900">미션</h1>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense

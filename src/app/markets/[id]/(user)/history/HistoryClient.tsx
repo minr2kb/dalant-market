@@ -16,7 +16,7 @@ export function HistoryClient({ marketId, userId }: { marketId: string; userId: 
   const orderMap = Object.fromEntries(orders.map((o) => [o.id, o]))
 
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+    <div className="px-4 max-w-lg mx-auto space-y-5">
       <div className="flex items-baseline justify-between">
         <h1 className="text-xl font-bold text-gray-900">달란트 내역</h1>
         <span className="text-sm text-gray-500">

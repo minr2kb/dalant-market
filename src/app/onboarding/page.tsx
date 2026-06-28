@@ -71,7 +71,7 @@ export default function OnboardingPage() {
     (step === 3 && gender !== null)
 
   return (
-    <div className="flex min-h-svh flex-col bg-white px-6 pt-14">
+    <div className="flex min-h-svh flex-col bg-white px-6 pt-4">
       <div className="mb-8 space-y-4">
         {step > 1 && (
           <button

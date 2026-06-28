@@ -13,7 +13,7 @@ export default async function AdminUsersPage(props: PageProps<'/markets/[id]/adm
   const participants = await listParticipants(supabase, marketId)
   qc.setQueryData(participantsQuery.list({ marketId }).queryKey, { data: participants })
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+    <div className="px-4 max-w-lg mx-auto space-y-5">
       <h1 className="text-xl font-bold text-gray-900">유저 관리</h1>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense

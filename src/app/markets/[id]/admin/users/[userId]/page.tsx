@@ -23,7 +23,7 @@ export default async function AdminUserDetailPage(
   qc.setQueryData(missionsQuery.list({ marketId }).queryKey, { data: missions })
   return (
     <div>
-      <div className="flex items-center gap-3 px-4 pt-14 pb-4 max-w-lg mx-auto">
+      <div className="flex items-center gap-3 px-4 pb-4 max-w-lg mx-auto">
         <Link href={`/markets/${marketId}/admin/users`} className="text-gray-400">
           <ChevronLeft className="h-6 w-6" />
         </Link>

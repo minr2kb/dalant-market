@@ -29,7 +29,7 @@ export default async function MarketsPage() {
   const available = allMapped.filter((m) => !joinedIds.has(m.market.id))
 
   return (
-    <div className="min-h-svh bg-gray-50 px-4 pt-14 pb-8">
+    <div className="min-h-svh bg-gray-50 px-4 pt-4 pb-8">
       <div className="max-w-lg mx-auto space-y-6">
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-gray-900">마켓</h1>

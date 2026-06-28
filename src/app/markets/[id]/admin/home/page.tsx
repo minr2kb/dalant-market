@@ -11,7 +11,7 @@ import { AdminHomeClient } from './AdminHomeClient'
 
 function Skeleton() {
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-6">
+    <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="h-7 w-40 animate-pulse rounded-lg bg-gray-100" />
         <div className="h-8 w-20 animate-pulse rounded-full bg-gray-100" />

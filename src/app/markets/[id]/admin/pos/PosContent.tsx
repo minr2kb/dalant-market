@@ -104,7 +104,7 @@ function PosInner({
 
   return (
     <>
-      <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+      <div className="px-4 max-w-lg mx-auto space-y-5">
         <h1 className="text-xl font-bold text-gray-900">물품 결제</h1>
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">

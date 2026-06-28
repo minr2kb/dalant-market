@@ -4,7 +4,7 @@ import { getCurrentUserId } from '@/lib/auth'
 
 function Skeleton() {
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+    <div className="px-4 max-w-lg mx-auto space-y-5">
       <div className="flex items-baseline justify-between">
         <div className="h-7 w-28 animate-pulse rounded-lg bg-gray-100" />
         <div className="h-5 w-24 animate-pulse rounded bg-gray-100" />

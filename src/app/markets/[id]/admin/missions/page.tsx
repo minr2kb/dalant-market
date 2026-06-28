@@ -121,7 +121,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
 
   return (
     <>
-      <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+      <div className="px-4 max-w-lg mx-auto space-y-5">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-900">미션 관리</h1>
           <Button
@@ -377,7 +377,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
 
 function MissionsSkeleton() {
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-5">
+    <div className="px-4 max-w-lg mx-auto space-y-5">
       <div className="flex items-center justify-between">
         <div className="h-7 w-28 animate-pulse rounded-lg bg-gray-100" />
         <div className="h-9 w-24 animate-pulse rounded-full bg-gray-100" />

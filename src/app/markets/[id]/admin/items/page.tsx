@@ -65,7 +65,7 @@ function AdminItemsContent({ marketId }: { marketId: string }) {
   }
 
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-6">
+    <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400">
           <ChevronLeft className="h-6 w-6" />

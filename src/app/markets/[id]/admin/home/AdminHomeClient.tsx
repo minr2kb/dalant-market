@@ -28,7 +28,7 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
   const recentLogs = [...logs].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5)
 
   return (
-    <div className="px-4 pt-14 max-w-lg mx-auto space-y-6">
+    <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold text-gray-900">{market.title}</h1>

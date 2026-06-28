@@ -19,7 +19,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
   const recentLogs = pointLogs.slice(0, 3)
 
   return (
-    <div className="px-4 pt-14 space-y-6 max-w-lg mx-auto">
+    <div className="px-4 space-y-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs text-gray-400">{market.title}</p>
