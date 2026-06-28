@@ -77,7 +77,7 @@ export const missionsRouter = defineRouter('/markets', {
       query: z.object({
         status: z.enum(['active', 'upcoming', 'past']).optional(),
         userId: z.string().optional(),
-      }),
+      }).optional(),
     },
     response: listOf(MissionSchema),
   }),
@@ -86,7 +86,7 @@ export const missionsRouter = defineRouter('/markets', {
     path: '/:marketId/missions/:missionId',
     request: {
       path: marketAndMission,
-      query: z.object({ userId: z.string().optional() }),
+      query: z.object({ userId: z.string().optional() }).optional(),
     },
     response: oneOf(MissionSchema),
   }),
