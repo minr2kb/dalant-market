@@ -141,7 +141,7 @@ export const missionsRouter = defineRouter('/markets', {
       body: z.object({
         userId: z.string(),
         slot: z.number().optional(),
-        photoUrl: z.string().optional(),
+        photoUrls: z.array(z.string()).optional(),
       }),
     },
     response: oneOf(

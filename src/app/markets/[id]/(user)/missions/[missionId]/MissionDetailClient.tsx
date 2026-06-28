@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useSuspenseQueries, useMutation } from '@tanstack/react-query'
-import { ChevronLeft, Upload, CheckCircle2, ScanLine, Loader2 } from 'lucide-react'
+import { ChevronLeft, CheckCircle2, ScanLine, Loader2, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { MissionSlot } from '@/components/MissionSlot'
 import { QRModal } from '@/components/QRModal'
@@ -13,6 +13,8 @@ import { uploadMissionPhoto } from '@/lib/upload'
 import { getMissionStatus } from '@/types'
 import type { MarketParticipant } from '@/types'
 import { missionsQuery, participantsQuery } from '@/lib/query/queries'
+
+const MAX_PHOTOS = 3
 
 const TYPE_LABEL: Record<string, string> = {
   user_qr: '유저 간 인증',
@@ -36,12 +38,25 @@ export function MissionDetailClient({
   missionId: string
   userId: string
 }) {
-  const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle')
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const storageKey = `upload:${missionId}:${userId}`
+
+  const [photoUrls, setPhotoUrls] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      return JSON.parse(localStorage.getItem(storageKey) ?? '[]')
+    } catch {
+      return []
+    }
+  })
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState(false)
   const [scannerOpen, setScannerOpen] = useState(false)
   const [scanTarget, setScanTarget] = useState<MarketParticipant | null>(null)
   const [scanDone, setScanDone] = useState(false)
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(photoUrls))
+  }, [storageKey, photoUrls])
 
   const [{ data: missionData }, { data: participantsData }] = useSuspenseQueries({
     queries: [
@@ -59,17 +74,22 @@ export function MissionDetailClient({
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (!file) return
-    setPreviewUrl(URL.createObjectURL(file))
-    setUploadState('uploading')
+    if (!file || photoUrls.length >= MAX_PHOTOS) return
+    e.target.value = ''
+    setUploading(true)
+    setUploadError(false)
     try {
       const url = await uploadMissionPhoto(file, marketId, missionId, userId)
-      setPhotoUrl(url)
-      setUploadState('done')
+      setPhotoUrls((prev) => [...prev, url])
     } catch {
-      setUploadState('error')
-      setPreviewUrl(null)
+      setUploadError(true)
+    } finally {
+      setUploading(false)
     }
+  }
+
+  function removePhoto(index: number) {
+    setPhotoUrls((prev) => prev.filter((_, i) => i !== index))
   }
 
   function handleScan(val: string) {
@@ -148,41 +168,50 @@ export function MissionDetailClient({
           ) : (
             <div className="space-y-3">
               {mission.type === 'upload' && (
-                <label
-                  htmlFor="photo-upload"
-                  className={`flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed py-6 text-sm font-medium transition-colors ${
-                    uploadState === 'done'
-                      ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
-                      : uploadState === 'uploading'
-                      ? 'border-gray-200 bg-gray-50 text-gray-400'
-                      : uploadState === 'error'
-                      ? 'border-red-200 bg-red-50 text-red-500'
-                      : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
-                  }`}
-                >
-                  {previewUrl && (
-                    <img src={previewUrl} alt="" className="h-32 w-32 rounded-xl object-cover" />
-                  )}
-                  <span className="flex items-center gap-2">
-                    {uploadState === 'uploading' ? (
-                      <><Loader2 className="h-5 w-5 animate-spin" /> 업로드 중...</>
-                    ) : uploadState === 'done' ? (
-                      <><CheckCircle2 className="h-5 w-5" /> 사진 업로드 완료</>
-                    ) : uploadState === 'error' ? (
-                      <><Upload className="h-5 w-5" /> 업로드 실패 — 다시 시도</>
-                    ) : (
-                      <><Upload className="h-5 w-5" /> 사진 업로드</>
+                <div className="space-y-2">
+                  <div className="grid grid-cols-3 gap-2">
+                    {photoUrls.map((url, i) => (
+                      <div key={url} className="relative aspect-square">
+                        <img
+                          src={url}
+                          alt=""
+                          className="h-full w-full rounded-xl object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(i)}
+                          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {photoUrls.length < MAX_PHOTOS && (
+                      <label className="flex aspect-square cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-white text-gray-400 hover:border-emerald-300 hover:text-emerald-400 transition-colors">
+                        {uploading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Plus className="h-5 w-5" />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          disabled={uploading}
+                          onChange={handleFileChange}
+                        />
+                      </label>
                     )}
-                  </span>
-                  <input
-                    id="photo-upload"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    disabled={uploadState === 'uploading'}
-                    onChange={handleFileChange}
-                  />
-                </label>
+                  </div>
+                  {uploadError && (
+                    <p className="text-center text-xs text-red-500">업로드 실패. 다시 시도해주세요</p>
+                  )}
+                  {photoUrls.length === 0 && !uploadError && (
+                    <p className="text-center text-xs text-gray-400">
+                      사진을 업로드해야 QR을 생성할 수 있어요 (최대 {MAX_PHOTOS}장)
+                    </p>
+                  )}
+                </div>
               )}
               {nextPendingSlot && (
                 <QRModal
@@ -190,9 +219,9 @@ export function MissionDetailClient({
                   missionId={missionId}
                   userId={userId}
                   missionTitle={mission.title}
-                  photoUrl={photoUrl ?? undefined}
+                  photoUrls={photoUrls.length > 0 ? photoUrls : undefined}
                   hint={QR_HINT[mission.type]}
-                  disabled={mission.type === 'upload' && uploadState !== 'done'}
+                  disabled={mission.type === 'upload' && photoUrls.length === 0}
                 />
               )}
               {mission.type === 'user_qr' && (
@@ -208,11 +237,6 @@ export function MissionDetailClient({
                   <ScanLine className="mr-2 h-4 w-4" />
                   QR 인증해주기
                 </Button>
-              )}
-              {mission.type === 'upload' && uploadState !== 'done' && (
-                <p className="text-center text-xs text-gray-400">
-                  사진을 업로드해야 QR을 생성할 수 있어요
-                </p>
               )}
               {mission.type === 'admin_qr' && (
                 <p className="text-center text-xs text-gray-400">

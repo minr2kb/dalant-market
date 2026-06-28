@@ -2,7 +2,7 @@ import { authRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const POST = authRoute<{ marketId: string; missionId: string }>(
   async (req, { supabase, params, userId: verifiedBy }) => {
-    const body = (await req.json()) as { userId: string; slot?: number; photoUrl?: string }
+    const body = (await req.json()) as { userId: string; slot?: number; photoUrls?: string[] }
     const { marketId, missionId } = params
 
     const [{ data: mission, error: e1 }, { data: participant, error: e2 }, { data: verifier }] =
@@ -57,10 +57,10 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
 
     if (e3) return err(e3.message)
 
-    if (body.photoUrl) {
+    if (body.photoUrls && body.photoUrls.length > 0) {
       await supabase
         .from('mission_logs')
-        .update({ photo_url: body.photoUrl })
+        .update({ photo_url: body.photoUrls.join(',') })
         .eq('mission_id', missionId)
         .eq('user_id', body.userId)
         .eq('slot', slotNum)

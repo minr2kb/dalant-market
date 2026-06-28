@@ -328,24 +328,27 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <p className="text-xs font-medium text-gray-500">시작일 (선택)</p>
-                <Input
-                  type="date"
-                  value={form.activeFrom}
-                  onChange={(e) => setForm((f) => ({ ...f, activeFrom: e.target.value }))}
-                  className="rounded-xl"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <p className="text-xs font-medium text-gray-500">종료일 (선택)</p>
-                <Input
-                  type="date"
-                  value={form.activeUntil}
-                  onChange={(e) => setForm((f) => ({ ...f, activeUntil: e.target.value }))}
-                  className="rounded-xl"
-                />
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="text-xs font-medium text-gray-500">시작일 (선택)</p>
+                  <Input
+                    type="date"
+                    value={form.activeFrom}
+                    onChange={(e) => setForm((f) => ({ ...f, activeFrom: e.target.value }))}
+                    className="rounded-xl"
+                  />
+                </div>
+                <span className="mt-5 shrink-0 text-gray-300">~</span>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="text-xs font-medium text-gray-500">종료일 (선택)</p>
+                  <Input
+                    type="date"
+                    value={form.activeUntil}
+                    onChange={(e) => setForm((f) => ({ ...f, activeUntil: e.target.value }))}
+                    className="rounded-xl"
+                  />
+                </div>
               </div>
             </div>
 

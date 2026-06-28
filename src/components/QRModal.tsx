@@ -12,17 +12,17 @@ interface QRModalProps {
   missionId: string
   userId: string
   missionTitle: string
-  photoUrl?: string
+  photoUrls?: string[]
   hint?: string
   disabled?: boolean
 }
 
-export function QRModal({ marketId, missionId, userId, missionTitle, photoUrl, hint, disabled = false }: QRModalProps) {
+export function QRModal({ marketId, missionId, userId, missionTitle, photoUrls, hint, disabled = false }: QRModalProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
 
-  const qrValue = encodeMissionQR(marketId, missionId, userId, photoUrl)
+  const qrValue = encodeMissionQR(marketId, missionId, userId, photoUrls)
 
   return (
     <>
