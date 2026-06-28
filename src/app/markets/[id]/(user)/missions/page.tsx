@@ -12,7 +12,7 @@ export default async function MissionsPage(props: PageProps<'/markets/[id]/missi
   const { data: { user } } = await supabase.auth.getUser()
   const userId = user?.id
   const qc = getQueryClient()
-  const missions = await listMissions(supabase, marketId, { userId })
+  const missions = await listMissions(supabase, marketId, { userId }).catch(() => [])
   qc.setQueryData(missionsQuery.list({ marketId, userId }).queryKey, { data: missions })
 
   return (
