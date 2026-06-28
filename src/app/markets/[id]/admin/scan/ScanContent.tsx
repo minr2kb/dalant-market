@@ -40,14 +40,17 @@ function ScanInner({ marketId }: { marketId: string }) {
 
   function handleScan(val: string) {
     const qr = parseQR(val)
-    if (qr?.type === 'mission') {
-      const mission = missions.find((m) => m.id === qr.missionId)
+    if (qr) {
       const participant = participants.find((p) => p.user.id === qr.userId)
-      if (mission && participant) {
-        setSelectedMission(mission)
-        setSelectedUser(participant)
-        setState('confirm')
-        return
+      if (participant) setSelectedUser(participant)
+
+      if (qr.type === 'mission') {
+        const mission = missions.find((m) => m.id === qr.missionId)
+        if (mission && participant) {
+          setSelectedMission(mission)
+          setState('confirm')
+          return
+        }
       }
     }
     setState('picking_mission')
@@ -67,7 +70,7 @@ function ScanInner({ marketId }: { marketId: string }) {
 
   function selectMission(mission: Mission) {
     setSelectedMission(mission)
-    setState('picking_user')
+    setState(selectedUser ? 'confirm' : 'picking_user')
   }
 
   function selectUser(participant: MarketParticipant) {

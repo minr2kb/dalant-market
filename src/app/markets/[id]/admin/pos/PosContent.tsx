@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react'
 import { useSuspenseQueries, useMutation } from '@tanstack/react-query'
 import { Plus, Minus, ShoppingCart, CheckCircle2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { QRScanner } from '@/components/QRScanner'
 import { parseQR } from '@/lib/qr'
@@ -78,12 +79,17 @@ function PosInner({
 
   async function confirmPayment() {
     if (!scannedUser) return
-    await orderMutation.mutateAsync({
-      marketId,
-      userId: scannedUser.user.id,
-      items: cart.map(({ item, qty }) => ({ name: item.name, price: item.price, qty })),
-    })
-    setScanState('done')
+    try {
+      await orderMutation.mutateAsync({
+        marketId,
+        userId: scannedUser.user.id,
+        items: cart.map(({ item, qty }) => ({ name: item.name, price: item.price, qty })),
+      })
+      setScanState('done')
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : '결제에 실패했습니다.'
+      toast.error('결제 실패', { description: msg })
+    }
   }
 
   function reset() {
