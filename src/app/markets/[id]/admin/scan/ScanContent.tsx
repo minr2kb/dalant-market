@@ -23,7 +23,7 @@ function ScanInner({ marketId }: { marketId: string }) {
     ],
   })
   const missions = missionsData.data.filter(
-    (m) => m.type === 'admin_qr' || m.type === 'upload',
+    (m) => m.isActive && (m.type === 'admin_qr' || m.type === 'upload'),
   )
   const participants = participantsData.data
 

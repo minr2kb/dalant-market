@@ -83,8 +83,8 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
       limitCount: mission.limitCount !== null ? String(mission.limitCount) : '',
       type: mission.type,
       isGroup: mission.isGroup,
-      activeFrom: mission.activeFrom ?? '',
-      activeUntil: mission.activeUntil ?? '',
+      activeFrom: mission.activeFrom ? mission.activeFrom.slice(0, 10) : '',
+      activeUntil: mission.activeUntil ? mission.activeUntil.slice(0, 10) : '',
     })
     setExpandedId(null)
     setFormOpen(true)
