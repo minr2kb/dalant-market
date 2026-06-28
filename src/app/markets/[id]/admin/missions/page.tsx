@@ -264,7 +264,6 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                 value={form.title}
                 onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                 className="rounded-xl"
-                autoFocus
               />
             </div>
 
