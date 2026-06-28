@@ -15,9 +15,11 @@ export function useMarketRealtime(marketId: string, userId: string) {
     const supabase = createClient()
     let channel: ReturnType<typeof supabase.channel> | null = null
 
+    let mounted = true
+
     const setup = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
+      if (!session || !mounted) return
 
       supabase.realtime.setAuth(session.access_token)
 
@@ -54,6 +56,7 @@ export function useMarketRealtime(marketId: string, userId: string) {
     setup()
 
     return () => {
+      mounted = false
       if (channel) supabase.removeChannel(channel)
     }
   }, [marketId, userId, queryClient])
