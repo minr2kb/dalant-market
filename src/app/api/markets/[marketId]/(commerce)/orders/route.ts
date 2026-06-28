@@ -1,5 +1,5 @@
 import { mapOrder } from '@/lib/db'
-import { route, marketAdminRoute, ok, err } from '@/lib/api/route-helpers'
+import { route, authRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ marketId: string }>(async (req, { supabase, params }) => {
   const userId = req.nextUrl.searchParams.get('userId')
@@ -16,7 +16,7 @@ export const GET = route<{ marketId: string }>(async (req, { supabase, params })
   return ok((data ?? []).map((r) => mapOrder(r as Record<string, unknown>)))
 })
 
-export const POST = marketAdminRoute<{ marketId: string }>(
+export const POST = authRoute<{ marketId: string }>(
   async (req, { supabase, params, userId: verifiedBy }) => {
     const body = (await req.json()) as {
       userId: string

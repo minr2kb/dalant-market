@@ -1,6 +1,6 @@
-import { marketAdminRoute, ok, err } from '@/lib/api/route-helpers'
+import { authRoute, ok, err } from '@/lib/api/route-helpers'
 
-export const PATCH = marketAdminRoute<{ marketId: string; userId: string }>(async (req, { supabase, params }) => {
+export const PATCH = authRoute<{ marketId: string; userId: string }>(async (req, { supabase, params }) => {
   const body = (await req.json()) as { amount: number; memo?: string }
   if (typeof body.amount !== 'number') return err('amount required', 400)
 

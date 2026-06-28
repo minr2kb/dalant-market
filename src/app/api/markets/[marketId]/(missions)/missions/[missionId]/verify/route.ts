@@ -22,17 +22,6 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
     if (e1 || !mission) return err('Mission not found', 404)
     if (e2 || !participant) return err('User not found', 404)
 
-    // admin_qr / upload 미션은 관리자만 인증 가능
-    if (mission.type === 'admin_qr' || mission.type === 'upload') {
-      const { data: adminCheck } = await supabase
-        .from('market_participants')
-        .select('role')
-        .eq('market_id', marketId)
-        .eq('user_id', verifiedBy)
-        .single()
-      if (adminCheck?.role !== 'admin') return err('Forbidden', 403)
-    }
-
     const { data: existingLogs } = await supabase
       .from('mission_logs')
       .select('slot')
