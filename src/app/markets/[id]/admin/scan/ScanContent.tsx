@@ -37,6 +37,7 @@ function ScanInner({ marketId }: { marketId: string }) {
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null)
   const [selectedUser, setSelectedUser] = useState<MarketParticipant | null>(null)
   const [groupUsers, setGroupUsers] = useState<string[]>([])
+  const [pendingPhotoUrl, setPendingPhotoUrl] = useState<string | null>(null)
 
   function handleScan(val: string) {
     const qr = parseQR(val)
@@ -45,6 +46,7 @@ function ScanInner({ marketId }: { marketId: string }) {
       if (participant) setSelectedUser(participant)
 
       if (qr.type === 'mission') {
+        if (qr.photoUrl) setPendingPhotoUrl(qr.photoUrl)
         const mission = missions.find((m) => m.id === qr.missionId)
         if (mission && participant) {
           setSelectedMission(mission)
@@ -93,6 +95,7 @@ function ScanInner({ marketId }: { marketId: string }) {
           marketId,
           missionId: selectedMission.id,
           userId: uid,
+          ...(pendingPhotoUrl ? { photoUrl: pendingPhotoUrl } : {}),
         }),
       ),
     )
@@ -112,6 +115,7 @@ function ScanInner({ marketId }: { marketId: string }) {
     setSelectedMission(null)
     setSelectedUser(null)
     setGroupUsers([])
+    setPendingPhotoUrl(null)
   }
 
   const otherParticipants = participants.filter((p) => p.user.id !== selectedUser?.user.id)
@@ -194,6 +198,18 @@ function ScanInner({ marketId }: { marketId: string }) {
                 {selectedUser.user.realName} · +{selectedMission.reward} 달란트
               </p>
             </div>
+            {selectedMission.type === 'upload' && pendingPhotoUrl && (
+              <img
+                src={pendingPhotoUrl}
+                alt="업로드된 사진"
+                className="w-full max-h-48 rounded-2xl object-cover"
+              />
+            )}
+            {selectedMission.type === 'upload' && !pendingPhotoUrl && (
+              <div className="rounded-xl bg-amber-50 px-4 py-3 text-center">
+                <p className="text-sm text-amber-700">QR에 사진이 포함되지 않았어요</p>
+              </div>
+            )}
             <div className="flex gap-3">
               <Button
                 variant="outline"

@@ -2,10 +2,8 @@ import { authRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const POST = authRoute<{ marketId: string; missionId: string }>(
   async (req, { supabase, params, userId: verifiedBy }) => {
-    const body = (await req.json()) as { userId: string; slot?: number }
+    const body = (await req.json()) as { userId: string; slot?: number; photoUrl?: string }
     const { marketId, missionId } = params
-
-    if (body.userId === verifiedBy) return err('Cannot verify own QR', 403)
 
     const [{ data: mission, error: e1 }, { data: participant, error: e2 }, { data: verifier }] =
       await Promise.all([
@@ -21,6 +19,9 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
 
     if (e1 || !mission) return err('Mission not found', 404)
     if (e2 || !participant) return err('User not found', 404)
+
+    if (body.userId === verifiedBy && mission.type === 'user_qr')
+      return err('Cannot verify own QR', 403)
 
     const { data: existingLogs } = await supabase
       .from('mission_logs')
@@ -55,6 +56,15 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
     })
 
     if (e3) return err(e3.message)
+
+    if (body.photoUrl) {
+      await supabase
+        .from('mission_logs')
+        .update({ photo_url: body.photoUrl })
+        .eq('mission_id', missionId)
+        .eq('user_id', body.userId)
+        .eq('slot', slotNum)
+    }
 
     return ok({
       missionId,

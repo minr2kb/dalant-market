@@ -12,15 +12,17 @@ interface QRModalProps {
   missionId: string
   userId: string
   missionTitle: string
+  photoUrl?: string
+  hint?: string
   disabled?: boolean
 }
 
-export function QRModal({ marketId, missionId, userId, missionTitle, disabled = false }: QRModalProps) {
+export function QRModal({ marketId, missionId, userId, missionTitle, photoUrl, hint, disabled = false }: QRModalProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
 
-  const qrValue = encodeMissionQR(marketId, missionId, userId)
+  const qrValue = encodeMissionQR(marketId, missionId, userId, photoUrl)
 
   return (
     <>
@@ -52,8 +54,8 @@ export function QRModal({ marketId, missionId, userId, missionTitle, disabled = 
             </div>
 
             <div className="rounded-xl bg-amber-50 px-4 py-3 text-center">
-              <p className="text-sm font-medium text-amber-700">상대방 카메라로 스캔해주세요</p>
-              <p className="text-xs text-amber-600 mt-0.5">유저 간 인증 미션 — 상대방이 이 QR을 찍어줘야 해요</p>
+              <p className="text-sm font-medium text-amber-700">카메라로 스캔해주세요</p>
+              {hint && <p className="text-xs text-amber-600 mt-0.5">{hint}</p>}
             </div>
           </div>
         </div>

@@ -2,13 +2,14 @@
 
 import { useState, useCallback } from 'react'
 import { useSuspenseQueries, useMutation } from '@tanstack/react-query'
-import { ChevronLeft, Upload, CheckCircle2, ScanLine } from 'lucide-react'
+import { ChevronLeft, Upload, CheckCircle2, ScanLine, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { MissionSlot } from '@/components/MissionSlot'
 import { QRModal } from '@/components/QRModal'
 import { QRScanner } from '@/components/QRScanner'
 import { Button } from '@/components/ui/button'
 import { parseQR } from '@/lib/qr'
+import { uploadMissionPhoto } from '@/lib/upload'
 import { getMissionStatus } from '@/types'
 import type { MarketParticipant } from '@/types'
 import { missionsQuery, participantsQuery } from '@/lib/query/queries'
@@ -20,6 +21,12 @@ const TYPE_LABEL: Record<string, string> = {
   manual: '상시',
 }
 
+const QR_HINT: Record<string, string> = {
+  user_qr: '유저 간 인증 미션 — 상대방이 이 QR을 찍어줘야 해요',
+  upload: '업로드형 미션 — 관리자에게 QR을 보여주세요',
+  admin_qr: '관리자 인증 미션 — 관리자에게 QR을 보여주세요',
+}
+
 export function MissionDetailClient({
   marketId,
   missionId,
@@ -29,7 +36,9 @@ export function MissionDetailClient({
   missionId: string
   userId: string
 }) {
-  const [photoUploaded, setPhotoUploaded] = useState(false)
+  const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle')
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [scannerOpen, setScannerOpen] = useState(false)
   const [scanTarget, setScanTarget] = useState<MarketParticipant | null>(null)
   const [scanDone, setScanDone] = useState(false)
@@ -47,6 +56,21 @@ export function MissionDetailClient({
   const verifyMutation = useMutation(
     missionsQuery.verify({ invalidates: [missionsQuery.$key] })
   )
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPreviewUrl(URL.createObjectURL(file))
+    setUploadState('uploading')
+    try {
+      const url = await uploadMissionPhoto(file, marketId, missionId, userId)
+      setPhotoUrl(url)
+      setUploadState('done')
+    } catch {
+      setUploadState('error')
+      setPreviewUrl(null)
+    }
+  }
 
   function handleScan(val: string) {
     const qr = parseQR(val)
@@ -124,25 +148,41 @@ export function MissionDetailClient({
           ) : (
             <div className="space-y-3">
               {mission.type === 'upload' && (
-                <button
-                  type="button"
-                  onClick={() => setPhotoUploaded(true)}
-                  className={`flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed py-6 text-sm font-medium transition-colors ${
-                    photoUploaded
+                <label
+                  htmlFor="photo-upload"
+                  className={`flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed py-6 text-sm font-medium transition-colors ${
+                    uploadState === 'done'
                       ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
+                      : uploadState === 'uploading'
+                      ? 'border-gray-200 bg-gray-50 text-gray-400'
+                      : uploadState === 'error'
+                      ? 'border-red-200 bg-red-50 text-red-500'
                       : 'border-gray-200 bg-white text-gray-400 hover:border-gray-300'
                   }`}
                 >
-                  {photoUploaded ? (
-                    <>
-                      <CheckCircle2 className="h-5 w-5" /> 사진 업로드 완료
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-5 w-5" /> 사진 업로드
-                    </>
+                  {previewUrl && (
+                    <img src={previewUrl} alt="" className="h-32 w-32 rounded-xl object-cover" />
                   )}
-                </button>
+                  <span className="flex items-center gap-2">
+                    {uploadState === 'uploading' ? (
+                      <><Loader2 className="h-5 w-5 animate-spin" /> 업로드 중...</>
+                    ) : uploadState === 'done' ? (
+                      <><CheckCircle2 className="h-5 w-5" /> 사진 업로드 완료</>
+                    ) : uploadState === 'error' ? (
+                      <><Upload className="h-5 w-5" /> 업로드 실패 — 다시 시도</>
+                    ) : (
+                      <><Upload className="h-5 w-5" /> 사진 업로드</>
+                    )}
+                  </span>
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={uploadState === 'uploading'}
+                    onChange={handleFileChange}
+                  />
+                </label>
               )}
               {nextPendingSlot && (
                 <QRModal
@@ -150,7 +190,9 @@ export function MissionDetailClient({
                   missionId={missionId}
                   userId={userId}
                   missionTitle={mission.title}
-                  disabled={mission.type === 'upload' && !photoUploaded}
+                  photoUrl={photoUrl ?? undefined}
+                  hint={QR_HINT[mission.type]}
+                  disabled={mission.type === 'upload' && uploadState !== 'done'}
                 />
               )}
               {mission.type === 'user_qr' && (
@@ -167,7 +209,7 @@ export function MissionDetailClient({
                   QR 인증해주기
                 </Button>
               )}
-              {mission.type === 'upload' && !photoUploaded && (
+              {mission.type === 'upload' && uploadState !== 'done' && (
                 <p className="text-center text-xs text-gray-400">
                   사진을 업로드해야 QR을 생성할 수 있어요
                 </p>
