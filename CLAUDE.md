@@ -105,6 +105,26 @@ useModalHistory(open, close)      // 열릴 때 pushState, popstate로 close 연
 ❌ 페이지:    <div className="min-h-svh bg-white">  ← nav가 콘텐츠 가림
 ```
 
+## DB ID 타입 규칙 — 혼동 금지
+
+**`user_id` / `users.id`만 UUID. 그 외 모든 ID는 `text` (nanoid).**
+
+| 컬럼 | 타입 | 이유 |
+|------|------|------|
+| `users.id` | `uuid` | Supabase Auth가 생성 |
+| `*.user_id` (모든 테이블의 user_id FK) | `uuid` | `users.id` 참조 |
+| `markets.id` | `text` | nanoid |
+| `*.market_id` (모든 테이블의 market_id FK) | `text` | nanoid |
+| `missions.id`, `mission_logs.id` | `text` | nanoid |
+| `mission_logs.mission_id` | `text` | nanoid |
+| `orders.id`, `point_logs.id` | `text` | nanoid |
+| `market_items.id` | `text` | nanoid |
+
+**RPC / SQL 함수 작성 시 체크리스트:**
+- `p_market_id` → `text` ✅ (uuid ❌)
+- `p_mission_id` → `text` ✅ (uuid ❌)
+- `p_user_id` / `p_from_user_id` / `p_to_user_id` → `uuid` ✅
+
 ## 스타일링
 
 - Tailwind CSS v4 — `tailwind.config.js` 없음, `@import "tailwindcss"` in CSS
