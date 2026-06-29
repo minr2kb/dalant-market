@@ -15,9 +15,10 @@ interface QRModalProps {
   photoUrls?: string[]
   hint?: string
   disabled?: boolean
+  buttonText?: string
 }
 
-export function QRModal({ marketId, missionId, userId, missionTitle, photoUrls, hint, disabled = false }: QRModalProps) {
+export function QRModal({ marketId, missionId, userId, missionTitle, photoUrls, hint, disabled = false, buttonText = 'QR 생성하기' }: QRModalProps) {
   const [open, setOpen] = useState(false)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
@@ -32,7 +33,7 @@ export function QRModal({ marketId, missionId, userId, missionTitle, photoUrls, 
         className="h-12 w-full rounded-full bg-emerald-500 text-base font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
       >
         <QrCode className="mr-2 h-5 w-5" />
-        QR 생성하기
+        {buttonText}
       </Button>
 
       {open && (

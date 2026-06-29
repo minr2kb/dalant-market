@@ -12,8 +12,8 @@ const notoSansKR = Noto_Sans_KR({
 })
 
 export const metadata: Metadata = {
-  title: 'Dalant Market',
-  description: '오프라인 모임을 위한 미션 인증 기반 포인트 마켓',
+  title: '달란트페이',
+  description: '오프라인 모임을 위한 미션 인증 기반 달란트 결제 서비스',
 }
 
 export default function RootLayout({

@@ -20,8 +20,8 @@ export default function LoginPage() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500">
             <span className="text-2xl font-bold text-white">D</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Dalant Market</h1>
-          <p className="text-sm text-gray-500">오프라인 모임 미션 인증 포인트 마켓</p>
+          <h1 className="text-2xl font-bold text-gray-900">달란트페이</h1>
+          <p className="text-sm text-gray-500">오프라인 모임 미션 인증 달란트 결제 서비스</p>
         </div>
 
         <div className="space-y-3">
