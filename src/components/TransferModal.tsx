@@ -132,7 +132,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-6">
-      <div className="w-full max-w-sm rounded-t-3xl bg-white p-6 pb-10 space-y-5 sm:rounded-3xl">
+      <div className="w-full max-w-sm rounded-t-3xl bg-white p-6 pb-10 space-y-5 sm:rounded-3xl text-gray-900">
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -264,8 +264,8 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
           <div className="space-y-4">
             <div className="rounded-2xl bg-gray-50 p-6 text-center space-y-2">
               <p className="text-sm text-gray-500">아래 내용으로 전송할까요?</p>
-              <p className="text-xl font-bold text-gray-900">{recipient.user.realName}에게</p>
-              <p className="text-3xl font-bold text-emerald-500 tabular-nums">
+              <p className="text-base font-bold text-gray-900">{recipient.user.realName}에게</p>
+              <p className="text-2xl font-bold text-emerald-500 tabular-nums">
                 {parseInt(amount, 10)} 달란트
               </p>
             </div>
