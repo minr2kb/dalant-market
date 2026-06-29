@@ -9,7 +9,8 @@ export default async function UserLayout(props: LayoutProps<'/markets/[id]'>) {
   const tabs = [
     { label: '홈', segment: 'home', href: `/markets/${id}/home`, icon: 'Home' },
     { label: '미션', segment: 'missions', href: `/markets/${id}/missions`, icon: 'ListTodo' },
-    { label: '내역', segment: 'history', href: `/markets/${id}/history`, icon: 'History' },
+    { label: '랭킹', segment: 'ranking', href: `/markets/${id}/ranking`, icon: 'Trophy' },
+    { label: '마이', segment: 'mypage', href: `/markets/${id}/mypage`, icon: 'User' },
   ]
 
   return (

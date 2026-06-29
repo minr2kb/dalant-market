@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Home, ListTodo, History, User, QrCode, Wallet, Users, ShoppingBag, type LucideIcon } from 'lucide-react'
+import { Home, ListTodo, History, User, QrCode, Wallet, Users, ShoppingBag, Trophy, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const ICON_MAP: Record<string, LucideIcon> = {
-  Home, ListTodo, History, User, QrCode, Wallet, Users, ShoppingBag,
+  Home, ListTodo, History, User, QrCode, Wallet, Users, ShoppingBag, Trophy,
 }
 
 export interface TabItem {

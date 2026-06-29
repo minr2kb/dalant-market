@@ -7,6 +7,7 @@ import { useSuspenseQueries } from '@tanstack/react-query'
 import { PayQRButton } from '@/components/PayQRButton'
 import { TransferModal } from '@/components/TransferModal'
 import { AdminAccessButton } from '@/components/AdminAccessButton'
+import { HomeScanButton } from '@/components/HomeScanButton'
 import { Button } from '@/components/ui/button'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
 export function UserHomeClient({ marketId, userId }: { marketId: string; userId: string }) {
@@ -50,14 +51,17 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         </div>
       </div>
 
-      <Button
-        variant="outline"
-        className="h-12 w-full gap-2"
-        onClick={() => setTransferOpen(true)}
-      >
-        <ArrowRightLeft className="h-4 w-4" />
-        달란트 전송하기
-      </Button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant="ghost"
+          className="h-12 gap-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 rounded-2xl font-semibold"
+          onClick={() => setTransferOpen(true)}
+        >
+          <ArrowRightLeft className="h-4 w-4" />
+          달란트 전송
+        </Button>
+        <HomeScanButton marketId={marketId} />
+      </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
