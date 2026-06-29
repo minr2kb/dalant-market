@@ -60,6 +60,8 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
         <LogOut className="h-4 w-4" />
         로그아웃
       </Button>
+
+      <p className="text-center text-xs text-gray-300">© 2026 Kyungbae Min</p>
     </div>
   )
 }

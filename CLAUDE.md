@@ -1,6 +1,15 @@
 @AGENTS.md
 
-# Dalant Market — 개발 컨텍스트
+# 달란트페이 — 개발 컨텍스트
+
+## 서비스 개요
+
+오프라인 모임(수련회, MT, 행사 등)에서 미션 수행 → 달란트 적립 → 마켓 구매/전송까지 웹으로 처리하는 서비스. 실물 달란트·종이 미션표 없이 스마트폰 하나로 운영. 마켓 단위로 격리되어 행사마다 독립적으로 재사용 가능.
+
+- **달란트** = 마켓 내 포인트. 이름 커스텀 가능 (`markets.point_label`: 달란트, 코인, 별 등)
+- **권한**: `admin` (미션 관리, QR 스캔, 수동 지급, POS 결제) / `user` (미션 인증, 달란트 확인, 구매, 전송)
+- 관리자도 참여자로 미션 수행 가능. 단, 자기 자신 QR 스캔 불가 (`verified_by != user_id`)
+- 관리자 승격: 홈에서 `markets.admin_code` 입력 → `market_participants.role = 'admin'` 즉시 승격
 
 ## 라우팅 구조
 
@@ -10,10 +19,12 @@
 /markets                            → 마켓 목록
 /markets/[id]                       → QR 랜딩 (마켓 진입)
 /markets/[id]/(user)/...            → 일반 유저 화면 (route group, URL에 포함 안됨)
-/markets/[id]/home                  → 유저 홈
+/markets/[id]/home                  → 유저 홈 (잔액 카드, 결제 QR, 전송, 최근 내역)
 /markets/[id]/missions              → 미션 목록 (status=active|past)
 /markets/[id]/missions/[missionId]  → 미션 상세
 /markets/[id]/history               → 달란트 내역 (구매내역 포함, 탭 확장)
+/markets/[id]/mypage                → 마이페이지
+/markets/[id]/ranking               → 달란트 랭킹
 /markets/[id]/admin/...             → 관리자 화면 (/admin/ URL 세그먼트 포함)
 /markets/[id]/admin/home
 /markets/[id]/admin/scan
@@ -124,6 +135,51 @@ useModalHistory(open, close)      // 열릴 때 pushState, popstate로 close 연
 - `p_market_id` → `text` ✅ (uuid ❌)
 - `p_mission_id` → `text` ✅ (uuid ❌)
 - `p_user_id` / `p_from_user_id` / `p_to_user_id` → `uuid` ✅
+
+## DB 스키마 요약
+
+```sql
+users          (id uuid PK, name, real_name, birth_date, gender, created_at)
+markets        (id text PK, title, description, point_label, admin_code, starts_at, ends_at, created_at)
+market_participants (id text PK, market_id text, user_id uuid, role 'admin'|'user', balance int, UNIQUE(market_id,user_id))
+market_items   (id text PK, market_id text, name, price int)
+missions       (id text PK, market_id text, title, description, type, is_group bool, reward int, limit_count int|null, active_from ts|null, active_until ts|null, is_active bool)
+mission_logs   (id text PK, mission_id text, user_id uuid, verified_by uuid, slot int, photo_url, verified_at, UNIQUE(mission_id,user_id,slot), CHECK(user_id!=verified_by))
+point_logs     (id text PK, market_id text, user_id uuid, amount int, reason_type, mission_log_id text|null, order_id text|null, memo text|null, created_at)
+orders         (id text PK, market_id text, user_id uuid, verified_by uuid, items jsonb, total int, purchased_at)
+```
+
+`reason_type`: `'mission' | 'purchase' | 'manual' | 'transfer'`
+
+## QR 데이터 포맷
+
+- **미션 QR**: `{ type: 'mission', missionId, userId, marketId, expiresAt }` — HMAC-SHA256 서명, 유효시간 5분. 이미 처리된 QR 재사용은 서버에서 차단.
+- **결제 QR (Pay QR)**: `dalant:p:<marketId>:<userId>` — 마켓 POS 결제 및 달란트 전송 수신자 식별에 재활용. 별도 수신자 전용 버튼 없음.
+- QR 파싱: `src/lib/qr.ts`의 `parseQR(val)` 사용
+
+## 달란트 전송 (`transfer`)
+
+- `PointReasonType`에 `'transfer'` 포함: `'mission' | 'purchase' | 'manual' | 'transfer'`
+- `memo` 포맷: `"<송신자 realName> -> <수신자 realName>"`
+- API: `POST /api/markets/:marketId/transfer` → `{ data: { fromUserId, toUserId, amount, newBalance } }`
+- Supabase RPC: `transfer_points(p_market_id text, p_from_user_id uuid, p_to_user_id uuid, p_amount int, p_memo text)` — 원자적 잔액 이전 + point_logs 2건 삽입
+
+## 데이터 패칭 패턴
+
+**라이브러리**: `@tanstack/react-query` + `@routar/react-query` (`flatten: true`)
+
+```
+Server Component (page.tsx)
+  → getQueryClient() + prefetchQuery(xyzQuery.endpoint({ marketId, ... }))
+  → <HydrationBoundary state={dehydrate(qc)}>
+      → <Suspense fallback={<p>불러오는 중…</p>}>
+          → <XyzClient marketId={marketId} />  ('use client')
+              → useSuspenseQuery / useSuspenseQueries
+```
+
+- Query 팩토리: `src/lib/query/queries.ts` — `marketsQuery`, `participantsQuery`, `missionsQuery`, `pointLogsQuery`, `ordersQuery`, `itemsQuery`, `adminQuery`
+- Mutation 캐시 무효화: `useMutation(xyzQuery.verb({ invalidates: [xyzQuery.list.queryKey({ marketId })] }))`
+- `admin/scan`은 full-screen overlay 특성상 prefetch shell 없이 클라이언트 전용
 
 ## 스타일링
 
