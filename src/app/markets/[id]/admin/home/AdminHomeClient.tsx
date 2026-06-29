@@ -24,8 +24,7 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
 
   const activeMissions = missions.filter((m) => getMissionStatus(m) === 'active').length
   const totalGranted = logs.filter((l) => l.amount > 0).reduce((s, l) => s + l.amount, 0)
-  const totalSpent = logs.filter((l) => l.amount < 0).reduce((s, l) => s + Math.abs(l.amount), 0)
-  const recentLogs = [...logs].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5)
+const recentLogs = [...logs].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5)
 
   return (
     <div className="px-4 max-w-lg mx-auto space-y-6">
@@ -120,10 +119,6 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
                 </div>
               )
             })}
-          </div>
-          <div className="flex justify-between text-xs text-gray-400 px-1">
-            <span>총 사용</span>
-            <span className="tabular-nums text-rose-400">-{totalSpent}</span>
           </div>
         </div>
       )}
