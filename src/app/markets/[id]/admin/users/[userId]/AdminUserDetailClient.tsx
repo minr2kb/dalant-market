@@ -13,7 +13,7 @@ export function AdminUserDetailClient({
   const [{ data: participantData }, { data: missionsData }] = useSuspenseQueries({
     queries: [
       participantsQuery.get({ marketId, userId }),
-      missionsQuery.list({ marketId }),
+      missionsQuery.list({ marketId, userId }),
     ],
   })
 
