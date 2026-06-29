@@ -1,13 +1,18 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
+import { ArrowRight, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react'
 import { useSuspenseQueries } from '@tanstack/react-query'
 import { PayQRButton } from '@/components/PayQRButton'
-import { TransferButton } from '@/components/TransferButton'
+import { TransferModal } from '@/components/TransferModal'
 import { AdminAccessButton } from '@/components/AdminAccessButton'
+import { Button } from '@/components/ui/button'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
 export function UserHomeClient({ marketId, userId }: { marketId: string; userId: string }) {
+  const [transferOpen, setTransferOpen] = useState(false)
+  const closeTransfer = useCallback(() => setTransferOpen(false), [])
+
   const [{ data: marketData }, { data: participantData }] = useSuspenseQueries({
     queries: [
       marketsQuery.get({ marketId }),
@@ -36,20 +41,23 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
             <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
             <p className="text-sm opacity-70">{market.pointLabel}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <TransferButton
-              marketId={marketId}
-              userId={user.user.id}
-            />
-            <PayQRButton
-              marketId={marketId}
-              userId={user.user.id}
-              userName={user.user.realName}
-              compact
-            />
-          </div>
+          <PayQRButton
+            marketId={marketId}
+            userId={user.user.id}
+            userName={user.user.realName}
+            compact
+          />
         </div>
       </div>
+
+      <Button
+        variant="outline"
+        className="h-12 w-full gap-2"
+        onClick={() => setTransferOpen(true)}
+      >
+        <ArrowRightLeft className="h-4 w-4" />
+        달란트 전송하기
+      </Button>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -110,6 +118,12 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
           )}
         </div>
       </div>
+      <TransferModal
+        marketId={marketId}
+        userId={userId}
+        open={transferOpen}
+        onClose={closeTransfer}
+      />
     </div>
   )
 }

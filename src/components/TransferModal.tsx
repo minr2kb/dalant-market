@@ -131,8 +131,8 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-6">
-      <div className="w-full max-w-sm rounded-t-3xl bg-white p-6 pb-10 space-y-5 sm:rounded-3xl text-gray-900">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-sm rounded-3xl bg-white p-6 space-y-5 text-gray-900">
         {/* 헤더 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
