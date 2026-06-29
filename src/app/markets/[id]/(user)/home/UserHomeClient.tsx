@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
 import { useSuspenseQueries } from '@tanstack/react-query'
 import { PayQRButton } from '@/components/PayQRButton'
+import { TransferButton } from '@/components/TransferButton'
 import { AdminAccessButton } from '@/components/AdminAccessButton'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
 export function UserHomeClient({ marketId, userId }: { marketId: string; userId: string }) {
@@ -35,12 +36,18 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
             <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
             <p className="text-sm opacity-70">{market.pointLabel}</p>
           </div>
-          <PayQRButton
-            marketId={marketId}
-            userId={user.user.id}
-            userName={user.user.realName}
-            compact
-          />
+          <div className="flex items-center gap-2">
+            <TransferButton
+              marketId={marketId}
+              userId={user.user.id}
+            />
+            <PayQRButton
+              marketId={marketId}
+              userId={user.user.id}
+              userName={user.user.realName}
+              compact
+            />
+          </div>
         </div>
       </div>
 

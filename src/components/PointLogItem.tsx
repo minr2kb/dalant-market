@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { TrendingUp, TrendingDown, Award, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react'
+import { TrendingUp, TrendingDown, Award, ChevronDown, ChevronUp, ShoppingBag, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
 import type { PointLog, Order } from '@/types'
 
 interface PointLogItemProps {
@@ -19,6 +19,8 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
       ? (log.missionTitle ?? '미션')
       : isPurchase
       ? (log.itemName ?? '마켓 구매')
+      : log.reasonType === 'transfer'
+      ? (log.memo ?? '달란트 전송')
       : (log.memo ?? '수동 지급')
 
   const sub =
@@ -26,18 +28,28 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
       ? `${log.verifiedByName} 인증`
       : isPurchase
       ? '마켓 구매'
+      : log.reasonType === 'transfer'
+      ? (log.amount > 0 ? '달란트 받음' : '달란트 전송')
       : '관리자 지급'
 
   const iconBg = isPositive
     ? log.reasonType === 'manual'
       ? 'bg-purple-50'
+      : log.reasonType === 'transfer'
+      ? 'bg-blue-50'
       : 'bg-emerald-50'
+    : log.reasonType === 'transfer'
+    ? 'bg-blue-50'
     : 'bg-rose-50'
 
   const amountColor = isPositive
     ? log.reasonType === 'manual'
       ? 'text-purple-500'
+      : log.reasonType === 'transfer'
+      ? 'text-blue-500'
       : 'text-emerald-500'
+    : log.reasonType === 'transfer'
+    ? 'text-blue-500'
     : 'text-rose-500'
 
   return (
@@ -51,7 +63,11 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
       >
         <div className="flex items-center gap-3">
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
-            {isPositive ? (
+            {log.reasonType === 'transfer' ? (
+              isPositive
+                ? <ArrowDownLeft className="h-4 w-4 text-blue-500" />
+                : <ArrowUpRight className="h-4 w-4 text-blue-500" />
+            ) : isPositive ? (
               log.reasonType === 'manual' ? (
                 <Award className="h-4 w-4 text-purple-500" />
               ) : (
