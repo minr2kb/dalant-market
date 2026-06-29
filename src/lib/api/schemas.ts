@@ -70,7 +70,7 @@ export const PointLogSchema = z.object({
   marketId: z.string(),
   userId: z.string(),
   amount: z.number(),
-  reasonType: z.enum(['mission', 'purchase', 'manual']),
+  reasonType: z.enum(['mission', 'purchase', 'manual', 'transfer']),
   missionTitle: z.string().optional(),
   verifiedByName: z.string().optional(),
   itemName: z.string().optional(),
@@ -83,6 +83,13 @@ export const MarketItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
+})
+
+export const TransferResponseSchema = z.object({
+  fromUserId: z.string(),
+  toUserId: z.string(),
+  amount: z.number(),
+  newBalance: z.number(),
 })
 
 // Response wrappers

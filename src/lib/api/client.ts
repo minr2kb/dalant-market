@@ -7,6 +7,7 @@ import {
   ordersRouter,
   itemsRouter,
   adminRouter,
+  transferRouter,
 } from './router'
 
 const BASE_URL =
@@ -35,3 +36,4 @@ export const pointLogsApi = createApi(executor, pointLogsRouter)
 export const ordersApi = createApi(executor, ordersRouter)
 export const itemsApi = createApi(executor, itemsRouter)
 export const adminApi = createApi(executor, adminRouter)
+export const transferApi = createApi(executor, transferRouter)

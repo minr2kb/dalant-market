@@ -8,6 +8,7 @@ import {
   OrderSchema,
   OrderItemSchema,
   MarketItemSchema,
+  TransferResponseSchema,
   listOf,
   oneOf,
 } from './schemas'
@@ -237,5 +238,20 @@ export const adminRouter = defineRouter('/markets', {
       body: z.object({ code: z.string() }),
     },
     response: oneOf(z.object({ granted: z.boolean() })),
+  }),
+})
+
+export const transferRouter = defineRouter('/markets', {
+  transfer: endpoint({
+    method: 'POST',
+    path: '/:marketId/transfer',
+    request: {
+      path: marketId,
+      body: z.object({
+        toUserId: z.string(),
+        amount: z.number().int().min(1),
+      }),
+    },
+    response: oneOf(TransferResponseSchema),
   }),
 })
