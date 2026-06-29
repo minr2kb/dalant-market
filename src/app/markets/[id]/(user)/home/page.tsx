@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getQueryClient } from '@/lib/query/get-query-client'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
 import { getMarket } from '@/lib/data/markets'
-import { getParticipant } from '@/lib/data/participants'
+import { getParticipant, joinMarket } from '@/lib/data/participants'
 import { UserHomeClient } from './UserHomeClient'
 
 function Skeleton() {
@@ -31,12 +31,7 @@ export default async function UserHomePage(props: PageProps<'/markets/[id]/home'
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  await supabase
-    .from('market_participants')
-    .upsert(
-      { market_id: marketId, user_id: user.id, role: 'user', balance: 0 },
-      { onConflict: 'market_id,user_id', ignoreDuplicates: true },
-    )
+  await joinMarket(supabase, marketId, user.id)
 
   const qc = getQueryClient()
   const [market, participantData] = await Promise.all([

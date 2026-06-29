@@ -29,7 +29,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs text-gray-400">{market.title}</p>
-          <h1 className="text-xl font-bold text-gray-900">{user.user.realName}</h1>
+          <h1 className="text-xl font-bold text-gray-900">{user.displayName}</h1>
         </div>
         <AdminAccessButton marketId={marketId} compact />
       </div>

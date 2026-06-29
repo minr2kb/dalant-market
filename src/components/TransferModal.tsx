@@ -60,7 +60,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
   const filtered = useMemo(
     () =>
       participants.filter((p) =>
-        p.user.realName.toLowerCase().includes(search.toLowerCase()),
+        p.displayName.toLowerCase().includes(search.toLowerCase()),
       ),
     [participants, search],
   )
@@ -211,7 +211,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
                         <UserRound className="h-4 w-4 text-emerald-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
+                        <p className="text-sm font-semibold text-gray-800">{p.displayName}</p>
                         <p className="text-xs text-gray-400">{p.balance} 달란트 보유</p>
                       </div>
                     </button>
@@ -237,7 +237,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
               </div>
               <div>
                 <p className="text-xs text-gray-400">받는 사람</p>
-                <p className="text-sm font-semibold text-gray-800">{recipient.user.realName}</p>
+                <p className="text-sm font-semibold text-gray-800">{recipient.displayName}</p>
               </div>
             </div>
             <Input
@@ -264,7 +264,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
           <div className="space-y-4">
             <div className="rounded-2xl bg-gray-50 p-6 text-center space-y-2">
               <p className="text-sm text-gray-500">아래 내용으로 전송할까요?</p>
-              <p className="text-base font-bold text-gray-900">{recipient.user.realName}에게</p>
+              <p className="text-base font-bold text-gray-900">{recipient.displayName}에게</p>
               <p className="text-2xl font-bold text-emerald-500 tabular-nums">
                 {parseInt(amount, 10)} 달란트
               </p>

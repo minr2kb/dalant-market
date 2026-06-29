@@ -1,6 +1,63 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { mapParticipant, mapPointLog, mapOrder } from '@/lib/db'
 
+export async function joinMarket(supabase: SupabaseClient, marketId: string, userId: string) {
+  const { data: existing } = await supabase
+    .from('market_participants')
+    .select('id, display_name')
+    .eq('market_id', marketId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (existing) return { isNew: false, hasConflict: false, displayName: (existing.display_name as string | null) }
+
+  const { data: userRow } = await supabase
+    .from('users')
+    .select('real_name')
+    .eq('id', userId)
+    .single()
+
+  if (!userRow) throw new Error('User not found')
+  const realName = userRow.real_name as string
+
+  const { data: others } = await supabase
+    .from('market_participants')
+    .select('display_name, user:users!user_id(real_name)')
+    .eq('market_id', marketId)
+
+  const existingNames = new Set(
+    (others ?? []).map((p) => {
+      const dn = p.display_name as string | null
+      const rn = (p as unknown as { user?: { real_name?: string } }).user?.real_name ?? null
+      return dn ?? rn ?? ''
+    }).filter(Boolean),
+  )
+
+  let displayName = realName
+  let hasConflict = false
+
+  if (existingNames.has(realName)) {
+    hasConflict = true
+    for (const suffix of 'BCDEFGHIJKLMNOPQRSTUVWXYZ') {
+      const candidate = `${realName}${suffix}`
+      if (!existingNames.has(candidate)) {
+        displayName = candidate
+        break
+      }
+    }
+  }
+
+  await supabase.from('market_participants').insert({
+    market_id: marketId,
+    user_id: userId,
+    role: 'user',
+    balance: 0,
+    display_name: displayName,
+  })
+
+  return { isNew: true, hasConflict, displayName }
+}
+
 export async function listParticipants(supabase: SupabaseClient, marketId: string) {
   const { data, error } = await supabase
     .from('market_participants')

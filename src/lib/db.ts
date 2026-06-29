@@ -25,12 +25,14 @@ export function mapMarket(row: Record<string, unknown>): Market {
 }
 
 export function mapParticipant(row: Record<string, unknown>): MarketParticipant {
+  const user = mapUser(row.user as Record<string, unknown>)
   return {
     id: row.id as string,
     marketId: row.market_id as string,
-    user: mapUser(row.user as Record<string, unknown>),
+    user,
     role: row.role as 'admin' | 'user',
     balance: row.balance as number,
+    displayName: (row.display_name as string | null) ?? user.realName,
   }
 }
 

@@ -29,6 +29,7 @@ export interface MarketParticipant {
   user: User
   role: Role
   balance: number
+  displayName: string
 }
 
 export interface MissionSlotData {

@@ -47,6 +47,7 @@ export const MarketParticipantSchema = z.object({
   user: UserSchema,
   role: z.enum(['admin', 'user']),
   balance: z.number(),
+  displayName: z.string(),
 })
 
 export const OrderItemSchema = z.object({
