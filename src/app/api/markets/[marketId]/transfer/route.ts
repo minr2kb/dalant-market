@@ -31,6 +31,7 @@ export const POST = authRoute<{ marketId: string }>(
     if (error) {
       if (error.message.includes('insufficient_balance')) return err('잔액이 부족합니다', 400)
       if (error.message.includes('sender_not_found')) return err('참가자를 찾을 수 없습니다', 404)
+      if (error.message.includes('recipient_not_found')) return err('수신자가 이 마켓의 참가자가 아닙니다', 404)
       return err(error.message)
     }
 
