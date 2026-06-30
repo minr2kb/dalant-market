@@ -140,7 +140,8 @@ export const missionsRouter = defineRouter('/markets', {
     request: {
       path: marketAndMission,
       body: z.object({
-        userId: z.string(),
+        token: z.string().optional(),
+        userId: z.string().optional(),
         slot: z.number().optional(),
         photoUrls: z.array(z.string()).optional(),
       }),

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { QrCode, X } from 'lucide-react'
 import QRCode from 'react-qr-code'
 import { useModalHistory } from '@/hooks/use-modal-history'
-import { encodeMissionQR } from '@/lib/qr'
+import { useInterval } from '@/hooks/use-interval'
 
 interface QRModalProps {
   marketId: string
@@ -18,12 +18,42 @@ interface QRModalProps {
   buttonText?: string
 }
 
-export function QRModal({ marketId, missionId, userId, missionTitle, photoUrls, hint, disabled = false, buttonText = 'QR 생성하기' }: QRModalProps) {
+export function QRModal({ marketId, missionId, photoUrls, missionTitle, hint, disabled = false, buttonText = 'QR 생성하기' }: QRModalProps) {
   const [open, setOpen] = useState(false)
+  const [qrValue, setQrValue] = useState<string | null>(null)
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null)
+  const [refreshTick, setRefreshTick] = useState(0)
   const close = useCallback(() => setOpen(false), [])
   useModalHistory(open, close)
 
-  const qrValue = encodeMissionQR(marketId, missionId, userId, photoUrls)
+  useEffect(() => {
+    if (!open) { setQrValue(null); setSecondsLeft(null); return }
+    setQrValue(null)
+    let cancelled = false
+    fetch(`/api/markets/${marketId}/missions/${missionId}/qr-token`)
+      .then((r) => r.json())
+      .then(({ data }: { data: { token: string } }) => {
+        if (cancelled) return
+        setQrValue(photoUrls?.length ? `${data.token}|${photoUrls.join(',')}` : data.token)
+        setSecondsLeft(300)
+      })
+    return () => { cancelled = true }
+  }, [open, marketId, missionId, photoUrls, refreshTick])
+
+  useInterval(() => {
+    if (secondsLeft === null) return
+    if (secondsLeft <= 1) {
+      setSecondsLeft(null)
+      setRefreshTick((t) => t + 1)
+    } else {
+      setSecondsLeft((s) => (s ?? 1) - 1)
+    }
+  }, secondsLeft !== null ? 1000 : null)
+
+  const timeLabel =
+    secondsLeft !== null
+      ? `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')}`
+      : null
 
   return (
     <>
@@ -51,11 +81,20 @@ export function QRModal({ marketId, missionId, userId, missionTitle, photoUrls, 
             </div>
 
             <div className="mx-auto flex h-52 w-52 items-center justify-center rounded-2xl bg-white p-2">
-              <QRCode value={qrValue} size={192} />
+              {qrValue ? (
+                <QRCode value={qrValue} size={192} />
+              ) : (
+                <div className="h-48 w-48 animate-pulse rounded-xl bg-gray-100" />
+              )}
             </div>
 
             <div className="rounded-xl bg-amber-50 px-4 py-3 text-center">
               <p className="text-sm font-medium text-amber-700">카메라로 스캔해주세요</p>
+              {timeLabel && (
+                <p className={`text-xs mt-0.5 font-medium ${secondsLeft !== null && secondsLeft < 30 ? 'text-red-500' : 'text-amber-600'}`}>
+                  유효시간 {timeLabel}
+                </p>
+              )}
               {hint && <p className="text-xs text-amber-600 mt-0.5">{hint}</p>}
             </div>
           </div>

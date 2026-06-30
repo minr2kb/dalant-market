@@ -1,41 +1,51 @@
 import { authRoute, ok, err } from '@/lib/api/route-helpers'
+import { verifyMissionQR } from '@/lib/qr-server'
 
 export const POST = authRoute<{ marketId: string; missionId: string }>(
   async (req, { supabase, params, userId: verifiedBy }) => {
-    const body = (await req.json()) as { userId: string; slot?: number; photoUrls?: string[] }
+    const body = (await req.json()) as { token?: string; userId?: string; slot?: number; photoUrls?: string[] }
     const { marketId, missionId } = params
 
-    const [{ data: mission, error: e1 }, { data: participant, error: e2 }, { data: verifier }, { data: verifierParticipant }] =
+    if (!body.token && !body.userId) return err('token or userId required', 400)
+
+    const [{ data: mission, error: e1 }, { data: verifier }, { data: verifierParticipant }] =
       await Promise.all([
         supabase.from('missions').select('*').eq('id', missionId).single(),
-        supabase
-          .from('market_participants')
-          .select('balance')
-          .eq('market_id', marketId)
-          .eq('user_id', body.userId)
-          .single(),
         supabase.from('users').select('real_name').eq('id', verifiedBy).maybeSingle(),
-        supabase
-          .from('market_participants')
-          .select('role')
-          .eq('market_id', marketId)
-          .eq('user_id', verifiedBy)
-          .maybeSingle(),
+        supabase.from('market_participants').select('role').eq('market_id', marketId).eq('user_id', verifiedBy).maybeSingle(),
       ])
 
     if (e1 || !mission) return err('Mission not found', 404)
-    if (e2 || !participant) return err('User not found', 404)
 
-    if (body.userId === verifiedBy) {
-      const role = (verifierParticipant as { role?: string } | null)?.role
-      if (role !== 'admin') return err('Cannot verify own QR', 403)
+    const verifierRole = (verifierParticipant as { role?: string } | null)?.role
+
+    let targetUserId: string
+    if (body.token) {
+      const parsed = verifyMissionQR(body.token)
+      if (!parsed) return err('Invalid or expired QR', 400)
+      if (parsed.marketId !== marketId || parsed.missionId !== missionId) return err('QR mismatch', 400)
+      targetUserId = parsed.userId
+    } else {
+      if (verifierRole !== 'admin') return err('Token required', 400)
+      targetUserId = body.userId!
     }
+
+    if (targetUserId === verifiedBy && verifierRole !== 'admin') return err('Cannot verify own QR', 403)
+
+    const { data: participant, error: e2 } = await supabase
+      .from('market_participants')
+      .select('balance')
+      .eq('market_id', marketId)
+      .eq('user_id', targetUserId)
+      .single()
+
+    if (e2 || !participant) return err('User not found', 404)
 
     const { data: existingLogs } = await supabase
       .from('mission_logs')
       .select('slot')
       .eq('mission_id', missionId)
-      .eq('user_id', body.userId)
+      .eq('user_id', targetUserId)
 
     const usedSlots = new Set((existingLogs ?? []).map((l) => l.slot as number))
     if (mission.limit_count !== null && usedSlots.size >= mission.limit_count)
@@ -45,7 +55,6 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
       body.slot ??
       (() => {
         if (mission.limit_count === null) {
-          // unlimited: next available = max used slot + 1
           const maxUsed = usedSlots.size > 0 ? Math.max(...usedSlots) : 0
           return maxUsed + 1
         }
@@ -62,7 +71,7 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
     const { error: e3 } = await supabase.rpc('award_mission', {
       p_market_id: marketId,
       p_mission_id: missionId,
-      p_user_id: body.userId,
+      p_user_id: targetUserId,
       p_verified_by: verifiedBy,
       p_slot: slotNum,
       p_verified_by_name: verifierName,
@@ -78,13 +87,13 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
         .from('mission_logs')
         .update({ photo_url: body.photoUrls.join(',') })
         .eq('mission_id', missionId)
-        .eq('user_id', body.userId)
+        .eq('user_id', targetUserId)
         .eq('slot', slotNum)
     }
 
     return ok({
       missionId,
-      userId: body.userId,
+      userId: targetUserId,
       verifiedBy,
       slot: slotNum,
       reward: mission.reward,

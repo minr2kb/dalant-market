@@ -20,9 +20,9 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 const QR_HINT: Record<string, string> = {
-  user_qr: '유저 간 인증 미션 — 상대방이 이 QR을 찍어줘야 해요',
-  upload: '업로드형 미션 — 관리자에게 QR을 보여주세요',
-  admin_qr: '관리자 인증 미션 — 관리자에게 QR을 보여주세요',
+  user_qr: '유저 간 인증 미션: 상대방이 이 QR을 찍어줘야 해요',
+  upload: '업로드형 미션: 관리자에게 QR을 보여주세요',
+  admin_qr: '관리자 인증 미션: 관리자에게 QR을 보여주세요',
 }
 
 export function MissionDetailClient({

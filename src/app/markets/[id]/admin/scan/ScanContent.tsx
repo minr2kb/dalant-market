@@ -40,6 +40,7 @@ function ScanInner({ marketId }: { marketId: string }) {
   const [selectedUser, setSelectedUser] = useState<MarketParticipant | null>(null)
   const [groupUsers, setGroupUsers] = useState<string[]>([])
   const [pendingPhotoUrls, setPendingPhotoUrls] = useState<string[]>([])
+  const [rawToken, setRawToken] = useState<string | null>(null)
 
   function handleScan(val: string) {
     const qr = parseQR(val)
@@ -52,11 +53,13 @@ function ScanInner({ marketId }: { marketId: string }) {
         const mission = missions.find((m) => m.id === qr.missionId)
         if (mission && participant) {
           setSelectedMission(mission)
+          setRawToken(qr.token)
           setState('confirm')
           return
         }
       }
     }
+    setRawToken(null)
     setState('picking_mission')
   }
 
@@ -78,9 +81,14 @@ function ScanInner({ marketId }: { marketId: string }) {
 
   async function confirmVerify(extraUserIds: string[] = []) {
     if (!selectedMission || !selectedUser) return
-    const allUserIds = [selectedUser.user.id, ...extraUserIds]
-    const results = await Promise.allSettled(
-      allUserIds.map((uid) =>
+    const results = await Promise.allSettled([
+      verifyMutation.mutateAsync({
+        marketId,
+        missionId: selectedMission.id,
+        ...(rawToken ? { token: rawToken } : { userId: selectedUser.user.id }),
+        ...(pendingPhotoUrls.length > 0 ? { photoUrls: pendingPhotoUrls } : {}),
+      }),
+      ...extraUserIds.map((uid) =>
         verifyMutation.mutateAsync({
           marketId,
           missionId: selectedMission.id,
@@ -88,7 +96,7 @@ function ScanInner({ marketId }: { marketId: string }) {
           ...(pendingPhotoUrls.length > 0 ? { photoUrls: pendingPhotoUrls } : {}),
         }),
       ),
-    )
+    ])
     const failed = results.filter((r) => r.status === 'rejected')
     if (failed.length > 0) {
       toast.error(`${failed.length}명 적립 실패`, {
@@ -106,6 +114,7 @@ function ScanInner({ marketId }: { marketId: string }) {
     setSelectedUser(null)
     setGroupUsers([])
     setPendingPhotoUrls([])
+    setRawToken(null)
   }
 
   const otherParticipants = participants.filter((p) => p.user.id !== selectedUser?.user.id)
@@ -231,7 +240,7 @@ function ScanInner({ marketId }: { marketId: string }) {
             <div className="mx-auto h-1 w-10 rounded-full bg-gray-200" />
             <div className="flex items-center gap-2">
               <UserPlus className="h-5 w-5 text-emerald-500" />
-              <h3 className="font-bold text-gray-900">단체 미션 — 함께한 참여자</h3>
+              <h3 className="font-bold text-gray-900">단체 미션: 함께한 참여자</h3>
             </div>
             <div className="max-h-44 overflow-y-auto space-y-2">
               {otherParticipants.map((p) => (
