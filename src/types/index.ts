@@ -17,7 +17,6 @@ export interface Market {
   title: string
   description: string
   pointLabel: string
-  adminCode: string
   startsAt: string
   endsAt: string
   createdAt: string

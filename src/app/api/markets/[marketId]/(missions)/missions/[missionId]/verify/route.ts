@@ -5,7 +5,7 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
     const body = (await req.json()) as { userId: string; slot?: number; photoUrls?: string[] }
     const { marketId, missionId } = params
 
-    const [{ data: mission, error: e1 }, { data: participant, error: e2 }, { data: verifier }] =
+    const [{ data: mission, error: e1 }, { data: participant, error: e2 }, { data: verifier }, { data: verifierParticipant }] =
       await Promise.all([
         supabase.from('missions').select('*').eq('id', missionId).single(),
         supabase
@@ -15,13 +15,21 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
           .eq('user_id', body.userId)
           .single(),
         supabase.from('users').select('real_name').eq('id', verifiedBy).maybeSingle(),
+        supabase
+          .from('market_participants')
+          .select('role')
+          .eq('market_id', marketId)
+          .eq('user_id', verifiedBy)
+          .maybeSingle(),
       ])
 
     if (e1 || !mission) return err('Mission not found', 404)
     if (e2 || !participant) return err('User not found', 404)
 
-    if (body.userId === verifiedBy && mission.type === 'user_qr')
-      return err('Cannot verify own QR', 403)
+    if (body.userId === verifiedBy) {
+      const role = (verifierParticipant as { role?: string } | null)?.role
+      if (role !== 'admin') return err('Cannot verify own QR', 403)
+    }
 
     const { data: existingLogs } = await supabase
       .from('mission_logs')

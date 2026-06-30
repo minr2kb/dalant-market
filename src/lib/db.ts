@@ -17,7 +17,6 @@ export function mapMarket(row: Record<string, unknown>): Market {
     title: row.title as string,
     description: (row.description as string) ?? '',
     pointLabel: row.point_label as string,
-    adminCode: row.admin_code as string,
     startsAt: row.starts_at as string,
     endsAt: row.ends_at as string,
     createdAt: row.created_at as string,

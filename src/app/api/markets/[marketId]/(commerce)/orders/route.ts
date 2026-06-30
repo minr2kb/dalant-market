@@ -1,5 +1,5 @@
 import { mapOrder } from '@/lib/db'
-import { route, authRoute, ok, err } from '@/lib/api/route-helpers'
+import { route, marketAdminRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ marketId: string }>(async (req, { supabase, params }) => {
   const userId = req.nextUrl.searchParams.get('userId')
@@ -16,21 +16,25 @@ export const GET = route<{ marketId: string }>(async (req, { supabase, params })
   return ok((data ?? []).map((r) => mapOrder(r as Record<string, unknown>)))
 })
 
-export const POST = authRoute<{ marketId: string }>(
+export const POST = marketAdminRoute<{ marketId: string }>(
   async (req, { supabase, params, userId: verifiedBy }) => {
     const body = (await req.json()) as {
       userId: string
       items: Array<{ name: string; price: number; qty: number }>
     }
 
-    const { data: participant, error: e1 } = await supabase
-      .from('market_participants')
-      .select('balance')
-      .eq('market_id', params.marketId)
-      .eq('user_id', body.userId)
-      .single()
+    const [{ data: participant, error: e1 }, { data: marketItems }] = await Promise.all([
+      supabase.from('market_participants').select('balance').eq('market_id', params.marketId).eq('user_id', body.userId).single(),
+      supabase.from('market_items').select('name, price').eq('market_id', params.marketId),
+    ])
 
     if (e1 || !participant) return err('User not found', 404)
+
+    const priceMap = new Map((marketItems ?? []).map(i => [i.name as string, i.price as number]))
+    for (const item of body.items) {
+      const serverPrice = priceMap.get(item.name)
+      if (serverPrice === undefined || serverPrice !== item.price) return err('Invalid item', 400)
+    }
 
     const total = body.items.reduce((sum, i) => sum + i.price * i.qty, 0)
     if (participant.balance < total) return err('Insufficient balance', 422)

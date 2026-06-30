@@ -1,6 +1,6 @@
 import { listItems } from '@/lib/data/items'
 import { mapItem } from '@/lib/db'
-import { route, ok, err } from '@/lib/api/route-helpers'
+import { route, marketAdminRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ marketId: string }>(async (_req, { supabase, params }) => {
   try {
@@ -10,7 +10,7 @@ export const GET = route<{ marketId: string }>(async (_req, { supabase, params }
   }
 })
 
-export const POST = route<{ marketId: string }>(async (req, { supabase, params }) => {
+export const POST = marketAdminRoute<{ marketId: string }>(async (req, { supabase, params }) => {
   const body = (await req.json()) as { name: string; price: number }
   const { data, error } = await supabase
     .from('market_items')

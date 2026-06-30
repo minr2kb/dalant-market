@@ -1,6 +1,6 @@
 import { getMission } from '@/lib/data/missions'
 import { mapMission } from '@/lib/db'
-import { route, ok, err } from '@/lib/api/route-helpers'
+import { route, marketAdminRoute, ok, err } from '@/lib/api/route-helpers'
 
 export const GET = route<{ missionId: string }>(async (req, { supabase, params }) => {
   const userId = req.nextUrl.searchParams.get('userId') ?? undefined
@@ -12,7 +12,7 @@ export const GET = route<{ missionId: string }>(async (req, { supabase, params }
   }
 })
 
-export const PATCH = route<{ missionId: string }>(async (req, { supabase, params }) => {
+export const PATCH = marketAdminRoute<{ marketId: string; missionId: string }>(async (req, { supabase, params }) => {
   const body = await req.json()
 
   const update: Record<string, unknown> = {}
@@ -37,7 +37,7 @@ export const PATCH = route<{ missionId: string }>(async (req, { supabase, params
   return ok(mapMission(data as Record<string, unknown>))
 })
 
-export const DELETE = route<{ missionId: string }>(async (_req, { supabase, params }) => {
+export const DELETE = marketAdminRoute<{ marketId: string; missionId: string }>(async (_req, { supabase, params }) => {
   const { error } = await supabase.from('missions').delete().eq('id', params.missionId)
   if (error) return err(error.message, 404)
   return ok({ id: params.missionId })

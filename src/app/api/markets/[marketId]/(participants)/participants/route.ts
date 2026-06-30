@@ -1,7 +1,7 @@
 import { listParticipants, joinMarket } from '@/lib/data/participants'
 import { route, authRoute, ok, err } from '@/lib/api/route-helpers'
 
-export const GET = route<{ marketId: string }>(async (_req, { supabase, params }) => {
+export const GET = authRoute<{ marketId: string }>(async (_req, { supabase, params }) => {
   try {
     return ok(await listParticipants(supabase, params.marketId))
   } catch (e) {
