@@ -56,7 +56,7 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
                 </p>
                 <div
                   className={cn('podium-block w-full rounded-t-2xl flex items-center justify-center', cfg.blockH, cfg.blockBg)}
-                  style={{ transitionDelay: `${i * 150}ms` }}
+                  style={{ transitionDelay: `${[150, 0, 300][i]}ms` }}
                 >
                   <span className="text-2xl">{cfg.medal}</span>
                 </div>
