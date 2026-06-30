@@ -25,7 +25,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-svh flex-col bg-primary">
       <div className="flex flex-1 flex-col items-center justify-center gap-6">
-        <div className="relative h-44 w-44">
+        <div className="relative h-44 w-44 animate-in zoom-in-75 fade-in-0 duration-700">
           <Image
             src="/logo_w.svg"
             alt="달란트페이"
@@ -34,7 +34,7 @@ export default function LoginPage() {
             priority
           />
         </div>
-        <div className="text-center">
+        <div className="text-center animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
           <h1 className={`${gmarketSans.className} text-3xl font-bold text-white`}>
             Dalant Pay
           </h1>
@@ -44,7 +44,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="space-y-3 px-8 pb-16">
+      <div className="space-y-3 px-8 pb-16 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-[350ms] fill-mode-both">
         <button
           type="button"
           onClick={handleKakaoLogin}

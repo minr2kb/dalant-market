@@ -58,14 +58,20 @@ export function MissionList({
 				))}
 			</div>
 
-			<div className="flex flex-col gap-2">
+			<div key={tab} className="flex flex-col gap-2">
 				{byTab[tab].length === 0 ? (
-					<div className="py-12 text-center text-sm text-gray-400">
+					<div className="py-12 text-center text-sm text-gray-400 animate-in fade-in-0 duration-300">
 						{EMPTY[tab]}
 					</div>
 				) : (
-					byTab[tab].map(mission => (
-						<MissionCard key={mission.id} mission={mission} marketId={marketId} />
+					byTab[tab].map((mission, i) => (
+						<div
+							key={mission.id}
+							className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300 fill-mode-both"
+							style={{ animationDelay: `${i * 50}ms` }}
+						>
+							<MissionCard mission={mission} marketId={marketId} />
+						</div>
 					))
 				)}
 			</div>

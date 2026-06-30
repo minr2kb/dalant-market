@@ -35,7 +35,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         <AdminAccessButton marketId={marketId} compact />
       </div>
 
-      <div className="rounded-3xl bg-emerald-500 p-6 text-white">
+      <div className="rounded-3xl bg-emerald-500 p-6 text-white animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
@@ -75,7 +75,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         </div>
 
         <div className="space-y-2">
-          {recentLogs.map((log) => {
+          {recentLogs.map((log, i) => {
             const label =
               log.reasonType === 'mission'
                 ? log.missionTitle
@@ -89,7 +89,8 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
             return (
               <div
                 key={log.id}
-                className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3"
+                className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-400 fill-mode-both"
+                style={{ animationDelay: `${200 + i * 75}ms` }}
               >
                 <div className="flex items-center gap-3">
                   <div

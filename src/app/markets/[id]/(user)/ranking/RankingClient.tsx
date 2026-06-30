@@ -46,7 +46,7 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
             const cfg = podiumConfig[i]
             const isMe = p.user.id === userId
             return (
-              <div key={p.id} className="flex flex-1 flex-col items-center gap-1">
+              <div key={p.id} className="flex flex-1 flex-col items-center gap-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: `${i * 100}ms` }}>
                 <p className={cn('w-full truncate text-center text-sm font-bold', cfg.labelColor)}>
                   {p.displayName}
                   {isMe && <span className="ml-1 text-[10px] font-normal text-emerald-500">나</span>}
@@ -74,9 +74,10 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
               <div
                 key={p.id}
                 className={cn(
-                  'flex items-center gap-3 rounded-2xl border px-4 py-3',
+                  'flex items-center gap-3 rounded-2xl border px-4 py-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-400 fill-mode-both',
                   isMe ? 'border-emerald-200 bg-emerald-50' : 'border-gray-100 bg-white',
                 )}
+                style={{ animationDelay: `${i * 50}ms` }}
               >
                 <span className="w-5 shrink-0 text-center text-sm font-bold text-gray-400">
                   {rank}
@@ -88,7 +89,7 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
                   </p>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                     <div
-                      className={cn('h-full rounded-full transition-all', isMe ? 'bg-emerald-400' : 'bg-emerald-300')}
+                      className={cn('ranking-bar h-full rounded-full', isMe ? 'bg-emerald-400' : 'bg-emerald-300')}
                       style={{ width: `${barPct}%` }}
                     />
                   </div>

@@ -19,7 +19,7 @@ export function MarketCard({ market, participantCount, isJoined }: MarketCardPro
   })
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4">
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 space-y-4">
       <div className="space-y-1">
         <h3 className="font-bold text-gray-900 text-base">{market.title}</h3>
         {market.description && (
