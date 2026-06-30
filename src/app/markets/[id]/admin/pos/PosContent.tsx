@@ -58,6 +58,10 @@ function PosInner({
 
   function handleScan(val: string) {
     const qr = parseQR(val)
+    if (qr?.type === 'mission') {
+      toast.error('미션 QR이에요', { description: '스캔 화면을 이용해주세요' })
+      return
+    }
     if (qr?.type === 'pay') {
       const participant = participants.find((p) => p.user.id === qr.userId)
       if (participant) {
@@ -65,6 +69,8 @@ function PosInner({
         setScanState('confirm')
         return
       }
+      toast.error('이 마켓의 참여자 QR이 아니에요')
+      return
     }
     setScanState('picking_user')
   }

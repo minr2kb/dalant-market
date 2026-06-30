@@ -36,7 +36,7 @@ export function FloatingTabBar({ tabs }: FloatingTabBarProps) {
 
   return (
     <nav className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-lg">
-      <div className="flex items-center justify-around rounded-full border border-gray-100 bg-white px-2 py-2 shadow-2xl">
+      <div className="flex items-center justify-around rounded-full  bg-white/60 backdrop-blur-sm px-2 py-2 shadow-[0_3px_10px_0_rgba(0,0,0,0.1)]">
         {tabs.map((tab) => {
           const isActive = pendingHref ? pendingHref === tab.href : pathname.includes(tab.segment)
           const Icon = ICON_MAP[tab.icon] ?? Home

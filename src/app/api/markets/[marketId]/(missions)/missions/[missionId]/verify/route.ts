@@ -6,7 +6,7 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
     const body = (await req.json()) as { token?: string; userId?: string; slot?: number; photoUrls?: string[] }
     const { marketId, missionId } = params
 
-    if (!body.token && !body.userId) return err('token or userId required', 400)
+    if (!body.token && !body.userId) return err('QR 인증이 필요해요', 400)
 
     const [{ data: mission, error: e1 }, { data: verifier }, { data: verifierParticipant }] =
       await Promise.all([
@@ -15,22 +15,27 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
         supabase.from('market_participants').select('role').eq('market_id', marketId).eq('user_id', verifiedBy).maybeSingle(),
       ])
 
-    if (e1 || !mission) return err('Mission not found', 404)
+    if (e1 || !mission) return err('미션을 찾을 수 없어요', 404)
 
     const verifierRole = (verifierParticipant as { role?: string } | null)?.role
+
+    if ((mission.type === 'admin_qr' || mission.type === 'upload') && verifierRole !== 'admin')
+      return err('관리자만 인증할 수 있는 미션이에요', 403)
+    if (mission.type === 'user_qr' && verifierRole === 'admin')
+      return err('유저 간 인증 미션이에요. 다른 참여자가 스캔해야 해요', 403)
 
     let targetUserId: string
     if (body.token) {
       const parsed = verifyMissionQR(body.token)
-      if (!parsed) return err('Invalid or expired QR', 400)
-      if (parsed.marketId !== marketId || parsed.missionId !== missionId) return err('QR mismatch', 400)
+      if (!parsed) return err('QR이 만료됐거나 올바르지 않아요', 400)
+      if (parsed.marketId !== marketId || parsed.missionId !== missionId) return err('미션 정보가 일치하지 않아요', 400)
       targetUserId = parsed.userId
     } else {
-      if (verifierRole !== 'admin') return err('Token required', 400)
+      if (verifierRole !== 'admin') return err('권한이 없어요', 403)
       targetUserId = body.userId!
     }
 
-    if (targetUserId === verifiedBy && verifierRole !== 'admin') return err('Cannot verify own QR', 403)
+    if (targetUserId === verifiedBy) return err('본인의 QR은 인증할 수 없어요', 403)
 
     const { data: participant, error: e2 } = await supabase
       .from('market_participants')
@@ -39,7 +44,7 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
       .eq('user_id', targetUserId)
       .single()
 
-    if (e2 || !participant) return err('User not found', 404)
+    if (e2 || !participant) return err('참여자를 찾을 수 없어요', 404)
 
     const { data: existingLogs } = await supabase
       .from('mission_logs')
@@ -49,7 +54,7 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
 
     const usedSlots = new Set((existingLogs ?? []).map((l) => l.slot as number))
     if (mission.limit_count !== null && usedSlots.size >= mission.limit_count)
-      return err('All slots already completed', 422)
+      return err('이미 완료한 미션이에요', 422)
 
     const slotNum =
       body.slot ??
@@ -80,7 +85,11 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
       p_mission_title: mission.title,
     })
 
-    if (e3) return err(e3.message)
+    if (e3) {
+      if (e3.message.includes('mission_logs_check')) return err('본인의 QR은 인증할 수 없어요', 403)
+      if (e3.message.includes('already exists') || e3.message.includes('unique')) return err('이미 인증된 미션이에요', 409)
+      return err('적립에 실패했어요', 500)
+    }
 
     if (body.photoUrls && body.photoUrls.length > 0) {
       await supabase

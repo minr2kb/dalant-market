@@ -44,21 +44,35 @@ function ScanInner({ marketId }: { marketId: string }) {
 
   function handleScan(val: string) {
     const qr = parseQR(val)
-    if (qr) {
+    if (!qr) return
+
+    if (qr.type === 'pay') {
+      toast.error('결제 QR이에요', { description: 'POS 화면을 이용해주세요' })
+      return
+    }
+
+    if (qr.type === 'mission') {
+      if (qr.photoUrls && qr.photoUrls.length > 0) setPendingPhotoUrls(qr.photoUrls)
       const participant = participants.find((p) => p.user.id === qr.userId)
       if (participant) setSelectedUser(participant)
-
-      if (qr.type === 'mission') {
-        if (qr.photoUrls && qr.photoUrls.length > 0) setPendingPhotoUrls(qr.photoUrls)
-        const mission = missions.find((m) => m.id === qr.missionId)
-        if (mission && participant) {
-          setSelectedMission(mission)
-          setRawToken(qr.token)
-          setState('confirm')
-          return
-        }
+      const mission = missions.find((m) => m.id === qr.missionId)
+      if (mission && participant) {
+        setSelectedMission(mission)
+        setRawToken(qr.token)
+        setState('confirm')
+        return
+      }
+      const anyMission = missionsData.data.find((m) => m.id === qr.missionId)
+      if (anyMission?.type === 'user_qr') {
+        toast.error('유저 간 인증 미션이에요', { description: '다른 참여자가 스캔해야 해요' })
+        return
+      }
+      if (!participant) {
+        toast.error('이 마켓의 참여자 QR이 아니에요')
+        return
       }
     }
+
     setRawToken(null)
     setState('picking_mission')
   }
@@ -99,9 +113,9 @@ function ScanInner({ marketId }: { marketId: string }) {
     ])
     const failed = results.filter((r) => r.status === 'rejected')
     if (failed.length > 0) {
-      toast.error(`${failed.length}명 적립 실패`, {
-        description: '일부 인원의 달란트 적립에 실패했습니다.',
-      })
+      const reason = (failed[0] as PromiseRejectedResult).reason
+      const msg = (reason as any)?.body?.error ?? '알 수 없는 오류'
+      toast.error(`${failed.length}명 적립 실패`, { description: msg })
     }
     if (results.some((r) => r.status === 'fulfilled')) {
       setState('done')

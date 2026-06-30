@@ -10,6 +10,7 @@ import { useModalHistory } from '@/hooks/use-modal-history'
 import { parseQR } from '@/lib/qr'
 import { participantsQuery, marketsQuery } from '@/lib/query/queries'
 import { transferApi } from '@/lib/api/client'
+import { toast } from 'sonner'
 import type { MarketParticipant } from '@/types'
 
 type Step = 'select' | 'amount' | 'confirm'
@@ -31,7 +32,6 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
   const [search, setSearch] = useState('')
   const [recipient, setRecipient] = useState<MarketParticipant | null>(null)
   const [amount, setAmount] = useState('')
-  const [scanError, setScanError] = useState<string | null>(null)
 
   const queryClient = useQueryClient()
 
@@ -44,7 +44,6 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
       setSearch('')
       setRecipient(null)
       setAmount('')
-      setScanError(null)
     }
   }, [open])
 
@@ -79,24 +78,27 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
   function handleScan(value: string) {
     setScanOpen(false)
     const parsed = parseQR(value)
+    if (parsed?.type === 'mission') {
+      toast.error('미션 QR이에요. 상대방의 결제 QR을 스캔해주세요')
+      return
+    }
     if (!parsed || parsed.type !== 'pay') {
-      setScanError('올바른 QR이 아니에요')
+      toast.error('올바른 QR이 아니에요')
       return
     }
     if (parsed.marketId !== marketId) {
-      setScanError('다른 마켓의 QR이에요')
+      toast.error('다른 마켓의 QR이에요')
       return
     }
     if (parsed.userId === userId) {
-      setScanError('자신에게는 전송할 수 없어요')
+      toast.error('자신에게는 전송할 수 없어요')
       return
     }
     const found = participants.find((p) => p.user.id === parsed.userId)
     if (!found) {
-      setScanError('이 마켓의 참가자가 아니에요')
+      toast.error('이 마켓의 참가자가 아니에요')
       return
     }
-    setScanError(null)
     setRecipient(found)
     setStep('amount')
   }
@@ -168,7 +170,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
                 <button
                   key={tab}
                   type="button"
-                  onClick={() => { setActiveTab(tab); setScanError(null) }}
+                  onClick={() => setActiveTab(tab)}
                   className={`flex-1 h-9 rounded-full text-sm font-medium transition-colors ${
                     activeTab === tab
                       ? 'bg-emerald-500 text-white'
@@ -182,13 +184,10 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
 
             {activeTab === 'qr' ? (
               <div className="space-y-3">
-                <Button className="h-12 w-full" onClick={() => { setScanError(null); setScanOpen(true) }}>
+                <Button className="h-12 w-full" onClick={() => setScanOpen(true)}>
                   <QrCode className="h-4 w-4 mr-2" />
                   QR 스캔하기
                 </Button>
-                {scanError && (
-                  <p className="text-center text-sm text-rose-500">{scanError}</p>
-                )}
               </div>
             ) : (
               <div className="space-y-3">
