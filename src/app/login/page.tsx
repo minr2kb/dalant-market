@@ -1,7 +1,15 @@
 'use client'
 
 import Image from 'next/image'
+import localFont from 'next/font/local'
 import { createClient } from '@/lib/supabase/client'
+
+const gmarketSans = localFont({
+  src: [
+    { path: '../../fonts/GmarketSansMedium.woff', weight: '500' },
+    { path: '../../fonts/GmarketSansBold.woff', weight: '700' },
+  ],
+})
 
 export default function LoginPage() {
   async function handleKakaoLogin() {
@@ -15,29 +23,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col overflow-hidden bg-white">
-      {/* 로고 */}
-      <div className="flex flex-1 items-center justify-center">
-        <div className="relative h-48 w-full">
+    <div className="flex min-h-svh flex-col bg-primary">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6">
+        <div className="relative h-44 w-44">
           <Image
-            src="/logo.png"
+            src="/logo_w.svg"
             alt="달란트페이"
             fill
             className="object-contain"
             priority
           />
         </div>
+        <div className="text-center">
+          <h1 className={`${gmarketSans.className} text-3xl font-bold text-white`}>
+            Dalant Pay
+          </h1>
+          <p className="mt-2 text-sm text-white/70">
+            오프라인 모임을 위한 미션 인증 · 결제 서비스
+          </p>
+        </div>
       </div>
 
-      {/* 로그인 */}
       <div className="space-y-3 px-8 pb-16">
-        <p className="text-center text-sm leading-relaxed text-gray-400 pb-2">
-          오프라인 모임을 위한 미션 인증 달란트 결제 서비스
-        </p>
         <button
           type="button"
           onClick={handleKakaoLogin}
-          className="flex h-12 w-full items-center justify-center gap-2.5 rounded-full bg-[#FEE500] font-semibold text-[#3C1E1E] transition-all hover:opacity-90 active:scale-[0.98]"
+          className="flex h-14 w-full max-w-sm mx-auto items-center justify-center gap-2.5 rounded-full bg-[#FEE500] font-semibold text-[#3C1E1E] transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
         >
           <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
             <path
@@ -49,8 +60,8 @@ export default function LoginPage() {
           </svg>
           카카오로 시작하기
         </button>
-        <p className="text-center text-xs text-gray-300">
-          로그인 시 서비스 이용약관에 동의합니다
+        <p className="text-center text-xs text-white/60">
+          로그인시 이용약관에 동의합니다
         </p>
       </div>
     </div>
