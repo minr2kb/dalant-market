@@ -46,7 +46,7 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
             const cfg = podiumConfig[i]
             const isMe = p.user.id === userId
             return (
-              <div key={p.id} className="flex flex-1 flex-col items-center gap-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: `${i * 100}ms` }}>
+              <div key={p.id} className="flex flex-1 flex-col items-center gap-1">
                 <p className={cn('w-full truncate text-center text-sm font-bold', cfg.labelColor)}>
                   {p.displayName}
                   {isMe && <span className="ml-1 text-[10px] font-normal text-emerald-500">나</span>}
