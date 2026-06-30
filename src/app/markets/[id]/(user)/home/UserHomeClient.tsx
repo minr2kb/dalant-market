@@ -29,8 +29,8 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
     <div className="px-4 space-y-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-gray-400">{market.title}</p>
-          <h1 className="text-xl font-bold text-gray-900">{user.displayName}</h1>
+          <p className="text-xs text-gray-400 dark:text-gray-500">{market.title}</p>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{user.displayName}</h1>
         </div>
         <AdminAccessButton marketId={marketId} compact />
       </div>
@@ -54,7 +54,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
       <div className="grid grid-cols-2 gap-2">
         <Button
           variant="ghost"
-          className="h-12 gap-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 rounded-2xl font-semibold"
+          className="h-12 gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-800 rounded-2xl font-semibold"
           onClick={() => openModal((close) => (
             <TransferModal marketId={marketId} userId={userId} onClose={close} />
           ))}
@@ -67,7 +67,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700">최근 내역</h2>
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">최근 내역</h2>
           <Link
             href={`/markets/${marketId}/history`}
             className="flex items-center gap-1 text-xs text-emerald-500"
@@ -91,12 +91,12 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
             return (
               <div
                 key={log.id}
-                className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-400 fill-mode-both"
+                className="flex items-center justify-between rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-400 fill-mode-both"
                 style={{ animationDelay: `${200 + i * 75}ms` }}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full ${isPositive ? 'bg-emerald-50' : 'bg-rose-50'}`}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full ${isPositive ? 'bg-emerald-50 dark:bg-emerald-900/30' : 'bg-rose-50 dark:bg-rose-900/30'}`}
                   >
                     {isPositive ? (
                       <TrendingUp className="h-4 w-4 text-emerald-500" />
@@ -105,8 +105,8 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{label}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                       {new Date(log.createdAt).toLocaleDateString('ko-KR', {
                         month: 'short',
                         day: 'numeric',

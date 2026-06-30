@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className={notoSansKR.className}>
-      <body className="bg-white text-gray-900 antialiased">
+    <html lang="ko" className={notoSansKR.className} suppressHydrationWarning>
+      <body className="bg-white text-gray-900 antialiased dark:bg-gray-950 dark:text-white">
         <NextTopLoader color="oklch(0.696 0.17 162.48)" showSpinner={false} height={3} />
         <Providers>{children}</Providers>
         <Toaster position="top-center" richColors />

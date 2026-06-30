@@ -29,14 +29,14 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
   // Podium order: 2nd(left), 1st(center), 3rd(right)
   const podiumOrder = [top3[1], top3[0], top3[2]]
   const podiumConfig = [
-    { medal: '🥈', blockH: 'h-16', blockBg: 'bg-emerald-200', labelColor: 'text-gray-700' },
-    { medal: '🥇', blockH: 'h-24', blockBg: 'bg-emerald-400', labelColor: 'text-gray-900' },
-    { medal: '🥉', blockH: 'h-10', blockBg: 'bg-slate-300',   labelColor: 'text-gray-500' },
+    { medal: '🥈', blockH: 'h-16', blockBg: 'bg-emerald-200 dark:bg-emerald-800', labelColor: 'text-gray-700 dark:text-gray-300' },
+    { medal: '🥇', blockH: 'h-24', blockBg: 'bg-emerald-400 dark:bg-emerald-600', labelColor: 'text-gray-900 dark:text-white' },
+    { medal: '🥉', blockH: 'h-10', blockBg: 'bg-slate-300 dark:bg-slate-600',   labelColor: 'text-gray-500 dark:text-gray-400' },
   ]
 
   return (
     <div className="px-4 space-y-6 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-gray-900">랭킹</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-white">랭킹</h1>
 
       {/* Podium */}
       {ranked.length > 0 && (
@@ -51,7 +51,7 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
                   {p.displayName}
                   {isMe && <span className="ml-1 text-[10px] font-normal text-emerald-500">나</span>}
                 </p>
-                <p className="text-xs text-gray-400 tabular-nums">
+                <p className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
                   {p.balance} {market.pointLabel}
                 </p>
                 <div
@@ -78,26 +78,26 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
                 key={p.id}
                 className={cn(
                   'flex items-center gap-3 rounded-2xl border px-4 py-3 animate-in fade-in-0 slide-in-from-bottom-2 duration-400 fill-mode-both',
-                  isMe ? 'border-emerald-200 bg-emerald-50' : 'border-gray-100 bg-white',
+                  isMe ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20' : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900',
                 )}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <span className="w-5 shrink-0 text-center text-sm font-bold text-gray-400">
+                <span className="w-5 shrink-0 text-center text-sm font-bold text-gray-400 dark:text-gray-500">
                   {rank}
                 </span>
                 <div className="min-w-0 flex-1 space-y-1.5">
-                  <p className={cn('truncate text-sm font-semibold', isMe ? 'text-emerald-700' : 'text-gray-900')}>
+                  <p className={cn('truncate text-sm font-semibold', isMe ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-900 dark:text-white')}>
                     {p.displayName}
                     {isMe && <span className="ml-1 text-xs font-normal text-emerald-500">(나)</span>}
                   </p>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                     <div
                       className={cn('ranking-bar h-full rounded-full', isMe ? 'bg-emerald-400' : 'bg-emerald-300')}
                       style={{ width: `${barPct}%` }}
                     />
                   </div>
                 </div>
-                <span className={cn('shrink-0 text-sm font-bold tabular-nums', isMe ? 'text-emerald-600' : 'text-gray-700')}>
+                <span className={cn('shrink-0 text-sm font-bold tabular-nums', isMe ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-700 dark:text-gray-300')}>
                   {p.balance} {market.pointLabel}
                 </span>
               </div>

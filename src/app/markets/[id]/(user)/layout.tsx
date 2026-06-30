@@ -14,7 +14,7 @@ export default async function UserLayout(props: LayoutProps<'/markets/[id]'>) {
   ]
 
   return (
-    <div className="min-h-svh bg-gray-50">
+    <div className="min-h-svh bg-gray-50 dark:bg-gray-950">
       <MarketRealtimeProvider marketId={id} userId={userId ?? ''} />
       <main className="min-h-svh pb-28 pt-4">{props.children}</main>
       <FloatingTabBar tabs={tabs} />

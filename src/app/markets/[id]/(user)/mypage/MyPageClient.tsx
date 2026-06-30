@@ -1,14 +1,23 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { useSuspenseQueries } from '@tanstack/react-query'
-import { LogOut } from 'lucide-react'
+import { LogOut, Monitor, Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
+import { cn } from '@/lib/utils'
+
+const THEME_OPTIONS = [
+  { value: 'system', label: '시스템', icon: Monitor },
+  { value: 'light', label: '라이트', icon: Sun },
+  { value: 'dark', label: '다크', icon: Moon },
+] as const
 
 export function MyPageClient({ marketId, userId }: { marketId: string; userId: string }) {
   const router = useRouter()
+  const { theme, setTheme } = useTheme()
 
   const [{ data: marketData }, { data: participantData }] = useSuspenseQueries({
     queries: [
@@ -38,30 +47,52 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
 
   return (
     <div className="px-4 space-y-6 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-gray-900">마이페이지</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-white">마이페이지</h1>
 
-      <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden divide-y divide-gray-50">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
         <InfoRow label="활동명" value={participant.displayName} />
         <InfoRow label="본명" value={user.realName} />
         <InfoRow label="생년월일" value={birthLabel} />
         <InfoRow label="성별" value={genderLabel} />
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden divide-y divide-gray-50">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
         <InfoRow label="마켓" value={market.title} />
         <InfoRow label={`보유 ${market.pointLabel}`} value={`${participant.balance} ${market.pointLabel}`} highlight />
       </div>
 
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
+        <p className="text-sm text-gray-500 dark:text-gray-400">화면 모드</p>
+        <div className="flex gap-2">
+          {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setTheme(value)}
+              className={cn(
+                'flex flex-1 flex-col items-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-colors',
+                theme === value
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <Button
         variant="outline"
-        className="h-12 w-full gap-2 text-red-500 border-red-100 hover:bg-red-50 hover:text-red-600"
+        className="h-12 w-full gap-2 text-red-500 border-red-100 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600"
         onClick={handleLogout}
       >
         <LogOut className="h-4 w-4" />
         로그아웃
       </Button>
 
-      <p className="text-center text-xs text-gray-300">© 2026 Kyungbae Min</p>
+      <p className="text-center text-xs text-gray-300 dark:text-gray-600">© 2026 Kyungbae Min</p>
     </div>
   )
 }
@@ -69,8 +100,8 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
 function InfoRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex items-center justify-between px-4 py-3.5">
-      <span className="text-sm text-gray-500">{label}</span>
-      <span className={`text-sm font-medium ${highlight ? 'text-emerald-600' : 'text-gray-900'}`}>
+      <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
+      <span className={`text-sm font-medium ${highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
         {value}
       </span>
     </div>

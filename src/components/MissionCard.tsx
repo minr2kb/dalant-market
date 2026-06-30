@@ -23,19 +23,19 @@ export function MissionCard({ mission, marketId }: MissionCardProps) {
 
   return (
     <Link href={`/markets/${marketId}/missions/${mission.id}`}>
-      <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-2.5 active:scale-[0.99] transition-transform">
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-2.5 active:scale-[0.99] transition-transform">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0 space-y-1">
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold text-gray-900 leading-snug">{mission.title}</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white leading-snug">{mission.title}</span>
               {mission.isGroup && (
-                <span className="shrink-0 rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-500">
+                <span className="shrink-0 rounded-full bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 text-[10px] font-medium text-blue-500">
                   단체
                 </span>
               )}
             </div>
             {mission.description && (
-              <p className="text-xs text-gray-400 line-clamp-1">{mission.description}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 line-clamp-1">{mission.description}</p>
             )}
           </div>
           <div className="flex shrink-0 flex-col items-end gap-1">
@@ -45,7 +45,7 @@ export function MissionCard({ mission, marketId }: MissionCardProps) {
             ) : status === 'partial' ? (
               <Clock className="h-4 w-4 text-amber-400" />
             ) : (
-              <Circle className="h-4 w-4 text-gray-200" />
+              <Circle className="h-4 w-4 text-gray-200 dark:text-gray-700" />
             )}
           </div>
         </div>
@@ -56,11 +56,11 @@ export function MissionCard({ mission, marketId }: MissionCardProps) {
               {mission.slots.map((slot) => (
                 <div
                   key={slot.slot}
-                  className={cn('h-1 flex-1 rounded-full', slot.verifiedAt ? 'bg-emerald-400' : 'bg-gray-100')}
+                  className={cn('h-1 flex-1 rounded-full', slot.verifiedAt ? 'bg-emerald-400' : 'bg-gray-100 dark:bg-gray-700')}
                 />
               ))}
             </div>
-            <span className="text-[11px] tabular-nums text-gray-400">
+            <span className="text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
               {completedCount}/{mission.limitCount}
             </span>
           </div>
