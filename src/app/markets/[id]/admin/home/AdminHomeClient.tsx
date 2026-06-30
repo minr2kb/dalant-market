@@ -1,7 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { useSuspenseQueries } from '@tanstack/react-query'
+import { orderBy, keyBy } from 'es-toolkit'
 import { ScanLine, Coins, ShoppingBag, User, TrendingUp, TrendingDown, Gift } from 'lucide-react'
 import { getMissionStatus } from '@/types'
 import { marketsQuery, participantsQuery, missionsQuery, pointLogsQuery } from '@/lib/query/queries'
@@ -22,9 +24,22 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
   const missions = missionsData.data
   const logs = logsData.data
 
-  const activeMissions = missions.filter((m) => getMissionStatus(m) === 'active').length
-  const totalGranted = logs.filter((l) => l.amount > 0).reduce((s, l) => s + l.amount, 0)
-const recentLogs = [...logs].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 5)
+  const activeMissions = useMemo(
+    () => missions.filter((m) => getMissionStatus(m) === 'active').length,
+    [missions],
+  )
+  const totalGranted = useMemo(
+    () => logs.filter((l) => l.amount > 0).reduce((s, l) => s + l.amount, 0),
+    [logs],
+  )
+  const recentLogs = useMemo(
+    () => orderBy(logs, [(l) => l.createdAt], ['desc']).slice(0, 5),
+    [logs],
+  )
+  const participantMap = useMemo(
+    () => keyBy(participants, (p) => p.user.id),
+    [participants],
+  )
 
   return (
     <div className="px-4 max-w-lg mx-auto space-y-6">
@@ -62,7 +77,7 @@ const recentLogs = [...logs].sort((a, b) => b.createdAt.localeCompare(a.createdA
       <div className="grid grid-cols-3 gap-3">
         {[
           { href: 'scan', icon: ScanLine, label: '미션 인증', bg: 'bg-emerald-50', color: 'text-emerald-500' },
-          { href: 'points', icon: Coins, label: '달란트 지급', bg: 'bg-purple-50', color: 'text-purple-500' },
+          { href: 'points', icon: Coins, label: `${market.pointLabel} 지급`, bg: 'bg-purple-50', color: 'text-purple-500' },
           { href: 'pos', icon: ShoppingBag, label: '물품 결제', bg: 'bg-rose-50', color: 'text-rose-500' },
         ].map(({ href, icon: Icon, label, bg, color }) => (
           <Link
@@ -83,13 +98,15 @@ const recentLogs = [...logs].sort((a, b) => b.createdAt.localeCompare(a.createdA
           <h2 className="text-sm font-semibold text-gray-700">최근 활동</h2>
           <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden divide-y divide-gray-50">
             {recentLogs.map((log) => {
-              const participant = participants.find((p) => p.user.id === log.userId)
+              const participant = participantMap[log.userId]
               const label =
                 log.reasonType === 'mission'
                   ? log.missionTitle
                   : log.reasonType === 'purchase'
                     ? log.itemName
-                    : log.memo ?? '수동 지급'
+                    : log.reasonType === 'transfer'
+                      ? (log.memo ?? `${market.pointLabel} 전송`)
+                      : (log.memo ?? '수동 지급')
               return (
                 <div key={log.id} className="flex items-center gap-3 px-4 py-3">
                   <div

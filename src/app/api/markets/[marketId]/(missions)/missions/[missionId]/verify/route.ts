@@ -35,10 +35,18 @@ export const POST = authRoute<{ marketId: string; missionId: string }>(
 
     const slotNum =
       body.slot ??
-      Array.from({ length: mission.limit_count ?? 99 }, (_, i) => i + 1).find(
-        (s) => !usedSlots.has(s),
-      ) ??
-      1
+      (() => {
+        if (mission.limit_count === null) {
+          // unlimited: next available = max used slot + 1
+          const maxUsed = usedSlots.size > 0 ? Math.max(...usedSlots) : 0
+          return maxUsed + 1
+        }
+        return (
+          Array.from({ length: mission.limit_count }, (_, i) => i + 1).find(
+            (s) => !usedSlots.has(s),
+          ) ?? 1
+        )
+      })()
 
     const verifiedAt = new Date().toISOString()
     const verifierName = (verifier as { real_name?: string } | null)?.real_name ?? verifiedBy

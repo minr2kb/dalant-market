@@ -7,9 +7,10 @@ import type { PointLog, Order } from '@/types'
 interface PointLogItemProps {
   log: PointLog
   order?: Order
+  pointLabel?: string
 }
 
-export function PointLogItem({ log, order }: PointLogItemProps) {
+export function PointLogItem({ log, order, pointLabel = '달란트' }: PointLogItemProps) {
   const [expanded, setExpanded] = useState(false)
   const isPositive = log.amount > 0
   const isPurchase = log.reasonType === 'purchase'
@@ -20,7 +21,7 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
       : isPurchase
       ? (log.itemName ?? '마켓 구매')
       : log.reasonType === 'transfer'
-      ? (log.memo ?? '달란트 전송')
+      ? (log.memo ?? `${pointLabel} 전송`)
       : (log.memo ?? '수동 지급')
 
   const sub =
@@ -29,7 +30,7 @@ export function PointLogItem({ log, order }: PointLogItemProps) {
       : isPurchase
       ? '마켓 구매'
       : log.reasonType === 'transfer'
-      ? (log.amount > 0 ? '달란트 받음' : '달란트 전송')
+      ? (log.amount > 0 ? `${pointLabel} 받음` : `${pointLabel} 전송`)
       : '관리자 지급'
 
   const iconBg = isPositive

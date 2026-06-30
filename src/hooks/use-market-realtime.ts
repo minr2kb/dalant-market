@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import { participantsQuery, missionsQuery, pointLogsQuery, ordersQuery } from '@/lib/query/queries'
+import { participantsQuery, missionsQuery, pointLogsQuery, ordersQuery, marketsQuery } from '@/lib/query/queries'
 
 export function useMarketRealtime(marketId: string, userId: string) {
   const queryClient = useQueryClient()
@@ -39,8 +39,10 @@ export function useMarketRealtime(marketId: string, userId: string) {
             if (row.market_id !== marketId || row.user_id !== userId) return
 
             const diff = row.balance - (old.balance ?? 0)
-            if (diff > 0) toast.success(`달란트 +${diff}`, { description: '잔액이 업데이트됐습니다.' })
-            else if (diff < 0) toast.info(`달란트 ${diff}`, { description: '잔액이 업데이트됐습니다.' })
+            const cached = queryClient.getQueryData(marketsQuery.get({ marketId }).queryKey) as { data: { pointLabel: string } } | undefined
+            const label = cached?.data.pointLabel ?? '달란트'
+            if (diff > 0) toast.success(`${label} +${diff}`, { description: '잔액이 업데이트됐습니다.' })
+            else if (diff < 0) toast.info(`${label} ${diff}`, { description: '잔액이 업데이트됐습니다.' })
 
             queryClient.invalidateQueries({ queryKey: participantsQuery.$key })
             queryClient.invalidateQueries({ queryKey: missionsQuery.$key })

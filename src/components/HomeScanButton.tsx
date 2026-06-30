@@ -11,7 +11,7 @@ import type { MarketParticipant } from '@/types'
 
 type ScanTarget = { participant: MarketParticipant; missionId: string }
 
-export function HomeScanButton({ marketId }: { marketId: string }) {
+export function HomeScanButton({ marketId, pointLabel }: { marketId: string; pointLabel: string }) {
   const [open, setOpen] = useState(false)
   const [scanTarget, setScanTarget] = useState<ScanTarget | null>(null)
   const [done, setDone] = useState(false)
@@ -74,7 +74,7 @@ export function HomeScanButton({ marketId }: { marketId: string }) {
                 </div>
                 <div>
                   <p className="font-bold text-gray-900">{scanTarget.participant.displayName}님의 QR</p>
-                  <p className="text-sm text-gray-500">인증하면 달란트가 지급됩니다</p>
+                  <p className="text-sm text-gray-500">인증하면 {pointLabel} 지급됩니다</p>
                 </div>
               </div>
               <div className="flex gap-3">
@@ -101,7 +101,7 @@ export function HomeScanButton({ marketId }: { marketId: string }) {
             <CheckCircle2 className="h-20 w-20 text-emerald-400" />
             <div>
               <p className="text-xl font-bold text-white">인증 완료!</p>
-              <p className="mt-1 text-sm text-white/60">{scanTarget.participant.displayName}님 달란트 적립됨</p>
+              <p className="mt-1 text-sm text-white/60">{scanTarget.participant.displayName}님 {pointLabel} 적립됨</p>
             </div>
             <Button
               onClick={handleClose}

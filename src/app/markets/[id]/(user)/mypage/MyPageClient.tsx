@@ -49,7 +49,7 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
 
       <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden divide-y divide-gray-50">
         <InfoRow label="마켓" value={market.title} />
-        <InfoRow label="보유 달란트" value={`${participant.balance} ${market.pointLabel}`} highlight />
+        <InfoRow label={`보유 ${market.pointLabel}`} value={`${participant.balance} ${market.pointLabel}`} highlight />
       </div>
 
       <Button

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react'
 import { useSuspenseQueries } from '@tanstack/react-query'
@@ -23,7 +23,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
 
   const market = marketData.data
   const { participant: user, pointLogs } = participantData.data
-  const recentLogs = pointLogs.slice(0, 3)
+  const recentLogs = useMemo(() => pointLogs.slice(0, 3), [pointLogs])
 
   return (
     <div className="px-4 space-y-6 max-w-lg mx-auto">
@@ -58,9 +58,9 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
           onClick={() => setTransferOpen(true)}
         >
           <ArrowRightLeft className="h-4 w-4" />
-          달란트 전송
+          {market.pointLabel} 전송
         </Button>
-        <HomeScanButton marketId={marketId} />
+        <HomeScanButton marketId={marketId} pointLabel={market.pointLabel} />
       </div>
 
       <div className="space-y-3">
@@ -81,8 +81,11 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
                 ? log.missionTitle
                 : log.reasonType === 'purchase'
                   ? log.itemName
-                  : log.memo ?? '수동 지급'
+                  : log.reasonType === 'transfer'
+                    ? (log.memo ?? `${market.pointLabel} 전송`)
+                    : (log.memo ?? '수동 지급')
             const isPositive = log.amount > 0
+            
             return (
               <div
                 key={log.id}

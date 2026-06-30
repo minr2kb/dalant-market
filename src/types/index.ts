@@ -57,6 +57,7 @@ export interface Mission {
 }
 
 export function getMissionStatus(mission: Mission): MissionStatus {
+  if (!mission.isActive) return 'past'
   const now = new Date()
   if (mission.activeUntil && new Date(mission.activeUntil) < now) return 'past'
   if (mission.activeFrom && new Date(mission.activeFrom) > now) return 'upcoming'
@@ -97,4 +98,13 @@ export interface MarketItem {
   id: string
   name: string
   price: number
+}
+
+export function getPointLogLabel(log: PointLog): string {
+  switch (log.reasonType) {
+    case 'mission': return log.missionTitle ?? '미션'
+    case 'purchase': return log.itemName ?? '마켓 구매'
+    case 'transfer': return log.memo ?? '달란트 전송'
+    case 'manual': return log.memo ?? '수동 지급'
+  }
 }

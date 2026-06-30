@@ -10,13 +10,12 @@ interface QRScannerProps {
   hint?: string
   badge?: ReactNode
   onScan: (value: string) => void
-  onSimulate?: () => void
   onClose: () => void
   children?: ReactNode
 }
 
 export function QRScanner({
-  open, title, hint, badge, onScan, onSimulate, onClose, children,
+  open, title, hint, badge, onScan, onClose, children,
 }: QRScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -141,15 +140,7 @@ export function QRScanner({
               <p className="animate-pulse text-xs text-white/40">QR 코드를 인식하는 중…</p>
             )}
 
-            {onSimulate && (
-              <button
-                type="button"
-                onClick={onSimulate}
-                className="rounded-full bg-white/20 px-6 py-3 text-sm font-medium text-white hover:bg-white/30"
-              >
-                {cameraError ? '카메라 권한 없음 — 시뮬레이션으로 진행' : '스캔 시뮬레이션'}
-              </button>
-            )}
+          
           </div>
         </div>
       )}

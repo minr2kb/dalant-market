@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { QRScanner } from '@/components/QRScanner'
 import { parseQR } from '@/lib/qr'
-import { itemsQuery, participantsQuery, ordersQuery } from '@/lib/query/queries'
+import { itemsQuery, participantsQuery, ordersQuery, marketsQuery } from '@/lib/query/queries'
 import type { MarketItem, MarketParticipant } from '@/types'
 
 type CartEntry = { item: MarketItem; qty: number }
@@ -18,14 +18,16 @@ function PosInner({
 }: {
   marketId: string
 }) {
-  const [{ data: itemsData }, { data: participantsData }] = useSuspenseQueries({
+  const [{ data: itemsData }, { data: participantsData }, { data: marketData }] = useSuspenseQueries({
     queries: [
       itemsQuery.list({ marketId }),
       participantsQuery.list({ marketId }),
+      marketsQuery.get({ marketId }),
     ],
   })
   const items = itemsData.data
   const participants = participantsData.data
+  const pointLabel = marketData.data.pointLabel
 
   const orderMutation = useMutation(
     ordersQuery.create({ invalidates: [participantsQuery.$key] }),
@@ -65,16 +67,6 @@ function PosInner({
       }
     }
     setScanState('picking_user')
-  }
-
-  function handleSimulate() {
-    const p = participants[0]
-    if (p) {
-      setScannedUser(p)
-      setScanState('confirm')
-    } else {
-      setScanState('picking_user')
-    }
   }
 
   async function confirmPayment() {
@@ -183,7 +175,7 @@ function PosInner({
             onClick={() => setScanState('scanning')}
             className="h-12 w-full rounded-2xl bg-rose-500 text-sm font-semibold text-white hover:bg-rose-600"
           >
-            결제하기 ({total} 달란트)
+            결제하기 (-{total})
           </Button>
         ) : (
           <p className="py-4 text-center text-sm text-gray-400">
@@ -198,11 +190,10 @@ function PosInner({
         hint="유저의 결제 QR을 화면 중앙에 맞춰주세요"
         badge={
           <span className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold tabular-nums text-white">
-            -{total} 달란트
+            -{total} {pointLabel}
           </span>
         }
         onScan={handleScan}
-        onSimulate={handleSimulate}
         onClose={() => setScanState('idle')}
       >
         {scanState === 'picking_user' && (
@@ -226,7 +217,7 @@ function PosInner({
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
-                      <p className="text-xs text-gray-400">{p.balance} 달란트 보유</p>
+                      <p className="text-xs text-gray-400">{p.balance} {pointLabel} 보유</p>
                     </div>
                   </button>
                 ))}
@@ -290,7 +281,7 @@ function PosInner({
             <div>
               <p className="text-xl font-bold text-white">결제 완료!</p>
               <p className="mt-1 text-sm text-white/60">
-                {updatedUser.user.realName} · -{total} 달란트
+                {updatedUser.user.realName} · -{total} {pointLabel}
               </p>
             </div>
             <Button

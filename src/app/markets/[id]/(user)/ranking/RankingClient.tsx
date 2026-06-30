@@ -1,6 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useSuspenseQueries } from '@tanstack/react-query'
+import { orderBy } from 'es-toolkit'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
 import { cn } from '@/lib/utils'
 
@@ -13,7 +15,10 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
   })
 
   const market = marketData.data
-  const ranked = [...participantsData.data].sort((a, b) => b.balance - a.balance)
+  const ranked = useMemo(
+    () => orderBy(participantsData.data, [(p) => p.balance], ['desc']),
+    [participantsData.data],
+  )
   const maxBalance = ranked[0]?.balance ?? 0
   const pct = (balance: number) =>
     maxBalance > 0 ? Math.round((balance / maxBalance) * 100) : 0

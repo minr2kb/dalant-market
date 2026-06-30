@@ -1,6 +1,8 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useSuspenseQueries } from '@tanstack/react-query'
+import { keyBy } from 'es-toolkit'
 import { PointLogItem } from '@/components/PointLogItem'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
 export function HistoryClient({ marketId, userId }: { marketId: string; userId: string }) {
@@ -13,12 +15,15 @@ export function HistoryClient({ marketId, userId }: { marketId: string; userId: 
 
   const market = marketData.data
   const { participant: user, pointLogs: logs, orders } = participantData.data
-  const orderMap = Object.fromEntries(orders.map((o) => [o.id, o]))
+  const orderMap = useMemo(
+    () => keyBy(orders, (o) => o.id),
+    [orders],
+  )
 
   return (
     <div className="px-4 max-w-lg mx-auto space-y-5">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-bold text-gray-900">달란트 내역</h1>
+        <h1 className="text-xl font-bold text-gray-900">{market.pointLabel} 내역</h1>
         <span className="text-sm text-gray-500">
           잔액{' '}
           <span className="font-bold text-emerald-500">
@@ -33,6 +38,7 @@ export function HistoryClient({ marketId, userId }: { marketId: string; userId: 
             key={log.id}
             log={log}
             order={log.orderId ? orderMap[log.orderId] : undefined}
+            pointLabel={market.pointLabel}
           />
         ))}
         {logs.length === 0 && (

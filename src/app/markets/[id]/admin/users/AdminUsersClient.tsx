@@ -1,24 +1,31 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { orderBy } from 'es-toolkit'
 import { Input } from '@/components/ui/input'
 import { participantsQuery } from '@/lib/query/queries'
 
 export function AdminUsersClient({ marketId }: { marketId: string }) {
   const { data } = useSuspenseQuery(participantsQuery.list({ marketId }))
-  const [query, setQuery] = useState('')
+  const [search, setSearch] = useState('')
 
-  const sorted = [...data.data].sort((a, b) => b.balance - a.balance)
-  const filtered = query.trim()
-    ? sorted.filter(
-        (p) =>
-          p.user.realName.includes(query.trim()) ||
-          p.displayName.includes(query.trim()),
-      )
-    : sorted
+  const sorted = useMemo(
+    () => orderBy(data.data, [(p) => p.balance], ['desc']),
+    [data.data],
+  )
+
+  const filtered = useMemo(
+    () =>
+      search
+        ? sorted.filter((p) =>
+            p.user.realName.toLowerCase().includes(search.toLowerCase()),
+          )
+        : sorted,
+    [sorted, search],
+  )
 
   return (
     <>
@@ -28,8 +35,8 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
           type="search"
           placeholder="이름으로 검색"
           className="rounded-xl pl-9"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 

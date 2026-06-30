@@ -21,7 +21,7 @@ export default function LoginPage() {
         <div className="relative h-48 w-full">
           <Image
             src="/logo.png"
-            alt="달란트 마켓"
+            alt="달란트페이"
             fill
             className="object-contain"
             priority

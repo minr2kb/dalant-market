@@ -193,7 +193,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                       <p className="font-medium text-gray-700">{TYPE_LABEL[mission.type]}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400">달란트</p>
+                      <p className="text-gray-400">보상</p>
                       <p className="font-medium text-gray-700">+{mission.reward}</p>
                     </div>
                     <div>

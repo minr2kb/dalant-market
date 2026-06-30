@@ -8,7 +8,7 @@ import { MissionSlot } from '@/components/MissionSlot'
 import { QRModal } from '@/components/QRModal'
 import { uploadMissionPhoto } from '@/lib/upload'
 import { getMissionStatus } from '@/types'
-import { missionsQuery } from '@/lib/query/queries'
+import { missionsQuery, marketsQuery } from '@/lib/query/queries'
 
 const MAX_PHOTOS = 3
 
@@ -54,8 +54,12 @@ export function MissionDetailClient({
   const { data: missionData } = useSuspenseQuery(
     missionsQuery.get({ marketId, missionId, userId })
   )
+  const { data: marketData } = useSuspenseQuery(
+    marketsQuery.get({ marketId })
+  )
 
   const mission = missionData.data
+  const market = marketData.data
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -95,7 +99,7 @@ export function MissionDetailClient({
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">{TYPE_LABEL[mission.type]}</span>
-              <span className="text-lg font-bold text-emerald-500">+{mission.reward} 달란트</span>
+              <span className="text-lg font-bold text-emerald-500">+{mission.reward} {market.pointLabel}</span>
             </div>
             {mission.description && (
               <p className="text-sm text-gray-600 leading-relaxed">{mission.description}</p>
@@ -121,7 +125,7 @@ export function MissionDetailClient({
                 관리자가 수동으로 지급하는 상시 미션이에요
               </p>
               <p className="text-xs text-gray-400">
-                별도 인증 없이 관리자가 직접 달란트를 지급합니다
+                별도 인증 없이 관리자가 직접 지급합니다
               </p>
             </div>
           ) : (

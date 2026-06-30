@@ -26,7 +26,7 @@ function AdminItemsList({ marketId }: { marketId: string }) {
         >
           <div className="space-y-0.5">
             <p className="text-sm font-semibold text-gray-800">{item.name}</p>
-            <p className="text-xs tabular-nums text-emerald-500">{item.price} 달란트</p>
+            <p className="text-xs tabular-nums text-emerald-500">{item.price}</p>
           </div>
           <button
             type="button"
@@ -84,7 +84,7 @@ function AdminItemsContent({ marketId }: { marketId: string }) {
             className="h-12 flex-1 rounded-xl"
           />
           <Input
-            placeholder="달란트"
+            placeholder="가격"
             type="number"
             value={newPrice}
             onChange={(e) => setNewPrice(e.target.value)}

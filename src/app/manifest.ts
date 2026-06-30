@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: '달란트 마켓',
-    short_name: '달란트',
+    name: '달란트페이',
+    short_name: '달란트페이',
     description: '오프라인 모임을 위한 미션 인증 기반 달란트 결제 서비스',
     start_url: '/',
     display: 'standalone',

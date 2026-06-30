@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { QRScanner } from '@/components/QRScanner'
 import { parseQR } from '@/lib/qr'
-import { missionsQuery, participantsQuery } from '@/lib/query/queries'
+import { missionsQuery, participantsQuery, marketsQuery } from '@/lib/query/queries'
 import type { Mission, MarketParticipant } from '@/types'
 
 type ScanState = 'idle' | 'picking_mission' | 'picking_user' | 'confirm' | 'group' | 'done'
@@ -16,16 +16,18 @@ type ScanState = 'idle' | 'picking_mission' | 'picking_user' | 'confirm' | 'grou
 function ScanInner({ marketId }: { marketId: string }) {
   const router = useRouter()
 
-  const [{ data: missionsData }, { data: participantsData }] = useSuspenseQueries({
+  const [{ data: missionsData }, { data: participantsData }, { data: marketData }] = useSuspenseQueries({
     queries: [
       missionsQuery.list({ marketId }),
       participantsQuery.list({ marketId }),
+      marketsQuery.get({ marketId }),
     ],
   })
   const missions = missionsData.data.filter(
     (m) => m.isActive && (m.type === 'admin_qr' || m.type === 'upload'),
   )
   const participants = participantsData.data
+  const pointLabel = marketData.data.pointLabel
 
   const verifyMutation = useMutation(
     missionsQuery.verify({
@@ -56,18 +58,6 @@ function ScanInner({ marketId }: { marketId: string }) {
       }
     }
     setState('picking_mission')
-  }
-
-  function handleSimulate() {
-    const mission = missions[0]
-    const participant = participants[0]
-    if (mission && participant) {
-      setSelectedMission(mission)
-      setSelectedUser(participant)
-      setState('confirm')
-    } else {
-      setState('picking_mission')
-    }
   }
 
   function selectMission(mission: Mission) {
@@ -126,7 +116,6 @@ function ScanInner({ marketId }: { marketId: string }) {
       title="QR 스캔"
       hint="미션 인증 QR을 화면 중앙에 맞춰주세요"
       onScan={handleScan}
-      onSimulate={handleSimulate}
       onClose={() => router.back()}
     >
       {state === 'picking_mission' && (
@@ -162,7 +151,7 @@ function ScanInner({ marketId }: { marketId: string }) {
             <div>
               <p className="text-sm font-semibold text-gray-700">누구의 QR인가요?</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                {selectedMission.title} · +{selectedMission.reward} 달란트
+                {selectedMission.title} · +{selectedMission.reward} {pointLabel}
               </p>
             </div>
             <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -178,7 +167,7 @@ function ScanInner({ marketId }: { marketId: string }) {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
-                    <p className="text-xs text-gray-400">{p.balance} 달란트 보유</p>
+                    <p className="text-xs text-gray-400">{p.balance} {pointLabel} 보유</p>
                   </div>
                 </button>
               ))}
@@ -195,7 +184,7 @@ function ScanInner({ marketId }: { marketId: string }) {
               <p className="text-xs font-medium text-gray-400">미션 인증 요청</p>
               <h3 className="text-lg font-bold text-gray-900">{selectedMission.title}</h3>
               <p className="text-sm text-gray-500">
-                {selectedUser.user.realName} · +{selectedMission.reward} 달란트
+                {selectedUser.user.realName} · +{selectedMission.reward} {pointLabel}
               </p>
             </div>
             {selectedMission.type === 'upload' && pendingPhotoUrls.length > 0 && (
@@ -267,7 +256,7 @@ function ScanInner({ marketId }: { marketId: string }) {
               onClick={() => confirmVerify(groupUsers)}
               className="h-12 w-full rounded-full bg-emerald-500 text-sm font-semibold text-white hover:bg-emerald-600"
             >
-              {groupUsers.length > 0 ? `${groupUsers.length + 1}명 달란트 적립` : '본인만 적립'}
+              {groupUsers.length > 0 ? `${groupUsers.length + 1}명 적립` : '본인만 적립'}
             </Button>
           </div>
         </div>
@@ -277,9 +266,9 @@ function ScanInner({ marketId }: { marketId: string }) {
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <CheckCircle2 className="h-20 w-20 text-emerald-400" />
           <div>
-            <p className="text-xl font-bold text-white">달란트 적립 완료!</p>
+            <p className="text-xl font-bold text-white">적립 완료!</p>
             <p className="mt-1 text-sm text-white/60">
-              {selectedMission.title} · +{selectedMission.reward} 달란트
+              {selectedMission.title} · +{selectedMission.reward} {pointLabel}
             </p>
           </div>
           <Button

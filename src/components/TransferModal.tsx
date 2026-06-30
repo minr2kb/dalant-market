@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useModalHistory } from '@/hooks/use-modal-history'
 import { parseQR } from '@/lib/qr'
-import { participantsQuery } from '@/lib/query/queries'
+import { participantsQuery, marketsQuery } from '@/lib/query/queries'
 import { transferApi } from '@/lib/api/client'
 import type { MarketParticipant } from '@/types'
 
@@ -22,7 +22,7 @@ interface TransferModalProps {
 }
 
 export function TransferModal({ marketId, userId, open, onClose }: TransferModalProps) {
-  const close = useCallback(() => onClose(), [onClose])
+  const close = useCallback(onClose, [onClose])
   useModalHistory(open, close)
 
   const [step, setStep] = useState<Step>('select')
@@ -53,6 +53,8 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
     ...participantsQuery.list({ marketId }),
     enabled: open,
   })
+  const { data: marketData } = useQuery({ ...marketsQuery.get({ marketId }), enabled: open })
+  const pointLabel = marketData?.data.pointLabel ?? '달란트'
   const participants = useMemo(
     () => (participantsData?.data ?? []).filter((p) => p.user.id !== userId),
     [participantsData, userId],
@@ -69,7 +71,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
     mutationFn: ({ toUserId, amount }: { toUserId: string; amount: number }) =>
       transferApi.transfer({ path: { marketId }, body: { toUserId, amount } }),
     onSuccess: () => {
-      queryClient.invalidateQueries()
+      queryClient.invalidateQueries({ queryKey: participantsQuery.$key })
       window.history.back()
     },
   })
@@ -146,7 +148,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
               </button>
             )}
             <h3 className="font-bold text-gray-900">
-              {step === 'select' ? '달란트 전송' : step === 'amount' ? '금액 입력' : '전송 확인'}
+              {step === 'select' ? `${pointLabel} 전송` : step === 'amount' ? '금액 입력' : '전송 확인'}
             </h3>
           </div>
           <button
@@ -212,7 +214,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-800">{p.displayName}</p>
-                        <p className="text-xs text-gray-400">{p.balance} 달란트 보유</p>
+                        <p className="text-xs text-gray-400">{p.balance} {pointLabel} 보유</p>
                       </div>
                     </button>
                   ))}
@@ -266,7 +268,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
               <p className="text-sm text-gray-500">아래 내용으로 전송할까요?</p>
               <p className="text-base font-bold text-gray-900">{recipient.displayName}에게</p>
               <p className="text-2xl font-bold text-emerald-500 tabular-nums">
-                {parseInt(amount, 10)} 달란트
+                {parseInt(amount, 10)} {pointLabel}
               </p>
             </div>
             <div className="flex gap-3">
