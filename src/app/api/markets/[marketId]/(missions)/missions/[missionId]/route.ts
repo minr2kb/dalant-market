@@ -6,7 +6,8 @@ export const GET = route<{ missionId: string }>(async (req, { supabase, params }
   const userId = req.nextUrl.searchParams.get('userId') ?? undefined
   try {
     return ok(await getMission(supabase, params.missionId, { userId }))
-  } catch {
+  } catch (e) {
+    console.error('[GET mission]', e)
     return err('Not found', 404)
   }
 })
