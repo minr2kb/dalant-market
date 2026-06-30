@@ -31,24 +31,24 @@ export default async function MarketJoinPage(props: PageProps<'/markets/[id]'>) 
   })
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-white px-6">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-white dark:bg-gray-900 px-6">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center space-y-2">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500">
             <span className="text-2xl font-bold text-white">D</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">{market.title}</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{market.title}</h1>
           {market.description && (
-            <p className="text-sm text-gray-500">{market.description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{market.description}</p>
           )}
         </div>
 
-        <div className="rounded-2xl bg-gray-50 p-5 space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-5 space-y-3">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Calendar className="h-4 w-4 text-emerald-500" />
             <span>{startDate} ~ {endDate}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Users className="h-4 w-4 text-emerald-500" />
             <span>현재 {count ?? 0}명 참여 중</span>
           </div>

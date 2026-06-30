@@ -14,7 +14,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0
 const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'))
 
 const selectClass =
-  'h-12 w-full appearance-none rounded-xl border border-gray-200 bg-white px-3 text-base text-gray-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
+  'h-12 w-full appearance-none rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-base text-gray-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -71,13 +71,13 @@ export default function OnboardingPage() {
     (step === 3 && gender !== null)
 
   return (
-    <div className="flex min-h-svh flex-col bg-white px-6 pt-4">
+    <div className="flex min-h-svh flex-col bg-white dark:bg-gray-950 px-6 pt-4">
       <div className="mb-8 space-y-4">
         {step > 1 && (
           <button
             type="button"
             onClick={() => setStep((s) => (s - 1) as Step)}
-            className="flex items-center gap-1 text-sm text-gray-500"
+            className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400"
           >
             <ChevronLeft className="h-4 w-4" />
             이전
@@ -88,19 +88,19 @@ export default function OnboardingPage() {
             <div
               key={s}
               className={`h-1 flex-1 rounded-full transition-colors ${
-                s <= step ? 'bg-emerald-500' : 'bg-gray-100'
+                s <= step ? 'bg-emerald-500' : 'bg-gray-100 dark:bg-gray-800'
               }`}
             />
           ))}
         </div>
-        <p className="text-xs text-gray-400">{step} / 3</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">{step} / 3</p>
       </div>
 
       {step === 1 && (
         <div className="space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900">본명을 입력해주세요</h2>
-            <p className="text-sm text-gray-500">실명으로 등록해야 미션 인증에 이름이 표시돼요</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">본명을 입력해주세요</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">실명으로 등록해야 미션 인증에 이름이 표시돼요</p>
           </div>
           <Input
             placeholder="홍길동"
@@ -115,8 +115,8 @@ export default function OnboardingPage() {
       {step === 2 && (
         <div className="space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900">생일을 선택해주세요</h2>
-            <p className="text-sm text-gray-500">생일월 미션 인증에 활용돼요</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">생일을 선택해주세요</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">생일월 미션 인증에 활용돼요</p>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)} className={selectClass}>
@@ -138,8 +138,8 @@ export default function OnboardingPage() {
       {step === 3 && (
         <div className="space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-gray-900">성별을 선택해주세요</h2>
-            <p className="text-sm text-gray-500">미션 매칭에 활용돼요</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">성별을 선택해주세요</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">미션 매칭에 활용돼요</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {(['male', 'female'] as const).map((g) => (
@@ -149,8 +149,8 @@ export default function OnboardingPage() {
                 onClick={() => setGender(g)}
                 className={`rounded-2xl border-2 py-6 text-base font-medium transition-colors ${
                   gender === g
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                    : 'border-gray-100 bg-white text-gray-600'
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                    : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {g === 'male' ? '남자' : '여자'}

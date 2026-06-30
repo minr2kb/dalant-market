@@ -47,20 +47,20 @@ function ConfirmModal({
         {!done ? (
           <>
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-gray-400">미션 인증 요청</p>
-              <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500">미션 인증 요청</p>
+              <button type="button" onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div>
-              <p className="font-bold text-gray-900">{scanTarget.missionTitle}</p>
-              <p className="text-sm text-emerald-600 font-semibold">+{scanTarget.reward} {pointLabel}</p>
+              <p className="font-bold text-gray-900 dark:text-white">{scanTarget.missionTitle}</p>
+              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">+{scanTarget.reward} {pointLabel}</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-600">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                 {scanTarget.participant.displayName[0]}
               </div>
-              <p className="font-medium text-gray-800">{scanTarget.participant.displayName}님의 QR</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">{scanTarget.participant.displayName}님의 QR</p>
             </div>
             {verifyError && (
               <p className="rounded-xl bg-red-50 px-4 py-2 text-center text-sm font-medium text-red-600">
@@ -84,8 +84,8 @@ function ConfirmModal({
           <div className="flex flex-col items-center gap-4 py-4 text-center">
             <CheckCircle2 className="h-16 w-16 text-emerald-400" />
             <div>
-              <p className="text-xl font-bold text-gray-900">인증 완료!</p>
-              <p className="mt-1 text-sm text-gray-500">{scanTarget.participant.displayName}님 {pointLabel} 적립됨</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">인증 완료!</p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{scanTarget.participant.displayName}님 {pointLabel} 적립됨</p>
             </div>
             <Button
               onClick={onSuccess}

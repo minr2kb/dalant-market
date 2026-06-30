@@ -123,7 +123,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
     <>
       <div className="px-4 max-w-lg mx-auto space-y-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">미션 관리</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">미션 관리</h1>
           <Button
             onClick={openAdd}
             className="h-10 rounded-full bg-emerald-500 text-white hover:bg-emerald-600 text-sm"
@@ -137,7 +137,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
           {missions.map((mission) => (
             <div
               key={mission.id}
-              className="rounded-2xl border border-gray-100 bg-white overflow-hidden"
+              className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden"
             >
               <div className="flex items-center gap-3 px-4 py-4">
                 <button
@@ -149,32 +149,32 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                 >
                   <div className="min-w-0 flex-1">
                     <p
-                      className={`truncate text-sm font-semibold ${mission.isActive ? 'text-gray-900' : 'text-gray-400'}`}
+                      className={`truncate text-sm font-semibold ${mission.isActive ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}
                     >
                       {mission.title}
                     </p>
                     <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-                      <span className="text-xs text-gray-400">{TYPE_LABEL[mission.type]}</span>
-                      <span className="text-xs text-gray-300">·</span>
-                      <span className="text-xs text-gray-400">+{mission.reward}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">{TYPE_LABEL[mission.type]}</span>
+                      <span className="text-xs text-gray-300 dark:text-gray-600">·</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">+{mission.reward}</span>
                       {mission.limitCount !== null && (
                         <>
-                          <span className="text-xs text-gray-300">·</span>
-                          <span className="text-xs text-gray-400">{mission.limitCount}회</span>
+                          <span className="text-xs text-gray-300 dark:text-gray-600">·</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">{mission.limitCount}회</span>
                         </>
                       )}
                       {mission.isGroup && (
                         <>
-                          <span className="text-xs text-gray-300">·</span>
+                          <span className="text-xs text-gray-300 dark:text-gray-600">·</span>
                           <span className="text-xs font-medium text-blue-500">단체</span>
                         </>
                       )}
                     </div>
                   </div>
                   {expandedId === mission.id ? (
-                    <ChevronUp className="h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronUp className="h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronDown className="h-4 w-4 shrink-0 text-gray-400 dark:text-gray-500" />
                   )}
                 </button>
 
@@ -186,31 +186,31 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
               </div>
 
               {expandedId === mission.id && (
-                <div className="border-t border-gray-50 bg-gray-50 px-4 py-3 space-y-3">
+                <div className="border-t border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-3">
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
                     <div>
-                      <p className="text-gray-400">인증 방식</p>
-                      <p className="font-medium text-gray-700">{TYPE_LABEL[mission.type]}</p>
+                      <p className="text-gray-400 dark:text-gray-500">인증 방식</p>
+                      <p className="font-medium text-gray-700 dark:text-gray-300">{TYPE_LABEL[mission.type]}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400">보상</p>
-                      <p className="font-medium text-gray-700">+{mission.reward}</p>
+                      <p className="text-gray-400 dark:text-gray-500">보상</p>
+                      <p className="font-medium text-gray-700 dark:text-gray-300">+{mission.reward}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400">최대 횟수</p>
-                      <p className="font-medium text-gray-700">
+                      <p className="text-gray-400 dark:text-gray-500">최대 횟수</p>
+                      <p className="font-medium text-gray-700 dark:text-gray-300">
                         {mission.limitCount !== null ? `${mission.limitCount}회` : '무제한'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400">단체 미션</p>
-                      <p className="font-medium text-gray-700">
+                      <p className="text-gray-400 dark:text-gray-500">단체 미션</p>
+                      <p className="font-medium text-gray-700 dark:text-gray-300">
                         {mission.isGroup ? '예' : '아니오'}
                       </p>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-gray-400">활성화 기간</p>
-                      <p className="font-medium text-gray-700">
+                      <p className="text-gray-400 dark:text-gray-500">활성화 기간</p>
+                      <p className="font-medium text-gray-700 dark:text-gray-300">
                         {formatPeriod(mission.activeFrom, mission.activeUntil)}
                       </p>
                     </div>
@@ -219,7 +219,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                     <button
                       type="button"
                       onClick={() => openEdit(mission)}
-                      className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                      className="flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <Pencil className="h-3 w-3" /> 수정
                     </button>
@@ -236,7 +236,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
             </div>
           ))}
           {missions.length === 0 && (
-            <p className="py-8 text-center text-sm text-gray-400">등록된 미션이 없어요</p>
+            <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">등록된 미션이 없어요</p>
           )}
         </div>
       </div>
@@ -244,13 +244,13 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
       <BottomSheet open={formOpen} onClose={() => window.history.back()}>
         <div className="px-6 pb-10 pt-5">
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-base font-bold text-gray-900">
+            <h2 className="text-base font-bold text-gray-900 dark:text-white">
               {editingId ? '미션 수정' : '새 미션'}
             </h2>
             <button
               type="button"
               onClick={() => window.history.back()}
-              className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100"
+              className="rounded-full p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <X className="h-5 w-5" />
             </button>
@@ -258,7 +258,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
 
           <div className="space-y-5">
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-gray-500">미션 이름</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">미션 이름</p>
               <Input
                 placeholder="미션 이름을 입력하세요"
                 value={form.title}
@@ -268,8 +268,8 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-gray-500">
-                설명 <span className="text-gray-300">(선택)</span>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                설명 <span className="text-gray-300 dark:text-gray-600">(선택)</span>
               </p>
               <textarea
                 placeholder="미션에 대한 설명을 입력하세요"
@@ -281,7 +281,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-gray-500">인증 방식</p>
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400">인증 방식</p>
               <div className="grid grid-cols-2 gap-2">
                 {(['user_qr', 'upload', 'admin_qr', 'manual'] as MissionType[]).map((t) => (
                   <button
@@ -291,12 +291,12 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                     className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
                       form.type === t
                         ? 'border-emerald-400 bg-emerald-500 text-white'
-                        : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100'
+                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
                     <p className="text-xs font-semibold">{TYPE_LABEL[t]}</p>
                     <p
-                      className={`mt-0.5 text-[10px] ${form.type === t ? 'text-white/70' : 'text-gray-400'}`}
+                      className={`mt-0.5 text-[10px] ${form.type === t ? 'text-white/70' : 'text-gray-400 dark:text-gray-500'}`}
                     >
                       {TYPE_DESC[t]}
                     </p>
@@ -307,7 +307,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-gray-500">달란트 수량</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">달란트 수량</p>
                 <Input
                   placeholder="0"
                   type="number"
@@ -317,7 +317,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-gray-500">최대 횟수 (비우면 무제한)</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">최대 횟수 (비우면 무제한)</p>
                 <Input
                   placeholder="무제한"
                   type="number"
@@ -330,7 +330,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
 
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-gray-500">시작일 (선택)</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">시작일 (선택)</p>
                 <Input
                   type="date"
                   value={form.activeFrom}
@@ -339,7 +339,7 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
                 />
               </div>
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-gray-500">종료일 (선택)</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">종료일 (선택)</p>
                 <Input
                   type="date"
                   value={form.activeUntil}
@@ -349,10 +349,10 @@ function AdminMissionsContent({ marketId }: { marketId: string }) {
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3.5">
+            <div className="flex items-center justify-between rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-3.5">
               <div>
-                <p className="text-sm font-medium text-gray-800">단체 미션</p>
-                <p className="text-xs text-gray-400">QR 스캔 시 함께 줄 인원 선택 가능</p>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200">단체 미션</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">QR 스캔 시 함께 줄 인원 선택 가능</p>
               </div>
               <Switch
                 checked={form.isGroup}

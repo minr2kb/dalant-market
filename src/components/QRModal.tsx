@@ -63,8 +63,8 @@ function QRContent({
     <Modal onClose={onClose}>
       <div className="p-6 space-y-5">
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-gray-900">{missionTitle}</h3>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <h3 className="font-bold text-gray-900 dark:text-white">{missionTitle}</h3>
+          <button type="button" onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -73,7 +73,7 @@ function QRContent({
           {qrValue ? (
             <QRCode value={qrValue} size={192} />
           ) : (
-            <div className="h-48 w-48 animate-pulse rounded-xl bg-gray-100" />
+            <div className="h-48 w-48 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
           )}
         </div>
 

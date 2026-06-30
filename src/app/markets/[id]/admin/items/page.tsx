@@ -22,17 +22,17 @@ function AdminItemsList({ marketId }: { marketId: string }) {
       {items.map((item) => (
         <div
           key={item.id}
-          className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-3.5"
+          className="flex items-center justify-between rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3.5"
         >
           <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-gray-800">{item.name}</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{item.name}</p>
             <p className="text-xs tabular-nums text-emerald-500">{item.price}</p>
           </div>
           <button
             type="button"
             onClick={() => deleteMutation.mutate({ marketId, itemId: item.id })}
             disabled={deleteMutation.isPending}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-rose-50 hover:text-rose-400 disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-300 dark:text-gray-600 transition-colors hover:bg-rose-50 hover:text-rose-400 disabled:opacity-40"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -67,14 +67,14 @@ function AdminItemsContent({ marketId }: { marketId: string }) {
   return (
     <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400">
+        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400 dark:text-gray-500">
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900">물품 관리</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">물품 관리</h1>
       </div>
 
-      <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
-        <p className="text-xs font-semibold text-gray-500">새 물품 추가</p>
+      <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">새 물품 추가</p>
         <div className="flex gap-2">
           <Input
             placeholder="물품명"

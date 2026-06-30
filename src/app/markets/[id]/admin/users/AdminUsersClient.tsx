@@ -47,20 +47,20 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
             <Link
               key={p.id}
               href={`/markets/${marketId}/admin/users/${p.user.id}`}
-              className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-4 py-4 hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-between rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-bold text-gray-600 dark:text-gray-300">
                   {p.user.realName.slice(0, 1)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-gray-900">{p.user.realName}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{p.user.realName}</p>
                     {hasAlias && (
-                      <span className="text-xs text-gray-400">({p.displayName})</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">({p.displayName})</span>
                     )}
                     {p.role === 'admin' && (
-                      <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-600">
+                      <span className="rounded-full bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 text-[10px] font-medium text-purple-600">
                         관리자
                       </span>
                     )}
@@ -72,7 +72,7 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
           )
         })}
         {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400">검색 결과가 없어요</p>
+          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">검색 결과가 없어요</p>
         )}
       </div>
     </>

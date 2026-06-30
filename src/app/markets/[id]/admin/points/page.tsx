@@ -58,15 +58,15 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
   return (
     <div>
       <div className="flex items-center gap-3 px-4 pb-4 max-w-lg mx-auto">
-        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400">
+        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400 dark:text-gray-500">
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="text-lg font-bold text-gray-900">달란트 일괄 지급</h1>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">달란트 일괄 지급</h1>
       </div>
 
       <div className="px-4 max-w-lg mx-auto space-y-5">
-        <div className="rounded-2xl border border-gray-100 bg-white p-4 space-y-3">
-          <p className="text-sm font-semibold text-gray-700">지급 설정</p>
+        <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">지급 설정</p>
           <Input
             type="number"
             placeholder="달란트 수량"
@@ -108,14 +108,14 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
         <button
           type="button"
           onClick={toggleAll}
-          className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-left hover:bg-gray-50"
+          className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
         >
           {allSelected ? (
             <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
           ) : (
-            <Square className="h-5 w-5 text-gray-300 shrink-0" />
+            <Square className="h-5 w-5 text-gray-300 dark:text-gray-600 shrink-0" />
           )}
-          <span className="text-sm font-semibold text-gray-700">
+          <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             전체 선택 ({selected.size}/{participants.length})
           </span>
         </button>
@@ -130,22 +130,22 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
                 onClick={() => toggle(p.user.id)}
                 className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${
                   isSelected
-                    ? 'border-emerald-200 bg-emerald-50'
-                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                    ? 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-900'
+                    : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {isSelected ? (
                   <CheckSquare className="h-5 w-5 text-emerald-500 shrink-0" />
                 ) : (
-                  <Square className="h-5 w-5 text-gray-300 shrink-0" />
+                  <Square className="h-5 w-5 text-gray-300 dark:text-gray-600 shrink-0" />
                 )}
                 <div className="flex min-w-0 flex-1 items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-bold text-gray-600 dark:text-gray-300">
                       {p.user.realName[0]}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{p.user.realName}</p>
                       {p.role === 'admin' && (
                         <span className="text-[10px] text-purple-500">관리자</span>
                       )}
@@ -154,7 +154,7 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
                   <div className="text-right shrink-0">
                     <p className="text-sm font-bold tabular-nums text-emerald-500">{p.balance}</p>
                     {n > 0 && isSelected && (
-                      <p className="text-xs tabular-nums text-gray-400">→ {p.balance + n}</p>
+                      <p className="text-xs tabular-nums text-gray-400 dark:text-gray-500">→ {p.balance + n}</p>
                     )}
                   </div>
                 </div>

@@ -23,8 +23,8 @@ export function HistoryClient({ marketId, userId }: { marketId: string; userId: 
   return (
     <div className="px-4 max-w-lg mx-auto space-y-5">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-xl font-bold text-gray-900">{market.pointLabel} 내역</h1>
-        <span className="text-sm text-gray-500">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{market.pointLabel} 내역</h1>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
           잔액{' '}
           <span className="font-bold text-emerald-500">
             {user.balance} {market.pointLabel}
@@ -42,7 +42,7 @@ export function HistoryClient({ marketId, userId }: { marketId: string; userId: 
           />
         ))}
         {logs.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400">아직 내역이 없어요</p>
+          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">아직 내역이 없어요</p>
         )}
       </div>
     </div>

@@ -54,7 +54,7 @@ export function PointLogItem({ log, order, pointLabel = '달란트' }: PointLogI
     : 'text-rose-500'
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
       <button
         type="button"
         onClick={() => isPurchase && order && setExpanded((v) => !v)}
@@ -79,9 +79,9 @@ export function PointLogItem({ log, order, pointLabel = '달란트' }: PointLogI
             )}
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-800">{label}</p>
-            <p className="text-xs text-gray-400">{sub}</p>
-            <p className="text-xs text-gray-300">
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{label}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{sub}</p>
+            <p className="text-xs text-gray-300 dark:text-gray-600">
               {new Date(log.createdAt).toLocaleString('ko-KR', {
                 month: 'short',
                 day: 'numeric',
@@ -106,17 +106,17 @@ export function PointLogItem({ log, order, pointLabel = '달란트' }: PointLogI
       </button>
 
       {expanded && order && (
-        <div className="border-t border-gray-50 bg-gray-50 px-4 py-3 space-y-2">
+        <div className="border-t border-gray-50 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-2">
           {order.items.map((item, idx) => (
             <div key={idx} className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-gray-600">
-                <ShoppingBag className="h-3.5 w-3.5 text-gray-400" />
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                <ShoppingBag className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                 <span>{item.name} × {item.qty}</span>
               </div>
-              <span className="tabular-nums text-gray-500">{item.price * item.qty}</span>
+              <span className="tabular-nums text-gray-500 dark:text-gray-400">{item.price * item.qty}</span>
             </div>
           ))}
-          <div className="flex justify-between border-t border-gray-100 pt-2 text-xs text-gray-400">
+          <div className="flex justify-between border-t border-gray-100 dark:border-gray-700 pt-2 text-xs text-gray-400 dark:text-gray-500">
             <span>{order.verifiedByName} 처리</span>
             <span className="font-medium tabular-nums text-rose-400">-{order.total} 합계</span>
           </div>

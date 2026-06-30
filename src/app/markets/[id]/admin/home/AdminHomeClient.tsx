@@ -45,14 +45,14 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
     <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-gray-900">{market.title}</h1>
-          <span className="rounded-full bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-500">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{market.title}</h1>
+          <span className="rounded-full bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 text-[10px] font-medium text-purple-500">
             관리자
           </span>
         </div>
         <Link
           href={`/markets/${marketId}/home`}
-          className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-200 active:scale-95 transition-all"
+          className="flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition-all"
         >
           <User className="h-3.5 w-3.5" />
           일반화면
@@ -60,43 +60,43 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-2xl bg-white border border-gray-100 px-3 py-3.5 text-center">
-          <p className="text-lg font-bold tabular-nums text-gray-900">{participants.length}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">참여자</p>
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 px-3 py-3.5 text-center">
+          <p className="text-lg font-bold tabular-nums text-gray-900 dark:text-white">{participants.length}</p>
+          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">참여자</p>
         </div>
-        <div className="rounded-2xl bg-white border border-gray-100 px-3 py-3.5 text-center">
-          <p className="text-lg font-bold tabular-nums text-gray-900">{activeMissions}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">활성 미션</p>
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 px-3 py-3.5 text-center">
+          <p className="text-lg font-bold tabular-nums text-gray-900 dark:text-white">{activeMissions}</p>
+          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">활성 미션</p>
         </div>
-        <div className="rounded-2xl bg-white border border-gray-100 px-3 py-3.5 text-center">
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 px-3 py-3.5 text-center">
           <p className="text-lg font-bold tabular-nums text-emerald-500">+{totalGranted}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">총 지급</p>
+          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">총 지급</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          { href: 'scan', icon: ScanLine, label: '미션 인증', bg: 'bg-emerald-50', color: 'text-emerald-500' },
-          { href: 'points', icon: Coins, label: `${market.pointLabel} 지급`, bg: 'bg-purple-50', color: 'text-purple-500' },
-          { href: 'pos', icon: ShoppingBag, label: '물품 결제', bg: 'bg-rose-50', color: 'text-rose-500' },
+          { href: 'scan', icon: ScanLine, label: '미션 인증', bg: 'bg-emerald-50 dark:bg-emerald-900/30', color: 'text-emerald-500' },
+          { href: 'points', icon: Coins, label: `${market.pointLabel} 지급`, bg: 'bg-purple-50 dark:bg-purple-900/30', color: 'text-purple-500' },
+          { href: 'pos', icon: ShoppingBag, label: '물품 결제', bg: 'bg-rose-50 dark:bg-rose-900/30', color: 'text-rose-500' },
         ].map(({ href, icon: Icon, label, bg, color }) => (
           <Link
             key={href}
             href={`/markets/${marketId}/admin/${href}`}
-            className="flex flex-col items-center gap-2.5 rounded-2xl border border-gray-100 bg-white py-5 transition-colors hover:bg-gray-50 active:scale-95"
+            className="flex flex-col items-center gap-2.5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 py-5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95"
           >
             <div className={`flex h-11 w-11 items-center justify-center rounded-full ${bg}`}>
               <Icon className={`h-5 w-5 ${color}`} />
             </div>
-            <span className="text-xs font-semibold text-gray-700">{label}</span>
+            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{label}</span>
           </Link>
         ))}
       </div>
 
       {recentLogs.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-gray-700">최근 활동</h2>
-          <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden divide-y divide-gray-50">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">최근 활동</h2>
+          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
             {recentLogs.map((log) => {
               const participant = participantMap[log.userId]
               const label =
@@ -123,10 +123,10 @@ export function AdminHomeClient({ marketId }: { marketId: string }) {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                       {participant?.user.realName ?? '알 수 없음'}
                     </p>
-                    {label && <p className="text-xs text-gray-400 truncate">{label}</p>}
+                    {label && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{label}</p>}
                   </div>
                   <span
                     className={`text-sm font-bold tabular-nums shrink-0 ${log.amount > 0 ? 'text-emerald-500' : 'text-rose-500'}`}

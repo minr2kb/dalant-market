@@ -89,42 +89,42 @@ export function MissionDetailClient({
   return (
     <div>
       <div className="flex items-center gap-3 px-4 pb-4 max-w-lg mx-auto">
-          <Link href={`/markets/${marketId}/missions`} className="text-gray-400">
+          <Link href={`/markets/${marketId}/missions`} className="text-gray-400 dark:text-gray-500">
             <ChevronLeft className="h-6 w-6" />
           </Link>
-          <h1 className="text-lg font-bold text-gray-900">{mission.title}</h1>
+          <h1 className="text-lg font-bold text-gray-900 dark:text-white">{mission.title}</h1>
         </div>
 
         <div className="px-4 max-w-lg mx-auto space-y-6">
-          <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-2">
+          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">{TYPE_LABEL[mission.type]}</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">{TYPE_LABEL[mission.type]}</span>
               <span className="text-lg font-bold text-emerald-500">+{mission.reward} {market.pointLabel}</span>
             </div>
             {mission.description && (
-              <p className="text-sm text-gray-600 leading-relaxed">{mission.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{mission.description}</p>
             )}
             {mission.isGroup && (
-              <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
+              <span className="inline-block rounded-full bg-blue-50 dark:bg-blue-900/30 px-3 py-1 text-xs font-medium text-blue-600">
                 단체 미션
               </span>
             )}
           </div>
 
           {isLocked ? (
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-center space-y-1.5">
-              <CheckCircle2 className="mx-auto h-8 w-8 text-gray-300" />
-              <p className="text-sm font-medium text-gray-500">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 p-5 text-center space-y-1.5">
+              <CheckCircle2 className="mx-auto h-8 w-8 text-gray-300 dark:text-gray-600" />
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {isPast ? '기간이 종료된 미션이에요' : '이미 완료한 미션이에요'}
               </p>
             </div>
           ) : mission.type === 'manual' ? (
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6 text-center space-y-2">
-              <CheckCircle2 className="mx-auto h-10 w-10 text-gray-300" />
-              <p className="text-sm font-medium text-gray-600">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 p-6 text-center space-y-2">
+              <CheckCircle2 className="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600" />
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 관리자가 수동으로 지급하는 상시 미션이에요
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
                 별도 인증 없이 관리자가 직접 지급합니다
               </p>
             </div>
@@ -150,7 +150,7 @@ export function MissionDetailClient({
                       </div>
                     ))}
                     {photoUrls.length < MAX_PHOTOS && (
-                      <label className="flex aspect-square cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-white text-gray-400 hover:border-emerald-300 hover:text-emerald-400 transition-colors">
+                      <label className="flex aspect-square cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-500 hover:border-emerald-300 hover:text-emerald-400 transition-colors">
                         {uploading ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (
@@ -170,7 +170,7 @@ export function MissionDetailClient({
                     <p className="text-center text-xs text-red-500">업로드 실패. 다시 시도해주세요</p>
                   )}
                   {photoUrls.length === 0 && !uploadError && (
-                    <p className="text-center text-xs text-gray-400">
+                    <p className="text-center text-xs text-gray-400 dark:text-gray-500">
                       사진을 업로드해야 QR을 생성할 수 있어요 (최대 {MAX_PHOTOS}장)
                     </p>
                   )}
@@ -189,12 +189,12 @@ export function MissionDetailClient({
                 />
               )}
               {mission.type === 'admin_qr' && (
-                <p className="text-center text-xs text-gray-400">
+                <p className="text-center text-xs text-gray-400 dark:text-gray-500">
                   관리자에게 직접 가서 이 QR을 보여주세요
                 </p>
               )}
               {mission.type === 'user_qr' && (
-                <p className="text-center text-xs text-gray-400">
+                <p className="text-center text-xs text-gray-400 dark:text-gray-500">
                   내 QR을 보여주면 상대방이 홈 화면에서 스캔해줘요
                 </p>
               )}
@@ -202,7 +202,7 @@ export function MissionDetailClient({
           )}
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-700">인증 현황</h2>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">인증 현황</h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {mission.slots?.map((slot) => (
                 <MissionSlot key={slot.slot} slot={slot} slotNumber={slot.slot} />

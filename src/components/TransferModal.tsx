@@ -110,23 +110,23 @@ export function TransferModal({ marketId, userId, onClose }: TransferModalProps)
 
   return (
     <Modal className="z-[60]" onClose={onClose}>
-      <div className="p-6 space-y-5 text-gray-900">
+      <div className="p-6 space-y-5 text-gray-900 dark:text-white">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             {step !== 'select' && (
               <button
                 type="button"
                 onClick={() => setStep(step === 'confirm' ? 'amount' : 'select')}
-                className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100"
+                className="rounded-full p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
             )}
-            <h3 className="font-bold text-gray-900">
+            <h3 className="font-bold text-gray-900 dark:text-white">
               {step === 'select' ? `${pointLabel} 전송` : step === 'amount' ? '금액 입력' : '전송 확인'}
             </h3>
           </div>
-          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
+          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -140,7 +140,7 @@ export function TransferModal({ marketId, userId, onClose }: TransferModalProps)
                   type="button"
                   onClick={() => setActiveTab(tab)}
                   className={`flex-1 h-9 rounded-full text-sm font-medium transition-colors ${
-                    activeTab === tab ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-500'
+                    activeTab === tab ? 'bg-emerald-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                   }`}
                 >
                   {tab === 'qr' ? 'QR 스캔' : '이름 검색'}
@@ -170,22 +170,22 @@ export function TransferModal({ marketId, userId, onClose }: TransferModalProps)
                       key={p.user.id}
                       type="button"
                       onClick={() => handleSelectRecipient(p)}
-                      className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100"
+                      className="flex w-full items-center gap-3 rounded-2xl border border-gray-100 dark:border-gray-800 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 dark:active:bg-gray-700"
                     >
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/30">
                         <UserRound className="h-4 w-4 text-emerald-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">{p.displayName}</p>
-                        <p className="text-xs text-gray-400">{p.balance} {pointLabel} 보유</p>
+                        <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{p.displayName}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500">{p.balance} {pointLabel} 보유</p>
                       </div>
                     </button>
                   ))}
                   {filtered.length === 0 && search && (
-                    <p className="py-4 text-center text-sm text-gray-400">검색 결과가 없어요</p>
+                    <p className="py-4 text-center text-sm text-gray-400 dark:text-gray-500">검색 결과가 없어요</p>
                   )}
                   {participants.length === 0 && !search && (
-                    <p className="py-4 text-center text-sm text-gray-400">참가자를 불러오는 중...</p>
+                    <p className="py-4 text-center text-sm text-gray-400 dark:text-gray-500">참가자를 불러오는 중...</p>
                   )}
                 </div>
               </div>
@@ -195,13 +195,13 @@ export function TransferModal({ marketId, userId, onClose }: TransferModalProps)
 
         {step === 'amount' && recipient && (
           <div className="space-y-4">
-            <div className="flex items-center gap-3 rounded-2xl bg-gray-50 px-4 py-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50">
+            <div className="flex items-center gap-3 rounded-2xl bg-gray-50 dark:bg-gray-800 px-4 py-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/30">
                 <UserRound className="h-4 w-4 text-emerald-500" />
               </div>
               <div>
-                <p className="text-xs text-gray-400">받는 사람</p>
-                <p className="text-sm font-semibold text-gray-800">{recipient.displayName}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">받는 사람</p>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{recipient.displayName}</p>
               </div>
             </div>
             <Input
@@ -225,9 +225,9 @@ export function TransferModal({ marketId, userId, onClose }: TransferModalProps)
 
         {step === 'confirm' && recipient && (
           <div className="space-y-4">
-            <div className="rounded-2xl bg-gray-50 p-6 text-center space-y-2">
-              <p className="text-sm text-gray-500">아래 내용으로 전송할까요?</p>
-              <p className="text-base font-bold text-gray-900">{recipient.displayName}에게</p>
+            <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-6 text-center space-y-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400">아래 내용으로 전송할까요?</p>
+              <p className="text-base font-bold text-gray-900 dark:text-white">{recipient.displayName}에게</p>
               <p className="text-2xl font-bold text-emerald-500 tabular-nums">
                 {parseInt(amount, 10)} {pointLabel}
               </p>

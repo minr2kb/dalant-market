@@ -103,7 +103,7 @@ function PosInner({
   return (
     <>
       <div className="px-4 max-w-lg mx-auto space-y-5">
-        <h1 className="text-xl font-bold text-gray-900">물품 결제</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">물품 결제</h1>
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {items.map((item) => {
@@ -115,8 +115,8 @@ function PosInner({
                 onClick={() => addToCart(item)}
                 className={`relative flex flex-col items-start rounded-2xl border p-4 text-left transition-colors active:scale-95 ${
                   inCart
-                    ? 'border-emerald-300 bg-emerald-50'
-                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                    ? 'border-emerald-300 bg-emerald-50 dark:bg-emerald-900/30'
+                    : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {inCart && (
@@ -124,7 +124,7 @@ function PosInner({
                     {inCart.qty}
                   </span>
                 )}
-                <p className="text-sm font-semibold text-gray-800">{item.name}</p>
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{item.name}</p>
                 <p className="text-base font-bold tabular-nums text-emerald-500">{item.price}</p>
               </button>
             )
@@ -137,30 +137,30 @@ function PosInner({
         </div>
 
         {cart.length > 0 && (
-          <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50">
-              <ShoppingCart className="h-4 w-4 text-gray-400" />
-              <p className="text-sm font-semibold text-gray-700">장바구니</p>
+          <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-50 dark:border-gray-800">
+              <ShoppingCart className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">장바구니</p>
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-gray-50 dark:divide-gray-800">
               {cart.map(({ item, qty }) => (
                 <div key={item.id} className="flex items-center justify-between px-4 py-3">
-                  <p className="text-sm text-gray-700">{item.name}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">{item.name}</p>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => changeQty(item.id, -1)}
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                     >
-                      <Minus className="h-3 w-3 text-gray-600" />
+                      <Minus className="h-3 w-3 text-gray-600 dark:text-gray-300" />
                     </button>
                     <span className="w-6 text-center text-sm font-bold tabular-nums">{qty}</span>
                     <button
                       type="button"
                       onClick={() => changeQty(item.id, 1)}
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200"
+                      className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                     >
-                      <Plus className="h-3 w-3 text-gray-600" />
+                      <Plus className="h-3 w-3 text-gray-600 dark:text-gray-300" />
                     </button>
                     <span className="w-12 text-right text-sm tabular-nums text-rose-500">
                       -{item.price * qty}
@@ -169,8 +169,8 @@ function PosInner({
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between bg-gray-50 px-4 py-3">
-              <span className="text-sm font-semibold text-gray-700">합계</span>
+            <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 px-4 py-3">
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">합계</span>
               <span className="text-base font-bold tabular-nums text-rose-500">-{total}</span>
             </div>
           </div>
@@ -204,9 +204,9 @@ function PosInner({
       >
         {scanState === 'picking_user' && (
           <div className="flex flex-1 flex-col justify-end">
-            <div className="max-h-[70svh] overflow-y-auto rounded-t-3xl bg-white px-6 pb-10 pt-5 space-y-4">
-              <div className="mx-auto h-1 w-10 rounded-full bg-gray-200" />
-              <p className="text-sm font-semibold text-gray-700">누구의 QR인가요?</p>
+            <div className="max-h-[70svh] overflow-y-auto rounded-t-3xl bg-white dark:bg-gray-900 px-6 pb-10 pt-5 space-y-4">
+              <div className="mx-auto h-1 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">누구의 QR인가요?</p>
               <div className="space-y-2">
                 {participants.map((p) => (
                   <button
@@ -216,14 +216,14 @@ function PosInner({
                       setScannedUser(p)
                       setScanState('confirm')
                     }}
-                    className="flex h-14 w-full items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 text-left hover:bg-rose-50 hover:border-rose-200 transition-colors"
+                    className="flex h-14 w-full items-center gap-3 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 text-left hover:bg-rose-50 hover:border-rose-200 transition-colors"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-600">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-bold text-gray-600 dark:text-gray-300">
                       {p.user.realName[0]}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-800">{p.user.realName}</p>
-                      <p className="text-xs text-gray-400">{p.balance} {pointLabel} 보유</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{p.user.realName}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{p.balance} {pointLabel} 보유</p>
                     </div>
                   </button>
                 ))}
@@ -234,29 +234,29 @@ function PosInner({
 
         {scanState === 'confirm' && updatedUser && (
           <div className="flex flex-1 flex-col justify-end">
-            <div className="rounded-t-3xl bg-white px-6 pb-10 pt-5 space-y-5">
-              <div className="mx-auto h-1 w-10 rounded-full bg-gray-200" />
+            <div className="rounded-t-3xl bg-white dark:bg-gray-900 px-6 pb-10 pt-5 space-y-5">
+              <div className="mx-auto h-1 w-10 rounded-full bg-gray-200 dark:bg-gray-700" />
               <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 text-base font-bold text-gray-600">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-base font-bold text-gray-600 dark:text-gray-300">
                   {updatedUser.user.realName[0]}
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900">{updatedUser.user.realName}</p>
-                  <p className="text-sm text-gray-500">
+                  <p className="font-bold text-gray-900 dark:text-white">{updatedUser.user.realName}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     잔액 {updatedUser.balance} → {updatedUser.balance - total}
                   </p>
                 </div>
               </div>
-              <div className="rounded-xl bg-gray-50 px-4 py-3 space-y-1">
+              <div className="rounded-xl bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-1">
                 {cart.map(({ item, qty }) => (
-                  <div key={item.id} className="flex justify-between text-sm text-gray-600">
+                  <div key={item.id} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                     <span>
                       {item.name} × {qty}
                     </span>
                     <span className="tabular-nums">{item.price * qty}</span>
                   </div>
                 ))}
-                <div className="flex justify-between border-t border-gray-100 pt-2 text-sm font-bold">
+                <div className="flex justify-between border-t border-gray-100 dark:border-gray-700 pt-2 text-sm font-bold">
                   <span>합계</span>
                   <span className="tabular-nums text-rose-500">-{total}</span>
                 </div>
