@@ -54,7 +54,10 @@ export function RankingClient({ marketId, userId }: { marketId: string; userId: 
                 <p className="text-xs text-gray-400 tabular-nums">
                   {p.balance} {market.pointLabel}
                 </p>
-                <div className={cn('w-full rounded-t-2xl flex items-center justify-center', cfg.blockH, cfg.blockBg)}>
+                <div
+                  className={cn('podium-block w-full rounded-t-2xl flex items-center justify-center', cfg.blockH, cfg.blockBg)}
+                  style={{ animationDelay: `${i * 80}ms` }}
+                >
                   <span className="text-2xl">{cfg.medal}</span>
                 </div>
               </div>

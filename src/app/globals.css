@@ -15,6 +15,15 @@
   }
 }
 
+@keyframes grow-up {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+.podium-block {
+  transform-origin: bottom;
+  animation: grow-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 
 @custom-variant dark (&:is(.dark *));
 

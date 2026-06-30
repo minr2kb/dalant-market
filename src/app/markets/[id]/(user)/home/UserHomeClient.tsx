@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react'
 import { useSuspenseQueries } from '@tanstack/react-query'
 import { PayQRButton } from '@/components/PayQRButton'
+import { NumberTicker } from '@/components/NumberTicker'
 import { TransferModal } from '@/components/TransferModal'
 import { AdminAccessButton } from '@/components/AdminAccessButton'
 import { HomeScanButton } from '@/components/HomeScanButton'
@@ -39,7 +40,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
-            <p className="text-4xl font-bold tabular-nums">{user.balance}</p>
+            <NumberTicker value={user.balance} className="text-4xl font-bold tabular-nums" />
             <p className="text-sm opacity-70">{market.pointLabel}</p>
           </div>
           <PayQRButton
