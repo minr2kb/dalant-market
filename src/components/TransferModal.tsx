@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { X, ArrowLeft, Search, UserRound, QrCode } from 'lucide-react'
 import { QRScanner } from '@/components/QRScanner'
+import { Modal } from '@/components/Modal'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useModalHistory } from '@/hooks/use-modal-history'
 import { parseQR } from '@/lib/qr'
 import { participantsQuery, marketsQuery } from '@/lib/query/queries'
 import { transferApi } from '@/lib/api/client'
@@ -18,14 +18,10 @@ type Step = 'select' | 'amount' | 'confirm'
 interface TransferModalProps {
   marketId: string
   userId: string
-  open: boolean
   onClose: () => void
 }
 
-export function TransferModal({ marketId, userId, open, onClose }: TransferModalProps) {
-  const close = useCallback(onClose, [onClose])
-  useModalHistory(open, close)
-
+export function TransferModal({ marketId, userId, onClose }: TransferModalProps) {
   const [step, setStep] = useState<Step>('select')
   const [activeTab, setActiveTab] = useState<'qr' | 'search'>('qr')
   const [scanOpen, setScanOpen] = useState(false)
@@ -35,34 +31,15 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
 
   const queryClient = useQueryClient()
 
-  // 모달 닫힐 때 상태 초기화
-  useEffect(() => {
-    if (!open) {
-      setStep('select')
-      setActiveTab('qr')
-      setScanOpen(false)
-      setSearch('')
-      setRecipient(null)
-      setAmount('')
-    }
-  }, [open])
-
-  // 모달이 열릴 때만 참가자 목록 조회
-  const { data: participantsData } = useQuery({
-    ...participantsQuery.list({ marketId }),
-    enabled: open,
-  })
-  const { data: marketData } = useQuery({ ...marketsQuery.get({ marketId }), enabled: open })
+  const { data: participantsData } = useQuery(participantsQuery.list({ marketId }))
+  const { data: marketData } = useQuery(marketsQuery.get({ marketId }))
   const pointLabel = marketData?.data.pointLabel ?? '달란트'
   const participants = useMemo(
     () => (participantsData?.data ?? []).filter((p) => p.user.id !== userId),
     [participantsData, userId],
   )
   const filtered = useMemo(
-    () =>
-      participants.filter((p) =>
-        p.displayName.toLowerCase().includes(search.toLowerCase()),
-      ),
+    () => participants.filter((p) => p.displayName.toLowerCase().includes(search.toLowerCase())),
     [participants, search],
   )
 
@@ -71,7 +48,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
       transferApi.transfer({ path: { marketId }, body: { toUserId, amount } }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: participantsQuery.$key })
-      window.history.back()
+      onClose()
     },
   })
 
@@ -119,9 +96,6 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
     doTransfer({ toUserId: recipient.user.id, amount: parseInt(amount, 10) })
   }
 
-  if (!open) return null
-
-  // QR 스캔 화면 (full-screen)
   if (scanOpen) {
     return (
       <QRScanner
@@ -135,9 +109,8 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-sm rounded-3xl bg-white p-6 space-y-5 text-gray-900">
-        {/* 헤더 */}
+    <Modal className="z-[60]" onClose={onClose}>
+      <div className="p-6 space-y-5 text-gray-900">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             {step !== 'select' && (
@@ -153,16 +126,11 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
               {step === 'select' ? `${pointLabel} 전송` : step === 'amount' ? '금액 입력' : '전송 확인'}
             </h3>
           </div>
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100"
-          >
+          <button type="button" onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Step 1: 수신자 선택 */}
         {step === 'select' && (
           <div className="space-y-4">
             <div className="flex gap-2">
@@ -172,9 +140,7 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
                   type="button"
                   onClick={() => setActiveTab(tab)}
                   className={`flex-1 h-9 rounded-full text-sm font-medium transition-colors ${
-                    activeTab === tab
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-gray-100 text-gray-500'
+                    activeTab === tab ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-500'
                   }`}
                 >
                   {tab === 'qr' ? 'QR 스캔' : '이름 검색'}
@@ -183,12 +149,10 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
             </div>
 
             {activeTab === 'qr' ? (
-              <div className="space-y-3">
-                <Button className="h-12 w-full" onClick={() => setScanOpen(true)}>
-                  <QrCode className="h-4 w-4 mr-2" />
-                  QR 스캔하기
-                </Button>
-              </div>
+              <Button className="h-12 w-full" onClick={() => setScanOpen(true)}>
+                <QrCode className="h-4 w-4 mr-2" />
+                QR 스캔하기
+              </Button>
             ) : (
               <div className="space-y-3">
                 <div className="relative">
@@ -229,7 +193,6 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
           </div>
         )}
 
-        {/* Step 2: 금액 입력 */}
         {step === 'amount' && recipient && (
           <div className="space-y-4">
             <div className="flex items-center gap-3 rounded-2xl bg-gray-50 px-4 py-3">
@@ -260,7 +223,6 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
           </div>
         )}
 
-        {/* Step 3: 전송 확인 */}
         {step === 'confirm' && recipient && (
           <div className="space-y-4">
             <div className="rounded-2xl bg-gray-50 p-6 text-center space-y-2">
@@ -271,25 +233,16 @@ export function TransferModal({ marketId, userId, open, onClose }: TransferModal
               </p>
             </div>
             <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="h-12 flex-1"
-                onClick={() => setStep('amount')}
-                disabled={isPending}
-              >
+              <Button variant="outline" className="h-12 flex-1" onClick={() => setStep('amount')} disabled={isPending}>
                 취소
               </Button>
-              <Button
-                className="h-12 flex-1"
-                onClick={handleConfirm}
-                disabled={isPending}
-              >
+              <Button className="h-12 flex-1" onClick={handleConfirm} disabled={isPending}>
                 {isPending ? '전송 중…' : '전송'}
               </Button>
             </div>
           </div>
         )}
       </div>
-    </div>
+    </Modal>
   )
 }

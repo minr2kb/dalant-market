@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react'
 import { useSuspenseQueries } from '@tanstack/react-query'
@@ -11,10 +11,9 @@ import { AdminAccessButton } from '@/components/AdminAccessButton'
 import { HomeScanButton } from '@/components/HomeScanButton'
 import { Button } from '@/components/ui/button'
 import { marketsQuery, participantsQuery } from '@/lib/query/queries'
-export function UserHomeClient({ marketId, userId }: { marketId: string; userId: string }) {
-  const [transferOpen, setTransferOpen] = useState(false)
-  const closeTransfer = useCallback(() => setTransferOpen(false), [])
+import { openModal } from '@/lib/overlay'
 
+export function UserHomeClient({ marketId, userId }: { marketId: string; userId: string }) {
   const [{ data: marketData }, { data: participantData }] = useSuspenseQueries({
     queries: [
       marketsQuery.get({ marketId }),
@@ -56,7 +55,9 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         <Button
           variant="ghost"
           className="h-12 gap-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 rounded-2xl font-semibold"
-          onClick={() => setTransferOpen(true)}
+          onClick={() => openModal((close) => (
+            <TransferModal marketId={marketId} userId={userId} onClose={close} />
+          ))}
         >
           <ArrowRightLeft className="h-4 w-4" />
           {market.pointLabel} 전송
@@ -86,7 +87,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
                     ? (log.memo ?? `${market.pointLabel} 전송`)
                     : (log.memo ?? '수동 지급')
             const isPositive = log.amount > 0
-            
+
             return (
               <div
                 key={log.id}
@@ -127,12 +128,6 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
           )}
         </div>
       </div>
-      <TransferModal
-        marketId={marketId}
-        userId={userId}
-        open={transferOpen}
-        onClose={closeTransfer}
-      />
     </div>
   )
 }
