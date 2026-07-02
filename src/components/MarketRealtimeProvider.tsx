@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { useMarketRealtime } from '@/hooks/use-market-realtime'
+import { useMarketRealtime } from "@/hooks/use-market-realtime";
 
 export function MarketRealtimeProvider({
   marketId,
   userId,
 }: {
-  marketId: string
-  userId: string
+  marketId: string;
+  userId: string;
 }) {
-  useMarketRealtime(marketId, userId)
-  return null
+  useMarketRealtime(marketId, userId);
+  return null;
 }

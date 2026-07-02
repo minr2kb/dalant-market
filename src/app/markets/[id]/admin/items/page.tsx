@@ -1,20 +1,25 @@
-'use client'
+"use client";
 
-import { Suspense, useState, use } from 'react'
-import { useSuspenseQuery, useMutation } from '@tanstack/react-query'
-import { ChevronLeft, Plus, Trash2 } from 'lucide-react'
-import Link from 'next/link'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { itemsQuery } from '@/lib/query/queries'
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { ChevronLeft, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Suspense, use, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { itemsQuery } from "@/lib/query/queries";
 
 function AdminItemsList({ marketId }: { marketId: string }) {
-  const { data } = useSuspenseQuery(itemsQuery.list({ marketId }))
-  const items = data.data
-  const deleteMutation = useMutation(itemsQuery.delete({ invalidates: [itemsQuery.$key] }))
+  const { data: items } = useSuspenseQuery(itemsQuery.list({ marketId }));
+  const deleteMutation = useMutation(
+    itemsQuery.delete({ invalidates: [itemsQuery.$key] }),
+  );
 
   if (items.length === 0) {
-    return <p className="py-10 text-center text-sm text-gray-400">등록된 물품이 없어요</p>
+    return (
+      <p className="py-10 text-center text-sm text-gray-400">
+        등록된 물품이 없어요
+      </p>
+    );
   }
 
   return (
@@ -25,8 +30,12 @@ function AdminItemsList({ marketId }: { marketId: string }) {
           className="flex items-center justify-between rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3.5"
         >
           <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{item.name}</p>
-            <p className="text-xs tabular-nums text-emerald-500">{item.price}</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+              {item.name}
+            </p>
+            <p className="text-xs tabular-nums text-emerald-500">
+              {item.price}
+            </p>
           </div>
           <button
             type="button"
@@ -39,48 +48,64 @@ function AdminItemsList({ marketId }: { marketId: string }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function ListSkeleton() {
   return (
     <div className="space-y-2">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="h-[60px] animate-pulse rounded-2xl bg-gray-100" />
+        <div
+          key={i}
+          className="h-[60px] animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800"
+        />
       ))}
     </div>
-  )
+  );
 }
 
 function AdminItemsContent({ marketId }: { marketId: string }) {
-  const createMutation = useMutation(itemsQuery.create({ invalidates: [itemsQuery.$key] }))
-  const [newName, setNewName] = useState('')
-  const [newPrice, setNewPrice] = useState('')
+  const createMutation = useMutation(
+    itemsQuery.create({ invalidates: [itemsQuery.$key] }),
+  );
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
 
   async function addItem() {
-    if (!newName.trim() || !newPrice) return
-    await createMutation.mutateAsync({ marketId, name: newName.trim(), price: Number(newPrice) })
-    setNewName('')
-    setNewPrice('')
+    if (!newName.trim() || !newPrice) return;
+    await createMutation.mutateAsync({
+      marketId,
+      name: newName.trim(),
+      price: Number(newPrice),
+    });
+    setNewName("");
+    setNewPrice("");
   }
 
   return (
     <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400 dark:text-gray-500">
+        <Link
+          href={`/markets/${marketId}/admin/home`}
+          className="text-gray-400 dark:text-gray-500"
+        >
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">물품 관리</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          물품 관리
+        </h1>
       </div>
 
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
-        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">새 물품 추가</p>
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          새 물품 추가
+        </p>
         <div className="flex gap-2">
           <Input
             placeholder="물품명"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addItem()}
+            onKeyDown={(e) => e.key === "Enter" && addItem()}
             className="h-12 flex-1 rounded-xl"
           />
           <Input
@@ -88,7 +113,7 @@ function AdminItemsContent({ marketId }: { marketId: string }) {
             type="number"
             value={newPrice}
             onChange={(e) => setNewPrice(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addItem()}
+            onKeyDown={(e) => e.key === "Enter" && addItem()}
             className="h-12 w-24 rounded-xl"
           />
         </div>
@@ -106,10 +131,12 @@ function AdminItemsContent({ marketId }: { marketId: string }) {
         <AdminItemsList marketId={marketId} />
       </Suspense>
     </div>
-  )
+  );
 }
 
-export default function AdminItemsPage(props: PageProps<'/markets/[id]/admin/items'>) {
-  const { id: marketId } = use(props.params)
-  return <AdminItemsContent marketId={marketId} />
+export default function AdminItemsPage(
+  props: PageProps<"/markets/[id]/admin/items">,
+) {
+  const { id: marketId } = use(props.params);
+  return <AdminItemsContent marketId={marketId} />;
 }

@@ -1,44 +1,54 @@
-'use client'
+"use client";
 
-import { QrCode, X, Wallet } from 'lucide-react'
-import QRCode from 'react-qr-code'
-import { encodePayQR } from '@/lib/qr'
-import { Modal } from '@/components/Modal'
-import { openModal } from '@/lib/overlay'
+import { QrCode, Wallet, X } from "lucide-react";
+import QRCode from "react-qr-code";
+import { Modal } from "@/components/Modal";
+import { openModal } from "@/lib/overlay";
+import { encodePayQR } from "@/lib/qr";
 
 interface PayQRButtonProps {
-  marketId: string
-  userId: string
-  userName: string
-  compact?: boolean
+  marketId: string;
+  userId: string;
+  userName: string;
+  compact?: boolean;
 }
 
-export function PayQRButton({ marketId, userId, userName, compact = false }: PayQRButtonProps) {
-  const qrValue = encodePayQR(marketId, userId)
+export function PayQRButton({
+  marketId,
+  userId,
+  userName,
+  compact = false,
+}: PayQRButtonProps) {
+  const qrValue = encodePayQR(marketId, userId);
 
-  const handleOpen = () => openModal((close) => (
-    <Modal onClose={close}>
-      <div className="p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-medium text-gray-400">결제용 QR</p>
-            <h3 className="font-bold text-gray-900">{userName}</h3>
+  const handleOpen = () =>
+    openModal((close) => (
+      <Modal onClose={close}>
+        <div className="p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-gray-400">결제용 QR</p>
+              <h3 className="font-bold text-gray-900">{userName}</h3>
+            </div>
+            <button
+              type="button"
+              onClick={close}
+              className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
-          <button type="button" onClick={close} className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
 
-        <div className="mx-auto flex h-56 w-56 items-center justify-center rounded-2xl bg-white p-2">
-          <QRCode value={qrValue} size={208} />
-        </div>
+          <div className="mx-auto flex h-56 w-56 items-center justify-center rounded-2xl bg-white p-2">
+            <QRCode value={qrValue} size={208} />
+          </div>
 
-        <p className="text-center text-xs text-gray-400">
-          이 QR을 마켓 관리자에게 보여주세요
-        </p>
-      </div>
-    </Modal>
-  ))
+          <p className="text-center text-xs text-gray-400">
+            이 QR을 마켓 관리자에게 보여주세요
+          </p>
+        </div>
+      </Modal>
+    ));
 
   return compact ? (
     <button
@@ -57,5 +67,5 @@ export function PayQRButton({ marketId, userId, userName, compact = false }: Pay
       <Wallet className="h-4 w-4" />
       달란트 사용하기
     </button>
-  )
+  );
 }

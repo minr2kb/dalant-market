@@ -1,5 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { mapPointLog } from '@/lib/db'
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { mapPointLog } from "@/lib/db";
 
 export async function listPointLogs(
   supabase: SupabaseClient,
@@ -7,12 +7,12 @@ export async function listPointLogs(
   opts?: { userId?: string },
 ) {
   let query = supabase
-    .from('point_logs')
-    .select('*')
-    .eq('market_id', marketId)
-    .order('created_at', { ascending: false })
-  if (opts?.userId) query = query.eq('user_id', opts.userId)
-  const { data, error } = await query
-  if (error) throw new Error(error.message)
-  return (data ?? []).map((r) => mapPointLog(r as Record<string, unknown>))
+    .from("point_logs")
+    .select("*")
+    .eq("market_id", marketId)
+    .order("created_at", { ascending: false });
+  if (opts?.userId) query = query.eq("user_id", opts.userId);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return (data ?? []).map((r) => mapPointLog(r as Record<string, unknown>));
 }

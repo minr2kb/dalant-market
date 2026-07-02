@@ -1,19 +1,39 @@
-import { FloatingTabBar } from '@/components/FloatingTabBar'
+import { FloatingTabBar } from "@/components/FloatingTabBar";
 
-export default async function AdminLayout(props: LayoutProps<'/markets/[id]'>) {
-  const { id } = await props.params
+export default async function AdminLayout(props: LayoutProps<"/markets/[id]">) {
+  const { id } = await props.params;
 
   const tabs = [
-    { label: '홈', segment: 'admin/home', href: `/markets/${id}/admin/home`, icon: 'Home' },
-    { label: '미션', segment: 'admin/missions', href: `/markets/${id}/admin/missions`, icon: 'ListTodo' },
-    { label: '물품', segment: 'admin/items', href: `/markets/${id}/admin/items`, icon: 'ShoppingBag' },
-    { label: '유저', segment: 'admin/users', href: `/markets/${id}/admin/users`, icon: 'Users' },
-  ]
+    {
+      label: "홈",
+      segment: "admin/home",
+      href: `/markets/${id}/admin/home`,
+      icon: "Home",
+    },
+    {
+      label: "미션",
+      segment: "admin/missions",
+      href: `/markets/${id}/admin/missions`,
+      icon: "ListTodo",
+    },
+    {
+      label: "물품",
+      segment: "admin/items",
+      href: `/markets/${id}/admin/items`,
+      icon: "ShoppingBag",
+    },
+    {
+      label: "유저",
+      segment: "admin/users",
+      href: `/markets/${id}/admin/users`,
+      icon: "Users",
+    },
+  ];
 
   return (
     <div className="min-h-svh bg-gray-50 dark:bg-gray-950">
       <main className="min-h-svh pb-28 pt-4">{props.children}</main>
       <FloatingTabBar tabs={tabs} />
     </div>
-  )
+  );
 }

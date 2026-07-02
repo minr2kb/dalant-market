@@ -1,13 +1,13 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const UserSchema = z.object({
   id: z.string(),
   name: z.string(),
   realName: z.string(),
   birthDate: z.string(),
-  gender: z.enum(['male', 'female']),
+  gender: z.enum(["male", "female"]),
   createdAt: z.string(),
-})
+});
 
 export const MarketSchema = z.object({
   id: z.string(),
@@ -17,21 +17,21 @@ export const MarketSchema = z.object({
   startsAt: z.string(),
   endsAt: z.string(),
   createdAt: z.string(),
-})
+});
 
 export const MissionSlotSchema = z.object({
   slot: z.number(),
   verifiedByName: z.string().nullable(),
   verifiedAt: z.string().nullable(),
   photoUrl: z.string().nullable(),
-})
+});
 
 export const MissionSchema = z.object({
   id: z.string(),
   marketId: z.string(),
   title: z.string(),
   description: z.string().optional(),
-  type: z.enum(['user_qr', 'upload', 'admin_qr', 'manual']),
+  type: z.enum(["user_qr", "upload", "admin_qr", "manual"]),
   isGroup: z.boolean(),
   reward: z.number(),
   limitCount: z.number().nullable(),
@@ -39,22 +39,22 @@ export const MissionSchema = z.object({
   activeUntil: z.string().nullable(),
   isActive: z.boolean(),
   slots: z.array(MissionSlotSchema).optional(),
-})
+});
 
 export const MarketParticipantSchema = z.object({
   id: z.string(),
   marketId: z.string(),
   user: UserSchema,
-  role: z.enum(['admin', 'user']),
+  role: z.enum(["admin", "user"]),
   balance: z.number(),
   displayName: z.string(),
-})
+});
 
 export const OrderItemSchema = z.object({
   name: z.string(),
   price: z.number(),
   qty: z.number(),
-})
+});
 
 export const OrderSchema = z.object({
   id: z.string(),
@@ -64,38 +64,31 @@ export const OrderSchema = z.object({
   items: z.array(OrderItemSchema),
   total: z.number(),
   purchasedAt: z.string(),
-})
+});
 
 export const PointLogSchema = z.object({
   id: z.string(),
   marketId: z.string(),
   userId: z.string(),
   amount: z.number(),
-  reasonType: z.enum(['mission', 'purchase', 'manual', 'transfer']),
+  reasonType: z.enum(["mission", "purchase", "manual", "transfer"]),
   missionTitle: z.string().optional(),
   verifiedByName: z.string().optional(),
   itemName: z.string().optional(),
   orderId: z.string().optional(),
   memo: z.string().optional(),
   createdAt: z.string(),
-})
+});
 
 export const MarketItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   price: z.number(),
-})
+});
 
 export const TransferResponseSchema = z.object({
   fromUserId: z.string(),
   toUserId: z.string(),
   amount: z.number(),
   newBalance: z.number(),
-})
-
-// Response wrappers
-export const listOf = <T extends z.ZodTypeAny>(schema: T) =>
-  z.object({ data: z.array(schema) })
-
-export const oneOf = <T extends z.ZodTypeAny>(schema: T) =>
-  z.object({ data: schema })
+});

@@ -1,29 +1,37 @@
-import Link from 'next/link'
-import { Calendar, Users } from 'lucide-react'
-import type { Market } from '@/types'
+import { Calendar, Users } from "lucide-react";
+import Link from "next/link";
+import type { Market } from "@/types";
 
 interface MarketCardProps {
-  market: Market
-  participantCount: number
-  isJoined: boolean
+  market: Market;
+  participantCount: number;
+  isJoined: boolean;
 }
 
-export function MarketCard({ market, participantCount, isJoined }: MarketCardProps) {
-  const startDate = new Date(market.startsAt).toLocaleDateString('ko-KR', {
-    month: 'long',
-    day: 'numeric',
-  })
-  const endDate = new Date(market.endsAt).toLocaleDateString('ko-KR', {
-    month: 'long',
-    day: 'numeric',
-  })
+export function MarketCard({
+  market,
+  participantCount,
+  isJoined,
+}: MarketCardProps) {
+  const startDate = new Date(market.startsAt).toLocaleDateString("ko-KR", {
+    month: "long",
+    day: "numeric",
+  });
+  const endDate = new Date(market.endsAt).toLocaleDateString("ko-KR", {
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 space-y-4">
       <div className="space-y-1">
-        <h3 className="font-bold text-gray-900 dark:text-white text-base">{market.title}</h3>
+        <h3 className="font-bold text-gray-900 dark:text-white text-base">
+          {market.title}
+        </h3>
         {market.description && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">{market.description}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {market.description}
+          </p>
         )}
       </div>
       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
@@ -40,12 +48,12 @@ export function MarketCard({ market, participantCount, isJoined }: MarketCardPro
         href={isJoined ? `/markets/${market.id}/home` : `/markets/${market.id}`}
         className={`flex w-full items-center justify-center rounded-full py-2.5 text-sm font-medium transition-colors ${
           isJoined
-            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-            : 'border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30'
+            ? "bg-emerald-500 text-white hover:bg-emerald-600"
+            : "border border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
         }`}
       >
-        {isJoined ? '입장하기' : '참여하기'}
+        {isJoined ? "입장하기" : "참여하기"}
       </Link>
     </div>
-  )
+  );
 }

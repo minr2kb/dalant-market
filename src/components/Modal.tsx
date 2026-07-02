@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { type ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 interface ModalProps {
-  children: ReactNode
-  onClose?: () => void
-  className?: string
+  children: ReactNode;
+  onClose?: () => void;
+  className?: string;
 }
 
-export function Modal({ children, onClose, className = '' }: ModalProps) {
+export function Modal({ children, onClose, className = "" }: ModalProps) {
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 animate-in fade-in duration-200 ${className}`}
@@ -21,5 +21,5 @@ export function Modal({ children, onClose, className = '' }: ModalProps) {
         {children}
       </div>
     </div>
-  )
+  );
 }

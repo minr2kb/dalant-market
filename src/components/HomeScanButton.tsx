@@ -1,18 +1,24 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { ScanLine, CheckCircle2, X } from 'lucide-react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { QRScanner } from '@/components/QRScanner'
-import { Modal } from '@/components/Modal'
-import { parseQR } from '@/lib/qr'
-import { participantsQuery, missionsQuery } from '@/lib/query/queries'
-import { openModal } from '@/lib/overlay'
-import type { MarketParticipant } from '@/types'
+import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
+import { CheckCircle2, ScanLine, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Modal } from "@/components/Modal";
+import { QRScanner } from "@/components/QRScanner";
+import { Button } from "@/components/ui/button";
+import { openModal } from "@/lib/overlay";
+import { parseQR } from "@/lib/qr";
+import { missionsQuery, participantsQuery } from "@/lib/query/queries";
+import type { MarketParticipant } from "@/types";
 
-type ScanTarget = { participant: MarketParticipant; missionId: string; token: string; missionTitle: string; reward: number }
+type ScanTarget = {
+  participant: MarketParticipant;
+  missionId: string;
+  token: string;
+  missionTitle: string;
+  reward: number;
+};
 
 function ConfirmModal({
   scanTarget,
@@ -21,23 +27,30 @@ function ConfirmModal({
   onClose,
   onSuccess,
 }: {
-  scanTarget: ScanTarget
-  marketId: string
-  pointLabel: string
-  onClose: () => void
-  onSuccess: () => void
+  scanTarget: ScanTarget;
+  marketId: string;
+  pointLabel: string;
+  onClose: () => void;
+  onSuccess: () => void;
 }) {
-  const [done, setDone] = useState(false)
-  const [verifyError, setVerifyError] = useState<string | null>(null)
-  const verifyMutation = useMutation(missionsQuery.verify({ invalidates: [missionsQuery.$key] }))
+  const [done, setDone] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const verifyMutation = useMutation(
+    missionsQuery.verify({ invalidates: [missionsQuery.$key] }),
+  );
 
   async function handleVerify() {
-    setVerifyError(null)
+    setVerifyError(null);
     try {
-      await verifyMutation.mutateAsync({ marketId, missionId: scanTarget.missionId, token: scanTarget.token })
-      setDone(true)
+      await verifyMutation.mutateAsync({
+        marketId,
+        missionId: scanTarget.missionId,
+        token: scanTarget.token,
+      });
+      setDone(true);
     } catch (e) {
-      setVerifyError((e as any)?.body?.error ?? '인증에 실패했어요')
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      setVerifyError((e as any)?.body?.error ?? "인증에 실패했어요");
     }
   }
 
@@ -47,20 +60,32 @@ function ConfirmModal({
         {!done ? (
           <>
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-gray-400 dark:text-gray-500">미션 인증 요청</p>
-              <button type="button" onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500">
+                미션 인증 요청
+              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              >
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div>
-              <p className="font-bold text-gray-900 dark:text-white">{scanTarget.missionTitle}</p>
-              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">+{scanTarget.reward} {pointLabel}</p>
+              <p className="font-bold text-gray-900 dark:text-white">
+                {scanTarget.missionTitle}
+              </p>
+              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">
+                +{scanTarget.reward} {pointLabel}
+              </p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-sm font-bold text-emerald-600 dark:text-emerald-400">
                 {scanTarget.participant.displayName[0]}
               </div>
-              <p className="font-medium text-gray-800 dark:text-gray-200">{scanTarget.participant.displayName}님의 QR</p>
+              <p className="font-medium text-gray-800 dark:text-gray-200">
+                {scanTarget.participant.displayName}님의 QR
+              </p>
             </div>
             {verifyError && (
               <p className="rounded-xl bg-red-50 px-4 py-2 text-center text-sm font-medium text-red-600">
@@ -68,7 +93,11 @@ function ConfirmModal({
               </p>
             )}
             <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose} className="h-12 flex-1 rounded-full text-sm font-semibold">
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="h-12 flex-1 rounded-full text-sm font-semibold"
+              >
                 다시 스캔
               </Button>
               <Button
@@ -84,8 +113,12 @@ function ConfirmModal({
           <div className="flex flex-col items-center gap-4 py-4 text-center">
             <CheckCircle2 className="h-16 w-16 text-emerald-400" />
             <div>
-              <p className="text-xl font-bold text-gray-900 dark:text-white">인증 완료!</p>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{scanTarget.participant.displayName}님 {pointLabel} 적립됨</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                인증 완료!
+              </p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                {scanTarget.participant.displayName}님 {pointLabel} 적립됨
+              </p>
             </div>
             <Button
               onClick={onSuccess}
@@ -97,38 +130,67 @@ function ConfirmModal({
         )}
       </div>
     </Modal>
-  )
+  );
 }
 
-export function HomeScanButton({ marketId, pointLabel }: { marketId: string; pointLabel: string }) {
-  const [open, setOpen] = useState(false)
+export function HomeScanButton({
+  marketId,
+  pointLabel,
+}: {
+  marketId: string;
+  pointLabel: string;
+}) {
+  const [open, setOpen] = useState(false);
 
-  const { data: participantsData } = useQuery(participantsQuery.list({ marketId }))
-  const { data: missionsData } = useQuery(missionsQuery.list({ marketId }))
-  const participants = participantsData?.data ?? []
-  const missions = missionsData?.data ?? []
+  const [{ data: participants = [] }, { data: missions = [] }] = useQueries({
+    queries: [
+      participantsQuery.list({ marketId }),
+      missionsQuery.list({ marketId }),
+    ],
+  });
 
   function handleScan(val: string) {
-    const qr = parseQR(val)
-    if (!qr || qr.type !== 'mission') {
-      if (qr?.type === 'pay') toast.error('결제 QR이에요', { description: '달란트 전송 기능을 이용해주세요' })
-      return
+    const qr = parseQR(val);
+    if (!qr || qr.type !== "mission") {
+      if (qr?.type === "pay")
+        toast.error("결제 QR이에요", {
+          description: "달란트 전송 기능을 이용해주세요",
+        });
+      return;
     }
-    const participant = participants.find((p) => p.user.id === qr.userId)
-    const mission = missions.find((m) => m.id === qr.missionId)
-    if (!participant) { toast.error('이 마켓의 참여자 QR이 아니에요'); return }
-    if (!mission) { toast.error('인식할 수 없는 미션이에요'); return }
-    if (mission.type !== 'user_qr') { toast.error('관리자 인증이 필요한 미션이에요'); return }
+    const participant = participants.find((p) => p.user.id === qr.userId);
+    const mission = missions.find((m) => m.id === qr.missionId);
+    if (!participant) {
+      toast.error("이 마켓의 참여자 QR이 아니에요");
+      return;
+    }
+    if (!mission) {
+      toast.error("인식할 수 없는 미션이에요");
+      return;
+    }
+    if (mission.type !== "user_qr") {
+      toast.error("관리자 인증이 필요한 미션이에요");
+      return;
+    }
 
     openModal((close) => (
       <ConfirmModal
-        scanTarget={{ participant, missionId: qr.missionId, token: qr.token, missionTitle: mission.title, reward: mission.reward }}
+        scanTarget={{
+          participant,
+          missionId: qr.missionId,
+          token: qr.token,
+          missionTitle: mission.title,
+          reward: mission.reward,
+        }}
         marketId={marketId}
         pointLabel={pointLabel}
         onClose={close}
-        onSuccess={() => { close(); setOpen(false) }}
+        onSuccess={() => {
+          close();
+          setOpen(false);
+        }}
       />
-    ))
+    ));
   }
 
   return (
@@ -149,5 +211,5 @@ export function HomeScanButton({ marketId, pointLabel }: { marketId: string; poi
         onClose={() => setOpen(false)}
       />
     </>
-  )
+  );
 }

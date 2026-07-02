@@ -1,53 +1,64 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation'
-import { useTheme } from 'next-themes'
-import { useSuspenseQueries } from '@tanstack/react-query'
-import { LogOut, Monitor, Moon, Sun } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { createClient } from '@/lib/supabase/client'
-import { marketsQuery, participantsQuery } from '@/lib/query/queries'
-import { cn } from '@/lib/utils'
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
+import { marketsQuery, participantsQuery } from "@/lib/query/queries";
+import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 
 const THEME_OPTIONS = [
-  { value: 'system', label: '시스템', icon: Monitor },
-  { value: 'light', label: '라이트', icon: Sun },
-  { value: 'dark', label: '다크', icon: Moon },
-] as const
+  { value: "system", label: "시스템", icon: Monitor },
+  { value: "light", label: "라이트", icon: Sun },
+  { value: "dark", label: "다크", icon: Moon },
+] as const;
 
-export function MyPageClient({ marketId, userId }: { marketId: string; userId: string }) {
-  const router = useRouter()
-  const { theme, setTheme } = useTheme()
+export function MyPageClient({
+  marketId,
+  userId,
+}: {
+  marketId: string;
+  userId: string;
+}) {
+  const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
-  const [{ data: marketData }, { data: participantData }] = useSuspenseQueries({
+  const [
+    { data: market },
+    {
+      data: { participant },
+    },
+  ] = useSuspenseQueries({
     queries: [
       marketsQuery.get({ marketId }),
       participantsQuery.get({ marketId, userId }),
     ],
-  })
+  });
 
-  const market = marketData.data
-  const { participant } = participantData.data
-  const user = participant.user
+  const user = participant.user;
 
-  const genderLabel = user.gender === 'male' ? '남성' : '여성'
+  const genderLabel = user.gender === "male" ? "남성" : "여성";
   const birthLabel = user.birthDate
-    ? new Date(user.birthDate).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+    ? new Date(user.birthDate).toLocaleDateString("ko-KR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       })
-    : '-'
+    : "-";
 
   async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
   }
 
   return (
     <div className="px-4 space-y-6 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-gray-900 dark:text-white">마이페이지</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+        마이페이지
+      </h1>
 
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
         <InfoRow label="활동명" value={participant.displayName} />
@@ -58,7 +69,11 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
 
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden divide-y divide-gray-50 dark:divide-gray-800">
         <InfoRow label="마켓" value={market.title} />
-        <InfoRow label={`보유 ${market.pointLabel}`} value={`${participant.balance} ${market.pointLabel}`} highlight />
+        <InfoRow
+          label={`보유 ${market.pointLabel}`}
+          value={`${participant.balance} ${market.pointLabel}`}
+          highlight
+        />
       </div>
 
       <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
@@ -70,10 +85,10 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
               type="button"
               onClick={() => setTheme(value)}
               className={cn(
-                'flex flex-1 flex-col items-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-colors',
+                "flex flex-1 flex-col items-center gap-1.5 rounded-xl py-3 text-xs font-medium transition-colors",
                 theme === value
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
+                  ? "bg-emerald-500 text-white"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700",
               )}
             >
               <Icon className="h-4 w-4" />
@@ -92,18 +107,30 @@ export function MyPageClient({ marketId, userId }: { marketId: string; userId: s
         로그아웃
       </Button>
 
-      <p className="text-center text-xs text-gray-300 dark:text-gray-600">© 2026 Kyungbae Min</p>
+      <p className="text-center text-xs text-gray-300 dark:text-gray-600">
+        © 2026 Kyungbae Min
+      </p>
     </div>
-  )
+  );
 }
 
-function InfoRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function InfoRow({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between px-4 py-3.5">
       <span className="text-sm text-gray-500 dark:text-gray-400">{label}</span>
-      <span className={`text-sm font-medium ${highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+      <span
+        className={`text-sm font-medium ${highlight ? "text-emerald-600 dark:text-emerald-400" : "text-gray-900 dark:text-white"}`}
+      >
         {value}
       </span>
     </div>
-  )
+  );
 }

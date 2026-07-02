@@ -1,7 +1,7 @@
-import imageCompression from 'browser-image-compression'
-import { createClient } from '@/lib/supabase/client'
+import imageCompression from "browser-image-compression";
+import { createClient } from "@/lib/supabase/client";
 
-const BUCKET = 'mission-photos'
+const BUCKET = "mission-photos";
 
 export async function uploadMissionPhoto(
   file: File,
@@ -13,17 +13,19 @@ export async function uploadMissionPhoto(
     maxSizeMB: 0.5,
     maxWidthOrHeight: 1200,
     useWebWorker: true,
-  })
+  });
 
-  const supabase = createClient()
-  const ext = file.type.includes('png') ? 'png' : 'jpg'
-  const path = `${marketId}/${missionId}/${userId}-${Date.now()}.${ext}`
+  const supabase = createClient();
+  const ext = file.type.includes("png") ? "png" : "jpg";
+  const path = `${marketId}/${missionId}/${userId}-${Date.now()}.${ext}`;
 
-  const { error } = await supabase.storage.from(BUCKET).upload(path, compressed, {
-    contentType: compressed.type || 'image/jpeg',
-    upsert: true,
-  })
-  if (error) throw error
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, compressed, {
+      contentType: compressed.type || "image/jpeg",
+      upsert: true,
+    });
+  if (error) throw error;
 
-  return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
+  return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }

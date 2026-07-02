@@ -1,45 +1,49 @@
-'use client'
+"use client";
 
-import { Suspense, useState, use } from 'react'
-import { useSuspenseQuery, useMutation } from '@tanstack/react-query'
-import Link from 'next/link'
-import { ChevronLeft, CheckSquare, Square, CheckCircle } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { participantsQuery } from '@/lib/query/queries'
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { CheckCircle, CheckSquare, ChevronLeft, Square } from "lucide-react";
+import Link from "next/link";
+import { Suspense, use, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { participantsQuery } from "@/lib/query/queries";
 
 function AdminPointsContent({ marketId }: { marketId: string }) {
-  const { data } = useSuspenseQuery(participantsQuery.list({ marketId }))
-  const participants = data.data
+  const { data: participants } = useSuspenseQuery(
+    participantsQuery.list({ marketId }),
+  );
 
   const adjustMutation = useMutation(
     participantsQuery.adjustPoints({ invalidates: [participantsQuery.$key] }),
-  )
+  );
 
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [amount, setAmount] = useState('')
-  const [memo, setMemo] = useState('')
-  const [done, setDone] = useState(false)
-  const [isApplying, setIsApplying] = useState(false)
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [amount, setAmount] = useState("");
+  const [memo, setMemo] = useState("");
+  const [done, setDone] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
-  const allSelected = participants.length > 0 && selected.size === participants.length
-  const n = Number(amount)
+  const allSelected =
+    participants.length > 0 && selected.size === participants.length;
+  const n = Number(amount);
 
   function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(participants.map((p) => p.user.id)))
+    setSelected(
+      allSelected ? new Set() : new Set(participants.map((p) => p.user.id)),
+    );
   }
 
   function toggle(uid: string) {
     setSelected((prev) => {
-      const next = new Set(prev)
-      next.has(uid) ? next.delete(uid) : next.add(uid)
-      return next
-    })
+      const next = new Set(prev);
+      next.has(uid) ? next.delete(uid) : next.add(uid);
+      return next;
+    });
   }
 
   async function apply(sign: 1 | -1) {
-    if (!n || selected.size === 0 || isApplying) return
-    setIsApplying(true)
+    if (!n || selected.size === 0 || isApplying) return;
+    setIsApplying(true);
     await Promise.all(
       Array.from(selected).map((uid) =>
         adjustMutation.mutateAsync({
@@ -49,24 +53,31 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
           memo: memo || undefined,
         }),
       ),
-    )
-    setIsApplying(false)
-    setDone(true)
-    setTimeout(() => setDone(false), 2000)
+    );
+    setIsApplying(false);
+    setDone(true);
+    setTimeout(() => setDone(false), 2000);
   }
 
   return (
     <div>
       <div className="flex items-center gap-3 px-4 pb-4 max-w-lg mx-auto">
-        <Link href={`/markets/${marketId}/admin/home`} className="text-gray-400 dark:text-gray-500">
+        <Link
+          href={`/markets/${marketId}/admin/home`}
+          className="text-gray-400 dark:text-gray-500"
+        >
           <ChevronLeft className="h-6 w-6" />
         </Link>
-        <h1 className="text-lg font-bold text-gray-900 dark:text-white">달란트 일괄 지급</h1>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+          달란트 일괄 지급
+        </h1>
       </div>
 
       <div className="px-4 max-w-lg mx-auto space-y-5">
         <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 space-y-3">
-          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">지급 설정</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            지급 설정
+          </p>
           <Input
             type="number"
             placeholder="달란트 수량"
@@ -86,7 +97,9 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
               disabled={!n || selected.size === 0 || isApplying}
               className="flex-1 h-11 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 gap-1.5 font-semibold disabled:opacity-40"
             >
-              {selected.size > 0 && n ? `${selected.size}명에게 +${n} 지급` : '지급'}
+              {selected.size > 0 && n
+                ? `${selected.size}명에게 +${n} 지급`
+                : "지급"}
             </Button>
             <Button
               onClick={() => apply(-1)}
@@ -94,7 +107,9 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
               variant="outline"
               className="flex-1 h-11 rounded-xl border-rose-200 text-rose-500 hover:bg-rose-50 gap-1.5 font-semibold disabled:opacity-40"
             >
-              {selected.size > 0 && n ? `${selected.size}명에게 -${n} 차감` : '차감'}
+              {selected.size > 0 && n
+                ? `${selected.size}명에게 -${n} 차감`
+                : "차감"}
             </Button>
           </div>
           {done && (
@@ -122,7 +137,7 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
 
         <div className="space-y-2">
           {participants.map((p) => {
-            const isSelected = selected.has(p.user.id)
+            const isSelected = selected.has(p.user.id);
             return (
               <button
                 key={p.user.id}
@@ -130,8 +145,8 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
                 onClick={() => toggle(p.user.id)}
                 className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${
                   isSelected
-                    ? 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-900'
-                    : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800'
+                    ? "border-emerald-200 bg-emerald-50 dark:bg-emerald-900/30 dark:border-emerald-900"
+                    : "border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
               >
                 {isSelected ? (
@@ -145,33 +160,47 @@ function AdminPointsContent({ marketId }: { marketId: string }) {
                       {p.user.realName[0]}
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{p.user.realName}</p>
-                      {p.role === 'admin' && (
-                        <span className="text-[10px] text-purple-500">관리자</span>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                        {p.user.realName}
+                      </p>
+                      {p.role === "admin" && (
+                        <span className="text-[10px] text-purple-500">
+                          관리자
+                        </span>
                       )}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold tabular-nums text-emerald-500">{p.balance}</p>
+                    <p className="text-sm font-bold tabular-nums text-emerald-500">
+                      {p.balance}
+                    </p>
                     {n > 0 && isSelected && (
-                      <p className="text-xs tabular-nums text-gray-400 dark:text-gray-500">→ {p.balance + n}</p>
+                      <p className="text-xs tabular-nums text-gray-400 dark:text-gray-500">
+                        → {p.balance + n}
+                      </p>
                     )}
                   </div>
                 </div>
               </button>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default function AdminPointsPage(props: PageProps<'/markets/[id]/admin/points'>) {
-  const { id: marketId } = use(props.params)
+export default function AdminPointsPage(
+  props: PageProps<"/markets/[id]/admin/points">,
+) {
+  const { id: marketId } = use(props.params);
   return (
-    <Suspense fallback={<p className="py-8 text-center text-sm text-gray-400">불러오는 중…</p>}>
+    <Suspense
+      fallback={
+        <p className="py-8 text-center text-sm text-gray-400">불러오는 중…</p>
+      }
+    >
       <AdminPointsContent marketId={marketId} />
     </Suspense>
-  )
+  );
 }

@@ -1,20 +1,19 @@
-import { cache } from 'react'
-import { isServer } from '@tanstack/react-query'
-import { routarQueryClient } from '@routar/react-query'
+import { routarQueryClient } from "@routar/react-query";
+import { isServer } from "@tanstack/react-query";
+import { cache } from "react";
 
-function makeQueryClient() {
+export function makeQueryClient() {
   return routarQueryClient({
     defaultOptions: { queries: { staleTime: 60_000 } },
-  })
+  });
 }
 
-let browserQC: ReturnType<typeof makeQueryClient> | undefined
+let browserQC: ReturnType<typeof makeQueryClient> | undefined;
 
-// On the server, use React cache() so the same QueryClient is reused
-// across the entire request (server components + HydrationBoundary).
-const getServerQueryClient = cache(makeQueryClient)
+const getServerQueryClient = cache(makeQueryClient);
 
 export function getQueryClient() {
-  if (isServer) return getServerQueryClient()
-  return (browserQC ??= makeQueryClient())
+  if (isServer) return getServerQueryClient();
+  // biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+  return (browserQC ??= makeQueryClient());
 }

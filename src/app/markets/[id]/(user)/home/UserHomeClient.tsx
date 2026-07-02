@@ -1,36 +1,50 @@
-'use client'
+"use client";
 
-import { useMemo } from 'react'
-import Link from 'next/link'
-import { ArrowRight, ArrowRightLeft, TrendingUp, TrendingDown } from 'lucide-react'
-import { useSuspenseQueries } from '@tanstack/react-query'
-import { PayQRButton } from '@/components/PayQRButton'
-import { NumberTicker } from '@/components/NumberTicker'
-import { TransferModal } from '@/components/TransferModal'
-import { AdminAccessButton } from '@/components/AdminAccessButton'
-import { HomeScanButton } from '@/components/HomeScanButton'
-import { Button } from '@/components/ui/button'
-import { marketsQuery, participantsQuery } from '@/lib/query/queries'
-import { openModal } from '@/lib/overlay'
+import { useSuspenseQueries } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  ArrowRightLeft,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import Link from "next/link";
+import { useMemo } from "react";
+import { AdminAccessButton } from "@/components/AdminAccessButton";
+import { HomeScanButton } from "@/components/HomeScanButton";
+import { NumberTicker } from "@/components/NumberTicker";
+import { PayQRButton } from "@/components/PayQRButton";
+import { TransferModal } from "@/components/TransferModal";
+import { Button } from "@/components/ui/button";
+import { openModal } from "@/lib/overlay";
+import { marketsQuery, participantsQuery } from "@/lib/query/queries";
 
-export function UserHomeClient({ marketId, userId }: { marketId: string; userId: string }) {
-  const [{ data: marketData }, { data: participantData }] = useSuspenseQueries({
+export function UserHomeClient({
+  marketId,
+  userId,
+}: {
+  marketId: string;
+  userId: string;
+}) {
+  const [{ data: market }, { data: participants }] = useSuspenseQueries({
     queries: [
       marketsQuery.get({ marketId }),
       participantsQuery.get({ marketId, userId }),
     ],
-  })
+  });
 
-  const market = marketData.data
-  const { participant: user, pointLogs } = participantData.data
-  const recentLogs = useMemo(() => pointLogs.slice(0, 3), [pointLogs])
+  const { participant: user, pointLogs } = participants;
+  const recentLogs = useMemo(() => pointLogs.slice(0, 3), [pointLogs]);
 
   return (
     <div className="px-4 space-y-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-gray-400 dark:text-gray-500">{market.title}</p>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{user.displayName}</h1>
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            {market.title}
+          </p>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            {user.displayName}
+          </h1>
         </div>
         <AdminAccessButton marketId={marketId} compact />
       </div>
@@ -38,8 +52,13 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
       <div className="rounded-3xl bg-emerald-500 p-6 text-white">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-sm font-medium opacity-80">보유 {market.pointLabel}</p>
-            <NumberTicker value={user.balance} className="text-4xl font-bold tabular-nums" />
+            <p className="text-sm font-medium opacity-80">
+              보유 {market.pointLabel}
+            </p>
+            <NumberTicker
+              value={user.balance}
+              className="text-4xl font-bold tabular-nums"
+            />
             <p className="text-sm opacity-70">{market.pointLabel}</p>
           </div>
           <PayQRButton
@@ -55,9 +74,15 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         <Button
           variant="ghost"
           className="h-12 gap-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-800 rounded-2xl font-semibold"
-          onClick={() => openModal((close) => (
-            <TransferModal marketId={marketId} userId={userId} onClose={close} />
-          ))}
+          onClick={() =>
+            openModal((close) => (
+              <TransferModal
+                marketId={marketId}
+                userId={userId}
+                onClose={close}
+              />
+            ))
+          }
         >
           <ArrowRightLeft className="h-4 w-4" />
           {market.pointLabel} 전송
@@ -67,7 +92,9 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">최근 내역</h2>
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            최근 내역
+          </h2>
           <Link
             href={`/markets/${marketId}/history`}
             className="flex items-center gap-1 text-xs text-emerald-500"
@@ -79,14 +106,14 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
         <div className="space-y-2">
           {recentLogs.map((log, i) => {
             const label =
-              log.reasonType === 'mission'
+              log.reasonType === "mission"
                 ? log.missionTitle
-                : log.reasonType === 'purchase'
+                : log.reasonType === "purchase"
                   ? log.itemName
-                  : log.reasonType === 'transfer'
+                  : log.reasonType === "transfer"
                     ? (log.memo ?? `${market.pointLabel} 전송`)
-                    : (log.memo ?? '수동 지급')
-            const isPositive = log.amount > 0
+                    : (log.memo ?? "수동 지급");
+            const isPositive = log.amount > 0;
 
             return (
               <div
@@ -96,7 +123,7 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full ${isPositive ? 'bg-emerald-50 dark:bg-emerald-900/30' : 'bg-rose-50 dark:bg-rose-900/30'}`}
+                    className={`flex h-8 w-8 items-center justify-center rounded-full ${isPositive ? "bg-emerald-50 dark:bg-emerald-900/30" : "bg-rose-50 dark:bg-rose-900/30"}`}
                   >
                     {isPositive ? (
                       <TrendingUp className="h-4 w-4 text-emerald-500" />
@@ -105,29 +132,33 @@ export function UserHomeClient({ marketId, userId }: { marketId: string; userId:
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{label}</p>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      {label}
+                    </p>
                     <p className="text-xs text-gray-400 dark:text-gray-500">
-                      {new Date(log.createdAt).toLocaleDateString('ko-KR', {
-                        month: 'short',
-                        day: 'numeric',
+                      {new Date(log.createdAt).toLocaleDateString("ko-KR", {
+                        month: "short",
+                        day: "numeric",
                       })}
                     </p>
                   </div>
                 </div>
                 <span
-                  className={`text-sm font-bold tabular-nums ${isPositive ? 'text-emerald-500' : 'text-rose-500'}`}
+                  className={`text-sm font-bold tabular-nums ${isPositive ? "text-emerald-500" : "text-rose-500"}`}
                 >
-                  {isPositive ? '+' : ''}
+                  {isPositive ? "+" : ""}
                   {log.amount}
                 </span>
               </div>
-            )
+            );
           })}
           {recentLogs.length === 0 && (
-            <p className="py-4 text-center text-sm text-gray-400">아직 내역이 없어요</p>
+            <p className="py-4 text-center text-sm text-gray-400">
+              아직 내역이 없어요
+            </p>
           )}
         </div>
       </div>
     </div>
-  )
+  );
 }

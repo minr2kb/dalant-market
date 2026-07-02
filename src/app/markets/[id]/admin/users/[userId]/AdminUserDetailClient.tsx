@@ -1,35 +1,46 @@
-'use client'
+"use client";
 
-import { useSuspenseQueries } from '@tanstack/react-query'
-import { participantsQuery, missionsQuery } from '@/lib/query/queries'
+import { useSuspenseQueries } from "@tanstack/react-query";
+import { missionsQuery, participantsQuery } from "@/lib/query/queries";
 
 export function AdminUserDetailClient({
   marketId,
   userId,
 }: {
-  marketId: string
-  userId: string
+  marketId: string;
+  userId: string;
 }) {
-  const [{ data: participantData }, { data: missionsData }] = useSuspenseQueries({
+  const [
+    {
+      data: { participant },
+    },
+    { data: missions },
+  ] = useSuspenseQueries({
     queries: [
       participantsQuery.get({ marketId, userId }),
       missionsQuery.list({ marketId, userId }),
     ],
-  })
+  });
 
-  const { participant } = participantData.data
-  const missions = missionsData.data
-  const completedMissions = missions.filter((m) => m.slots?.some((s) => s.verifiedAt !== null))
+  const completedMissions = missions.filter((m) =>
+    m.slots?.some((s) => s.verifiedAt !== null),
+  );
 
   return (
     <div className="px-4 max-w-lg mx-auto space-y-6">
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 p-4 space-y-1">
-          <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">달란트 잔액</p>
-          <p className="text-2xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">{participant.balance}</p>
+          <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            달란트 잔액
+          </p>
+          <p className="text-2xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
+            {participant.balance}
+          </p>
         </div>
         <div className="rounded-2xl bg-gray-50 dark:bg-gray-800 p-4 space-y-1">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">미션 완료</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            미션 완료
+          </p>
           <p className="text-2xl font-bold tabular-nums text-gray-700 dark:text-gray-300">
             {completedMissions.length}
           </p>
@@ -37,24 +48,29 @@ export function AdminUserDetailClient({
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">미션 현황</h2>
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          미션 현황
+        </h2>
         <div className="space-y-2">
           {missions.map((m) => {
-            const done = m.slots?.filter((s) => s.verifiedAt !== null).length ?? 0
+            const done =
+              m.slots?.filter((s) => s.verifiedAt !== null).length ?? 0;
             return (
               <div
                 key={m.id}
                 className="flex items-center justify-between rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3"
               >
-                <span className="text-sm text-gray-700 dark:text-gray-300">{m.title}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  {m.title}
+                </span>
                 <span className="text-xs font-medium text-gray-400 dark:text-gray-500">
-                  {done}/{m.limitCount ?? '∞'}회
+                  {done}/{m.limitCount ?? "∞"}회
                 </span>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,21 +1,23 @@
-'use client'
+"use client";
 
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
-import { Search } from 'lucide-react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { orderBy } from 'es-toolkit'
-import { Input } from '@/components/ui/input'
-import { participantsQuery } from '@/lib/query/queries'
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { orderBy } from "es-toolkit";
+import { Search } from "lucide-react";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { participantsQuery } from "@/lib/query/queries";
 
 export function AdminUsersClient({ marketId }: { marketId: string }) {
-  const { data } = useSuspenseQuery(participantsQuery.list({ marketId }))
-  const [search, setSearch] = useState('')
+  const { data: participants } = useSuspenseQuery(
+    participantsQuery.list({ marketId }),
+  );
+  const [search, setSearch] = useState("");
 
   const sorted = useMemo(
-    () => orderBy(data.data, [(p) => p.balance], ['desc']),
-    [data.data],
-  )
+    () => orderBy(participants, [(p) => p.balance], ["desc"]),
+    [participants],
+  );
 
   const filtered = useMemo(
     () =>
@@ -25,7 +27,7 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
           )
         : sorted,
     [sorted, search],
-  )
+  );
 
   return (
     <>
@@ -42,7 +44,7 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
 
       <div className="space-y-2">
         {filtered.map((p) => {
-          const hasAlias = p.displayName !== p.user.realName
+          const hasAlias = p.displayName !== p.user.realName;
           return (
             <Link
               key={p.id}
@@ -55,11 +57,15 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">{p.user.realName}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {p.user.realName}
+                    </p>
                     {hasAlias && (
-                      <span className="text-xs text-gray-400 dark:text-gray-500">({p.displayName})</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        ({p.displayName})
+                      </span>
                     )}
-                    {p.role === 'admin' && (
+                    {p.role === "admin" && (
                       <span className="rounded-full bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 text-[10px] font-medium text-purple-600">
                         관리자
                       </span>
@@ -67,14 +73,18 @@ export function AdminUsersClient({ marketId }: { marketId: string }) {
                   </div>
                 </div>
               </div>
-              <span className="text-base font-bold tabular-nums text-emerald-500">{p.balance}</span>
+              <span className="text-base font-bold tabular-nums text-emerald-500">
+                {p.balance}
+              </span>
             </Link>
-          )
+          );
         })}
         {filtered.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">검색 결과가 없어요</p>
+          <p className="py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+            검색 결과가 없어요
+          </p>
         )}
       </div>
     </>
-  )
+  );
 }

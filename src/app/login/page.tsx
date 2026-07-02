@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import localFont from 'next/font/local'
-import { createClient } from '@/lib/supabase/client'
+import localFont from "next/font/local";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/client";
 
 const gmarketSans = localFont({
   src: [
-    { path: '../../fonts/GmarketSansMedium.woff', weight: '500' },
-    { path: '../../fonts/GmarketSansBold.woff', weight: '700' },
+    { path: "../../fonts/GmarketSansMedium.woff", weight: "500" },
+    { path: "../../fonts/GmarketSansBold.woff", weight: "700" },
   ],
-})
+});
 
 export default function LoginPage() {
   async function handleKakaoLogin() {
-    const supabase = createClient()
+    const supabase = createClient();
     await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
+      provider: "kakao",
       options: {
         redirectTo: `${location.origin}/auth/callback`,
       },
-    })
+    });
   }
 
   return (
@@ -35,7 +35,9 @@ export default function LoginPage() {
           />
         </div>
         <div className="text-center animate-in fade-in-0 slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
-          <h1 className={`${gmarketSans.className} text-3xl font-bold text-white`}>
+          <h1
+            className={`${gmarketSans.className} text-3xl font-bold text-white`}
+          >
             Dalant Pay
           </h1>
           <p className="mt-2 text-sm text-white/70">
@@ -50,7 +52,13 @@ export default function LoginPage() {
           onClick={handleKakaoLogin}
           className="flex h-14 w-full max-w-sm mx-auto items-center justify-center gap-2.5 rounded-full bg-[#FEE500] font-semibold text-[#3C1E1E] transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer"
         >
-          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               fillRule="evenodd"
               clipRule="evenodd"
@@ -65,5 +73,5 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

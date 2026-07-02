@@ -1,105 +1,114 @@
-import { defineRouter, endpoint } from '@routar/core'
-import { z } from 'zod'
+import { defineRouter, endpoint } from "@routar/core";
+import { z } from "zod";
 import {
-  MarketSchema,
-  MarketParticipantSchema,
-  MissionSchema,
-  PointLogSchema,
-  OrderSchema,
-  OrderItemSchema,
   MarketItemSchema,
+  MarketParticipantSchema,
+  MarketSchema,
+  MissionSchema,
+  OrderItemSchema,
+  OrderSchema,
+  PointLogSchema,
   TransferResponseSchema,
-  listOf,
-  oneOf,
-} from './schemas'
+} from "./schemas";
 
-const marketId = z.object({ marketId: z.string() })
-const marketAndUser = z.object({ marketId: z.string(), userId: z.string() })
-const marketAndMission = z.object({ marketId: z.string(), missionId: z.string() })
-const marketAndItem = z.object({ marketId: z.string(), itemId: z.string() })
+const marketId = z.object({ marketId: z.string() });
+const marketAndUser = z.object({ marketId: z.string(), userId: z.string() });
+const marketAndMission = z.object({
+  marketId: z.string(),
+  missionId: z.string(),
+});
+const marketAndItem = z.object({ marketId: z.string(), itemId: z.string() });
 
-export const marketsRouter = defineRouter('/markets', {
+export const marketsRouter = defineRouter("/markets", {
   list: endpoint({
-    method: 'GET',
-    path: '/',
-    response: listOf(MarketSchema),
+    method: "GET",
+    path: "/",
+    response: z.array(MarketSchema),
   }),
   get: endpoint({
-    method: 'GET',
-    path: '/:marketId',
+    method: "GET",
+    path: "/:marketId",
     request: { path: marketId },
-    response: oneOf(MarketSchema),
+    response: MarketSchema,
   }),
-})
+});
 
-export const participantsRouter = defineRouter('/markets', {
+export const participantsRouter = defineRouter("/markets", {
   list: endpoint({
-    method: 'GET',
-    path: '/:marketId/participants',
+    method: "GET",
+    path: "/:marketId/participants",
     request: { path: marketId },
-    response: listOf(MarketParticipantSchema),
+    response: z.array(MarketParticipantSchema),
   }),
   get: endpoint({
-    method: 'GET',
-    path: '/:marketId/participants/:userId',
+    method: "GET",
+    path: "/:marketId/participants/:userId",
     request: { path: marketAndUser },
-    response: oneOf(
-      z.object({
-        participant: MarketParticipantSchema,
-        pointLogs: z.array(PointLogSchema),
-        orders: z.array(OrderSchema),
-      })
-    ),
+    response: z.object({
+      participant: MarketParticipantSchema,
+      pointLogs: z.array(PointLogSchema),
+      orders: z.array(OrderSchema),
+    }),
   }),
   adjustPoints: endpoint({
-    method: 'PATCH',
-    path: '/:marketId/participants/:userId/points',
+    method: "PATCH",
+    path: "/:marketId/participants/:userId/points",
     request: {
       path: marketAndUser,
       body: z.object({ amount: z.number(), memo: z.string().optional() }),
     },
-    response: oneOf(
-      z.object({
-        userId: z.string(),
-        amount: z.number(),
-        newBalance: z.number(),
-        memo: z.string().nullable(),
-      })
-    ),
+    response: z.object({
+      userId: z.string(),
+      amount: z.number(),
+      newBalance: z.number(),
+      memo: z.string().nullable(),
+    }),
   }),
-})
+  join: endpoint({
+    method: "POST",
+    path: "/:marketId/participants",
+    request: { path: marketId },
+    response: z.object({
+      isNew: z.boolean(),
+      hasConflict: z.boolean(),
+      displayName: z.string(),
+    }),
+  }),
+});
 
-export const missionsRouter = defineRouter('/markets', {
+export const missionsRouter = defineRouter("/markets", {
   list: endpoint({
-    method: 'GET',
-    path: '/:marketId/missions',
+    method: "GET",
+    path: "/:marketId/missions",
     request: {
       path: marketId,
-      query: z.object({
-        status: z.enum(['active', 'upcoming', 'past']).optional(),
-        userId: z.string().optional(),
-      }).optional(),
+      query: z
+        .object({
+          status: z.enum(["active", "upcoming", "past"]).optional(),
+          userId: z.string().optional(),
+        })
+        .optional(),
     },
-    response: listOf(MissionSchema),
+    response: z.array(MissionSchema),
   }),
   get: endpoint({
-    method: 'GET',
-    path: '/:marketId/missions/:missionId',
+    method: "GET",
+    path: "/:marketId/missions/:missionId",
     request: {
       path: marketAndMission,
       query: z.object({ userId: z.string().optional() }).optional(),
     },
-    response: oneOf(MissionSchema),
+    response: MissionSchema,
   }),
   create: endpoint({
-    method: 'POST',
-    path: '/:marketId/missions',
+    method: "POST",
+    path: "/:marketId/missions",
     request: {
       path: marketId,
       body: z.object({
         title: z.string(),
         description: z.string().optional(),
-        type: z.enum(['user_qr', 'upload', 'admin_qr', 'manual']),
+        type: z.enum(["user_qr", "upload", "admin_qr", "manual"]),
         isGroup: z.boolean(),
         reward: z.number(),
         limitCount: z.number().nullable(),
@@ -107,17 +116,17 @@ export const missionsRouter = defineRouter('/markets', {
         activeUntil: z.string().nullable(),
       }),
     },
-    response: oneOf(MissionSchema),
+    response: MissionSchema,
   }),
   update: endpoint({
-    method: 'PATCH',
-    path: '/:marketId/missions/:missionId',
+    method: "PATCH",
+    path: "/:marketId/missions/:missionId",
     request: {
       path: marketAndMission,
       body: z.object({
         title: z.string().optional(),
         description: z.string().optional(),
-        type: z.enum(['user_qr', 'upload', 'admin_qr', 'manual']).optional(),
+        type: z.enum(["user_qr", "upload", "admin_qr", "manual"]).optional(),
         isGroup: z.boolean().optional(),
         reward: z.number().optional(),
         limitCount: z.number().nullable().optional(),
@@ -126,17 +135,17 @@ export const missionsRouter = defineRouter('/markets', {
         isActive: z.boolean().optional(),
       }),
     },
-    response: oneOf(MissionSchema),
+    response: MissionSchema,
   }),
   delete: endpoint({
-    method: 'DELETE',
-    path: '/:marketId/missions/:missionId',
+    method: "DELETE",
+    path: "/:marketId/missions/:missionId",
     request: { path: marketAndMission },
-    response: oneOf(z.object({ id: z.string() })),
+    response: z.object({ id: z.string() }),
   }),
   verify: endpoint({
-    method: 'POST',
-    path: '/:marketId/missions/:missionId/verify',
+    method: "POST",
+    path: "/:marketId/missions/:missionId/verify",
     request: {
       path: marketAndMission,
       body: z.object({
@@ -146,44 +155,42 @@ export const missionsRouter = defineRouter('/markets', {
         photoUrls: z.array(z.string()).optional(),
       }),
     },
-    response: oneOf(
-      z.object({
-        missionId: z.string(),
-        userId: z.string(),
-        verifiedBy: z.string(),
-        slot: z.number(),
-        reward: z.number(),
-        verifiedAt: z.string(),
-      })
-    ),
+    response: z.object({
+      missionId: z.string(),
+      userId: z.string(),
+      verifiedBy: z.string(),
+      slot: z.number(),
+      reward: z.number(),
+      verifiedAt: z.string(),
+    }),
   }),
-})
+});
 
-export const pointLogsRouter = defineRouter('/markets', {
+export const pointLogsRouter = defineRouter("/markets", {
   list: endpoint({
-    method: 'GET',
-    path: '/:marketId/point-logs',
+    method: "GET",
+    path: "/:marketId/point-logs",
     request: {
       path: marketId,
       query: z.object({ userId: z.string().optional() }).optional(),
     },
-    response: listOf(PointLogSchema),
+    response: z.array(PointLogSchema),
   }),
-})
+});
 
-export const ordersRouter = defineRouter('/markets', {
+export const ordersRouter = defineRouter("/markets", {
   list: endpoint({
-    method: 'GET',
-    path: '/:marketId/orders',
+    method: "GET",
+    path: "/:marketId/orders",
     request: {
       path: marketId,
       query: z.object({ userId: z.string().optional() }).optional(),
     },
-    response: listOf(OrderSchema),
+    response: z.array(OrderSchema),
   }),
   create: endpoint({
-    method: 'POST',
-    path: '/:marketId/orders',
+    method: "POST",
+    path: "/:marketId/orders",
     request: {
       path: marketId,
       body: z.object({
@@ -191,61 +198,59 @@ export const ordersRouter = defineRouter('/markets', {
         items: z.array(OrderItemSchema),
       }),
     },
-    response: oneOf(
-      z.object({
-        id: z.string(),
-        marketId: z.string(),
-        userId: z.string(),
-        verifiedBy: z.string(),
-        items: z.array(OrderItemSchema),
-        total: z.number(),
-        newBalance: z.number(),
-        purchasedAt: z.string(),
-      })
-    ),
+    response: z.object({
+      id: z.string(),
+      marketId: z.string(),
+      userId: z.string(),
+      verifiedBy: z.string(),
+      items: z.array(OrderItemSchema),
+      total: z.number(),
+      newBalance: z.number(),
+      purchasedAt: z.string(),
+    }),
   }),
-})
+});
 
-export const itemsRouter = defineRouter('/markets', {
+export const itemsRouter = defineRouter("/markets", {
   list: endpoint({
-    method: 'GET',
-    path: '/:marketId/items',
+    method: "GET",
+    path: "/:marketId/items",
     request: { path: marketId },
-    response: listOf(MarketItemSchema),
+    response: z.array(MarketItemSchema),
   }),
   create: endpoint({
-    method: 'POST',
-    path: '/:marketId/items',
+    method: "POST",
+    path: "/:marketId/items",
     request: {
       path: marketId,
       body: z.object({ name: z.string(), price: z.number() }),
     },
-    response: oneOf(MarketItemSchema),
+    response: MarketItemSchema,
   }),
   delete: endpoint({
-    method: 'DELETE',
-    path: '/:marketId/items/:itemId',
+    method: "DELETE",
+    path: "/:marketId/items/:itemId",
     request: { path: marketAndItem },
-    response: oneOf(z.object({ id: z.string() })),
+    response: z.object({ id: z.string() }),
   }),
-})
+});
 
-export const adminRouter = defineRouter('/markets', {
+export const adminRouter = defineRouter("/markets", {
   auth: endpoint({
-    method: 'POST',
-    path: '/:marketId/admin/auth',
+    method: "POST",
+    path: "/:marketId/admin/auth",
     request: {
       path: marketId,
       body: z.object({ code: z.string() }),
     },
-    response: oneOf(z.object({ granted: z.boolean() })),
+    response: z.object({ granted: z.boolean() }),
   }),
-})
+});
 
-export const transferRouter = defineRouter('/markets', {
+export const transferRouter = defineRouter("/markets", {
   transfer: endpoint({
-    method: 'POST',
-    path: '/:marketId/transfer',
+    method: "POST",
+    path: "/:marketId/transfer",
     request: {
       path: marketId,
       body: z.object({
@@ -253,6 +258,6 @@ export const transferRouter = defineRouter('/markets', {
         amount: z.number().int().min(1),
       }),
     },
-    response: oneOf(TransferResponseSchema),
+    response: TransferResponseSchema,
   }),
-})
+});
